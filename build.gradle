@@ -30,11 +30,7 @@ allprojects {
     testCompile 'org.mockito:mockito-all:[1.8.5,)'
     // From Maven, it's GroupId:ArtifactId:Version 
     testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-    testCompile 'com.typesafe.akka:akka-testkit_2.10:2.2.0-RC2'
 
-    // testCompile ''
-    compile 'commons-codec:commons-codec:1.6'
-    // compile 'io.netty:netty:3.5.7.Final'
     compile 'log4j:log4j:1.2.17'
 
     // logging
@@ -47,18 +43,7 @@ allprojects {
     testRuntime 'ch.qos.logback:logback-core:1.0.+'
     testRuntime 'ch.qos.logback:logback-classic:1.0.+'
 
-    compile 'org.codehaus.groovy:groovy-all:2.1.0'
-    compile 'org.clojure:clojure:1.5.1'
-
-    // for Akka
-    // This works: compile 'com.typesafe.akka:akka-actor_2.10:2.1.4'
-    compile 'com.typesafe.akka:akka-actor_2.10:2.2.0-RC2'
-    compile 'com.typesafe.akka:akka-transactor_2.10:2.2.0'
-    // compile 'com.typesafe.akka:akka-actor:2.10.1'
-    // compile 'org.scala-lang:scala-library:2.10.1'
-
-    // ScalaSTM, since that is what Akka uses for STM
-    compile 'org.scala-stm:scala-stm_2.10:0.7'
+    compile 'org.codehaus.groovy:groovy-all:2.3.0'
 
     // Multiverse
     compile 'org.multiverse:multiverse-core:0.7.0'
@@ -93,7 +78,7 @@ test {
   outputs.upToDateWhen { false }
 }
 
-task runJava(type: JavaExec) {
+task runJava( type: JavaExec ) {
      println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )
      dependsOn classes
      description = 'Run gradle.sample.SampleApp'
@@ -120,13 +105,12 @@ task runJava(type: JavaExec) {
      } 
 }
 
-task runGroovy(type: JavaExec) {
+task runGroovy( type: JavaExec ) {
      println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )
      dependsOn classes
      description = 'Run gradle.sample.SampleApp'
      // main class to execute.
-     // main = System.properties['mainClass']
-     if ( rootProject.hasProperty("mainClass") ) {     
+     if ( rootProject.hasProperty( "mainClass" ) ) {     
      	main = mainClass
      } else {
        main = 'org.lookup'
@@ -136,8 +120,6 @@ task runGroovy(type: JavaExec) {
      // Extra options can be set.
      systemProperty 'sysProp', 'notUsed'
      jvmArgs '-client'
-     // We can pass arguments to the main() method
-     // of gradle.sample.SampleApp.
      if ( rootProject.hasProperty( "mainArgs" ) ) {     
      	args = mainArgs.tokenize() // args wants a List, so split by spaces if need be
      } 
@@ -152,28 +134,13 @@ task showProperties {
 }
 
 // you can type "gradle console" and get a console with all your classes
-task(console, dependsOn: 'classes', type: JavaExec) {
+task( console, dependsOn: 'classes', type: JavaExec ) {
   main = 'groovy.ui.Console'
   classpath = sourceSets.main.runtimeClasspath
 }
 
 
 checkstyle {
-  // configProperties = [translation.severity: 'warn'] // [tabWidth: 10, translation.severity: 'warn']
-  // Map<String, Object> configProperties = new HashMap<String, Object>()
-// configProperties.put('translation.severity', 'warn')
-// apply(configProperties)
-   // configProperties {
-     // translation.serverity = 'warning'
-   // }
-
-   // def configProperties = [ "translation.severity":"warning"] // , likes:"cheese", id:1234]
-   // this works:
-   // configProperties = [ "translation.severity":"warning"] // , likes:"cheese", id:1234]
-   // these two together work:
-   // configProperties = new HashMap<String, Object>()
-   // configProperties.put('translation.severity', 'warning')
-   // this also works
    configProperties.put('translation.severity', 'warning')
    println("configProperties is a " + configProperties.getClass().getName())
 }
