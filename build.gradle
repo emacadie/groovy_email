@@ -2,26 +2,11 @@ apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'groovy'
 // do not run this every single time
-apply plugin: 'checkstyle'
-
-
+// apply plugin: 'checkstyle'
 
 repositories {
   mavenCentral()
-
-/*
-  maven {
-    // Name is optional. If not set url property is used	
-    name = 'Main Maven repository'
-    url = 'http://repo.typesafe.com/typesafe/releases'
-  }
-*/
-/*
-  maven {
-      name "codehaus" 
-      url =  "http://dist.codehaus.org/"
-  }
-*/
+  jcentral()
 }
 
 allprojects {
@@ -46,16 +31,13 @@ allprojects {
     compile 'org.codehaus.groovy:groovy-all:2.3.0'
 
     // Multiverse
-    compile 'org.multiverse:multiverse-core:0.7.0'
-    
-    // Guava
-    compile 'com.google.guava:guava:14.0.1'
+    // compile 'org.multiverse:multiverse-core:0.7.0'
 
     // GPars
-    compile 'org.codehaus.gpars:gpars:1.0.0'
+    compile 'org.codehaus.gpars:gpars:1.2.0'
   }
 
-  tasks.withType(Compile) { Compile compile ->
+  tasks.withType( GroovyCompile ) { GroovyCompile compile ->
     compile.options.debug = true
     compile.options.compilerArgs = [
       '-Xlint:deprecation',
