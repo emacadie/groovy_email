@@ -1,0 +1,20 @@
+processing new connection...
+name of current thread: Thread-7, and it is number 20
+input is a java.net.SocketInputStream
+output is a java.net.SocketOutputStream
+reader is a java.io.BufferedReader
+server received: echo testing ...
+can reader still be read? false
+processing/thread complete.
+
+processing new connection...
+name of current thread: Thread-8, and it is number 21
+input is a java.net.SocketInputStream
+output is a java.net.SocketOutputStream
+reader is a java.io.BufferedReader
+server received: Love those Taiwan lay-deez ...
+can reader still be read? false
+processing/thread complete.
+
+So it does do a new thread
+

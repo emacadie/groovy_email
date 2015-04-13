@@ -1,0 +1,17 @@
+This project will have code for concurrency in Java and a few other JVM languages.   
+
+To run a single test, do this:  
+gradle -Dtest.single=HelloSpock test -info   
+gradle -Dtest.single=DSRecordSpockTest test -info  
+   
+
+To run with Groovy:   
+gradle runGroovy -PmainClass="org.lookup"    
+
+To run with Java:       
+gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=6789  
+gradle runJava -PmainClass=info.shelfunit.socket.JTCPClient -PmainArgs=6789  
+gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=25
+
+
+

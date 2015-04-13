@@ -15,5 +15,10 @@ http://tools.ietf.org/html/rfc6186: Use of SRV Records for Locating Email Submis
 
 http://tools.ietf.org/html/rfc5034: The Post Office Protocol (POP3) (Updates 2449)
 
+Look at using http://email.jcabi.com/
+http://www.yegor256.com/2014/11/07/how-immutability-helps.html
 
+Another project:
+https://code.google.com/p/subethasmtp/wiki/SimpleExample
+https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
 
