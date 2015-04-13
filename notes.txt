@@ -19,6 +19,11 @@ Look at using http://email.jcabi.com/
 http://www.yegor256.com/2014/11/07/how-immutability-helps.html
 
 Another project:
-https://code.google.com/p/subethasmtp/wiki/SimpleExample
+https://github.com/voodoodyne/subethasmtp
 https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
+
+java.net.SocketInputStream:
+http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/java/net/SocketInputStream.java?av=f
+http://www.docjar.com/docs/api/java/net/SocketInputStream.html
+
 

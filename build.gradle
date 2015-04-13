@@ -28,7 +28,7 @@ allprojects {
     testRuntime 'ch.qos.logback:logback-core:1.0.+'
     testRuntime 'ch.qos.logback:logback-classic:1.0.+'
 
-    compile 'org.codehaus.groovy:groovy-all:2.3.0'
+    compile 'org.codehaus.groovy:groovy-all:2.4.0'
 
     // Multiverse
     // compile 'org.multiverse:multiverse-core:0.7.0'
@@ -106,7 +106,6 @@ task runGroovy( type: JavaExec ) {
      	args = mainArgs.tokenize() // args wants a List, so split by spaces if need be
      } 
 }
-
 
 task showProperties {
   doLast {
