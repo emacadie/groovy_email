@@ -31,7 +31,7 @@ class SMTPSocketWorker {
         println "reader is a ${reader.class.name}"
         // def buffer = reader.readLine()
         /*
-	while ( ( sCurrentLine = reader.readLine() ) != null ) {
+        while ( ( sCurrentLine = reader.readLine() ) != null ) {
             println( sCurrentLine );
         }
         */
@@ -39,18 +39,18 @@ class SMTPSocketWorker {
         println "can reader still be read before output? ${reader.ready()}"
         def now = new Date()
         output << "220 foo.com Simple Mail Transfer Service Ready\r\n"
-	// output.write( "220 foo.com Simple Mail Transfer Service Ready" )
-	// output.flush() // no need for flush
-	println "can reader still be read after output? ${reader.ready()}"
-	def buffer = reader.readLine()
-	println "Here is the buffer: ${buffer}"
-	/*
-        reader = input.newReader()
-        while ( ( sCurrentLine = reader.readLine() ) != null ) {
-            println( sCurrentLine );
-        }
-	*/
-	println "ending doWork"
+        // output.write( "220 foo.com Simple Mail Transfer Service Ready" )
+        // output.flush() // no need for flush
+        println "can reader still be read after output? ${reader.ready()}"
+        def buffer = reader.readLine()
+        println "Here is the buffer: ${buffer}"
+        /*
+            reader = input.newReader()
+            while ( ( sCurrentLine = reader.readLine() ) != null ) {
+                println( sCurrentLine );
+            }
+        */
+        println "ending doWork"
     }
 }
 

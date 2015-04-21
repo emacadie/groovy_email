@@ -16,13 +16,6 @@ class SMTPServer {
                     println "output is a ${output.class.name}"
                     SMTPSocketWorker sSockW = new SMTPSocketWorker( input, output )
                     sSockW.doWork(  )
-                    
-
-		    
- 
-
-	
-
 
                 }
                 println "processing/thread complete."
