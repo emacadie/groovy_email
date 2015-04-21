@@ -9,7 +9,6 @@ class SocketActor extends DynamicDispatchActor {
     
     void onMessage( SocketHolder sHold ) {
         def ServerSocket = sHold.getSocket()
-        
     }
     
     void onMessage( Object message ) { 
