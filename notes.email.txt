@@ -1,7 +1,7 @@
 Index of RFCs: http://tools.ietf.org/rfc/index
 
-http://tools.ietf.org/html/rfc5321: Simple Mail Transfer Protocol
-http://tools.ietf.org/html/rfc1939: Post Office Protocol - Version 3
+http://tools.ietf.org/html/rfc5321: Simple Mail Transfer Protocol (have read)
+http://tools.ietf.org/html/rfc1939: Post Office Protocol - Version 3 (have read)
 
 http://tools.ietf.org/html/rfc1047: DUPLICATE MESSAGES AND SMTP
 http://tools.ietf.org/html/rfc1870: SMTP Service Extension for Message Size Declaration
@@ -16,7 +16,7 @@ http://tools.ietf.org/html/rfc3461:Simple Mail Transfer Protocol (SMTP) Service 
 http://tools.ietf.org/html/rfc3464: An Extensible Message Format for Delivery Status Notifications
 http://tools.ietf.org/html/rfc3974: SMTP Operational Experience in Mixed IPv4/v6 Environments
 http://tools.ietf.org/html/rfc4954: SMTP Service Extension for Authentication
-http://tools.ietf.org/html/rfc5034: The Post Office Protocol (POP3) (Updates 2449)
+http://tools.ietf.org/html/rfc5034: The Post Office Protocol (POP3) (Updates 2449) (authentication)
 http://tools.ietf.org/html/rfc5248: A Registry for SMTP Enhanced Mail System Status Codes (updates but does not obsolete 4954)
 http://tools.ietf.org/html/rfc5322: Internet Message Format
 http://tools.ietf.org/html/rfc6186: Use of SRV Records for Locating Email Submission/Access Services
@@ -24,12 +24,14 @@ http://tools.ietf.org/html/rfc6409: Message Submission for Mail
 http://tools.ietf.org/html/rfc6531: SMTP Extension for Internationalized Email
 http://tools.ietf.org/html/rfc6854: Update to Internet Message Format (updates but does not obsolete 5322)
 
-
+http://tools.ietf.org/html/rfc5234: Augmented BNF for Syntax Specifications: ABNF
 
 http://www.iana.org/assignments/mail-parameters/mail-parameters.xhtml
 List of James RFCs: http://james.apache.org/server/rfclist.html
 http://www.smtp2go.com/articles/smtp-protocol
 http://en.wikipedia.org/wiki/Extended_SMTP
+
+List of standards: http://www.rfc-editor.org/search/standards.php
 
 
 Look at using http://email.jcabi.com/
@@ -42,5 +44,38 @@ https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
 java.net.SocketInputStream:
 http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/java/net/SocketInputStream.java?av=f
 http://www.docjar.com/docs/api/java/net/SocketInputStream.html
+
+5321 minimum implementation:
+EHLO
+HELO
+MAIL
+RCPT
+DATA
+RSET
+NOOP
+QUIT
+VRFY
+.
+PING shelfunit.info (45.33.18.182) 56(84) bytes of data
+02/05/15 12:42:04 INFO  James.Mailet: RemoteDelivery: Exception reading response
+02/05/15 12:42:04 INFO  James.Mailet: RemoteDelivery: Temporary exception delivering mail (Mail1430588344601-218-to-shelfunit.info: 
+02/05/15 12:42:04 INFO  James.Mailet: RemoteDelivery: Storing message Mail1430588344601-218-to-shelfunit.info into outgoing after 0 retries
+02/05/15 12:42:04 INFO  James.Mailet: RemoteDelivery: Attempting delivery of Mail1430587387321-205-to-shelfunit.info to host mail.shelfunit.info. at 45.33.18.182 for addresses [ff@shelfunit.info]
+
+What is the exception?
+reader is a java.io.BufferedReader
+can reader still be read before output? false
+can reader still be read after output? false
+Here is the buffer: EHLO www.MacAdie.net
+Here is the domain: www.MacAdie.net
+Here is the response:
+250-Hello www.MacAdie.net
+250 HELP
+
+theResponse is a java.lang.String
+sent response
+buffer after responding to ELHO: MAIL FROM:<eric@MacAdie.net>
+ending doWork
+processing/thread complete.
 
 
