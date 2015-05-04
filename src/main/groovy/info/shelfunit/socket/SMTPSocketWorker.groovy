@@ -15,6 +15,7 @@ class SMTPSocketWorker {
     private OutputStream output
 	private String domain
     private String theResponse
+    private String serverName
 
     SMTPSocketWorker( argIn, argOut ) {
         input = argIn
