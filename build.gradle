@@ -14,8 +14,9 @@ allprojects {
     testCompile 'junit:junit:4.10'
     testCompile 'org.mockito:mockito-all:[1.8.5,)'
     // From Maven, it's GroupId:ArtifactId:Version 
-    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
-
+    // testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+    testCompile 'cglib:cglib-nodep:3.1'
     compile 'log4j:log4j:1.2.17'
 
     // logging
@@ -29,9 +30,6 @@ allprojects {
     testRuntime 'ch.qos.logback:logback-classic:1.0.+'
 
     compile 'org.codehaus.groovy:groovy-all:2.4.0'
-
-    // Multiverse
-    // compile 'org.multiverse:multiverse-core:0.7.0'
 
     // GPars
     compile 'org.codehaus.gpars:gpars:1.2.0'

@@ -1,16 +1,17 @@
 package info.shelfunit.socket
 
-// import java.net.SocketInputStream
-// import java.net.SocketOutputStream
+import spock.lang.Specification
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
 
-class SMTPSocketWorker {
+class SMTPSocketWorkerSpec extends Specification {
     
-    // private SocketInputStream input
-    // private SocketOutputStream output
-
+    def setup() {}          // run before every feature method
+    def cleanup() {}        // run after every feature method
+    def setupSpec() {    }     // run before the first feature method
+    def cleanupSpec() {}   // run after the last feature method
+/*
     private InputStream input
     private OutputStream output
 	private String domain
@@ -42,7 +43,7 @@ class SMTPSocketWorker {
 	while ( ( sCurrentLine = reader.readLine() ) != null ) {
             println( sCurrentLine );
         }
-        */
+        * /
         // println "server received: $buffer"
         println "can reader still be read before output? ${reader.ready()}"
         def now = new Date()
@@ -74,6 +75,14 @@ class SMTPSocketWorker {
 			response += "250 HELP\r\n"
 		}
 		theResponse
+	}
+	*/
+	def "test handling EHLO"() {
+	    def serverName = "www.groovymail.org"
+	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    
+	    expect:
+	        ssWorker.serverName == "www.groovymail.org"
 	}
 }
 
