@@ -14,12 +14,12 @@ akka {
     // ORIG: event-handlers = ["akka.event.Logging$DefaultLogger"]
     // something about the work "event" with a hyphen
     // or hyphens/dashes in general
-    // event_handlers=["akka.event.Logging$DefaultLogger"]
+    event_handlers=["akka.event.Logging$DefaultLogger"]
      
     // Event handlers are created and registered synchronously during ActorSystem
     // start-up, and since they are actors, this timeout is used to bound the
     // waiting time
-    // event.handler.startup.timeout = 5s
+    event.handler.startup.timeout = 5s
      
     // Log level used by the configured loggers (see "event-handlers") as soon
     // as they have been started; before that, see "stdout-loglevel"
@@ -37,8 +37,8 @@ akka {
     // List FQCN of extensions which shall be loaded at actor system startup.
     // Should be on the format: 'extensions = ["foo", "bar"]' etc.
     // See the Akka Documentation for more info about Extensions
-    // extensions = [] // orig - i think empty map might be causing problems
-    // extensions=["one", "two"] 
+    extensions = []
+     
     // Toggles whether threads created by this ActorSystem should be daemons or not
     daemonic = off
      
@@ -123,7 +123,7 @@ akka {
                     // Alternatively to giving nr-of-instances you can specify the full
                     // paths of those actors which should be routed to. This setting takes
                     // precedence over nr-of-instances
-                    // paths = []
+                    paths = []
                 }
                  
                 // Routers with dynamically resizable number of routees; this feature is
@@ -341,7 +341,7 @@ akka {
             // [B = bytes // no good
             // "java.io.Serializable" = java // orig, no good
             // java.io.Serializable = java // no good
-            // bad.idea = "putting java packages in your keys"
+            bad.idea = "putting java packages in your keys"
         }
          
         // Configuration items which are used by the akka.actor.ActorDSL._ methods
@@ -354,7 +354,35 @@ akka {
             defaultx.timeout = 5s
         }
     }
-
      
-
+    // Used to set the behavior of the scheduler.
+    // Changing the default values may change the system behavior drastically so make
+    // sure you know what you're doing! See the Scheduler section of the Akka
+    // Documentation for more details.
+    scheduler {
+        // The HashedWheelTimer (HWT) implementation from Netty is used as the default
+        // scheduler in the system.
+        // HWT does not execute the scheduled tasks on exact time.
+        // It will, on every tick, check if there are any tasks behind the schedule
+        // and execute them. You can increase or decrease the accuracy of the execution
+        // timing by specifying smaller or larger tick duration.
+        // If you are scheduling a lot of tasks you should consider increasing the
+        // ticks per wheel.
+        // For more information see: http://www.jboss.org/netty/
+        tick.duration = 100ms
+        ticks.per.wheel = 512
+    }
+     
+    io {
+        // In bytes, the size of the shared read buffer. In the span 0b..2GiB.
+        //
+        read.buffer.size = 8KiB
+         
+        // Specifies how many ops are done between every descriptor selection
+        select.interval = 100
+         
+        // Number of connections that are allowed in the backlog.
+        // 0 or negative means that the platform default will be used.
+        defaultx.backlog = 1000
+    }
 }

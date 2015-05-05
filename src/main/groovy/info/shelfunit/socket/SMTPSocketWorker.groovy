@@ -17,9 +17,11 @@ class SMTPSocketWorker {
     private String theResponse
     private String serverName
 
-    SMTPSocketWorker( argIn, argOut ) {
+    SMTPSocketWorker( argIn, argOut, argServerName ) {
         input = argIn
         output = argOut
+        serverName = argServerName
+        println "server name is ${serverName}"
     }
     
 	// make sure private fields are truly private
@@ -44,7 +46,7 @@ class SMTPSocketWorker {
         // println "server received: $buffer"
         println "can reader still be read before output? ${reader.ready()}"
         def now = new Date()
-        output << "220 shelfunit.info Simple Mail Transfer Service Ready\r\n"
+        output << "220 ${serverName} Simple Mail Transfer Service Ready\r\n"
         
         println "can reader still be read after output? ${reader.ready()}"
         def buffer = reader.readLine()
