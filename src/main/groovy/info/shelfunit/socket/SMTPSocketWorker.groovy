@@ -1,15 +1,10 @@
 package info.shelfunit.socket
 
-// import java.net.SocketInputStream
-// import java.net.SocketOutputStream
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
 
 class SMTPSocketWorker {
-    
-    // private SocketInputStream input
-    // private SocketOutputStream output
 
     private InputStream input
     private OutputStream output
