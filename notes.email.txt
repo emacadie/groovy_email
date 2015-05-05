@@ -41,6 +41,9 @@ Another project:
 https://github.com/voodoodyne/subethasmtp
 https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
 
+Nice table:
+http://www.greenend.org.uk/rjk/tech/smtpreplies.html
+
 java.net.SocketInputStream:
 http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/java/net/SocketInputStream.java?av=f
 http://www.docjar.com/docs/api/java/net/SocketInputStream.html

@@ -70,8 +70,7 @@ class SMTPSocketWorker {
 		} else if ( theMessage.startsWith( 'HELO' ) ) {
 			domain = theMessage.replaceFirst( 'HELO ', '' )
 			println "Here is the domain: ${domain}"
-			response = "250-Hello ${domain}\n"
-			response += "250 HELP\r\n"
+			theResponse = "250 Hello ${domain}\r\n"
 		}
 		theResponse
 	}

@@ -83,6 +83,27 @@ class SMTPSocketWorkerSpec extends Specification {
 	    
 	    expect:
 	        ssWorker.serverName == "www.groovymail.org"
+	    
+	    def domain = "hot-groovy.com"
+	    when:
+	        def ehloResponse = ssWorker.handleMessage( "EHLO ${domain}" )
+	    then:
+	        ehloResponse == "250-Hello ${domain}\n" +
+	        "250 HELP\r\n"
+	}
+	
+	def "test handling HELO"() {
+	    def serverName = "www.groovymail.org"
+	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    
+	    expect:
+	        ssWorker.serverName == "www.groovymail.org"
+	    
+	    def domain = "hot-groovy.com"
+	    when:
+	        def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
+	    then:
+	        ehloResponse == "250 Hello ${domain}\r\n"
 	}
 }
 
