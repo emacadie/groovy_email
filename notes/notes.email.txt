@@ -51,8 +51,8 @@ http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/ja
 http://www.docjar.com/docs/api/java/net/SocketInputStream.html
 
 5321 minimum implementation:
-EHLO
-HELO
+x EHLO
+x HELO
 MAIL
 RCPT
 DATA
