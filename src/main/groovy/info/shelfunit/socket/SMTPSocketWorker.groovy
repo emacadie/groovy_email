@@ -89,6 +89,8 @@ class SMTPSocketWorker {
     }
 
 	def handleMessage( theMessage ) {
+		theResponse = ""
+		print "Incoming message: ${theMessage}"
 		if ( theMessage.startsWith( 'EHLO' ) ) {
 			domain = theMessage.replaceFirst( 'EHLO ', '' )
 			println "Here is the domain: ${domain}"
@@ -99,6 +101,14 @@ class SMTPSocketWorker {
 			domain = theMessage.replaceFirst( 'HELO ', '' )
 			println "Here is the domain: ${domain}"
 			theResponse = "250 Hello ${domain}\r\n"
+		} else if ( theMessage.startsWith( 'MAIL' ) ) {
+			// temporary
+			theResponse = "250 OK\r\n"
+		} else if ( theMessage.startsWith( 'RCPT' ) ) {
+			// temporary
+			theResponse = "250 OK\r\n"
+		} else if ( theMessage.startsWith( 'DATA' ) ) {
+			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>\r\n"
 		}
 		theResponse
 	}
