@@ -1,3 +1,4 @@
+/*
 package info.shelfunit.socket
 
 import java.net.ServerSocket
@@ -16,3 +17,4 @@ class SocketActor extends DynamicDispatchActor {
     }
 }
 
+*/

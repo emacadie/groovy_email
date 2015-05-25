@@ -27,6 +27,7 @@ class SMTPSocketWorker {
 
     def doWork() {
         String sCurrentLine
+        def gotQuitCommand = false
         println "beginning doWork, input is a ${input.class.name}"
         println "name of current thread: ${Thread.currentThread().getName()}, and it is number ${Thread.currentThread().getId()}"            
         println "available: ${input.available()}"
@@ -37,6 +38,7 @@ class SMTPSocketWorker {
 	while ( ( sCurrentLine = reader.readLine() ) != null ) {
             println( sCurrentLine );
         }
+
         */
         // println "server received: $buffer"
         println "can reader still be read before output? ${reader.ready()}"
@@ -44,14 +46,45 @@ class SMTPSocketWorker {
         output << "220 ${serverName} Simple Mail Transfer Service Ready\r\n"
         
         println "can reader still be read after output? ${reader.ready()}"
+        
+        def holdString = new StringBuffer()
+        def responseString
+        while ( !gotQuitCommand ) {
+	        holdString.delete( 0, holdString.length() )
+	        responseString = ''
+	        // reader = input.newReader()
+	        println "About to read input in the loop"
+	        // def newString =  input.newReader().getText() 
+	        def newString =  input.newReader().readLine() 
+	        println "Here is newString: ${newString}"
+	        /*
+	        reader.eachLine { theLine ->
+		        holdString.append( theLine )
+		        // println "Here is theLine: ${theLine}"
+		        
+	        }
+	        println "here is holdString: ${holdString.toString()}"
+	        */
+	        
+	        if ( newString.startsWith( 'QUIT' ) ) {
+		        gotQuitCommand = true
+	        } else {
+		        responseString = this.handleMessage( newString )
+		        println "responseString: ${responseString}"
+		        output << responseString
+	        }
+        }
+        
+        /*
         def buffer = reader.readLine()
-        println "Here is the buffer: ${buffer}"
+        println "Here is the buffer: ${buffer}\nand it's a ${buffer.getClass().getName()}"
         theResponse = this.handleMessage( buffer )
         println "theResponse is a ${theResponse.class.name}"
         output << theResponse
         println "sent response"
         buffer = input.newReader().readLine()
-        println "buffer after responding to ELHO: ${buffer}"
+        println "buffer after responding to ELHO: ${buffer}\nand it's a ${buffer.getClass().getName()}"
+        */
         println "ending doWork"
     }
 
