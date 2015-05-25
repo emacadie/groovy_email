@@ -17,7 +17,7 @@ while ( true ) {
             def theLine = reader.readLine()
             println "First line: ${theLine}"
             while ( !theLine.startsWith( "XX" ) ) {
-                println "Here is theLine before read: ${theLine}"
+                println "Here is theLine before read: ${theLine}  and it's a ${theLine.getClass().getName()}"
                 try {
                 theLine = reader?.readLine()
                 } catch ( Exception ex ) {
@@ -25,9 +25,16 @@ while ( true ) {
                     ex.printStackTrace()
                 }
                 println "Here is theLine after read: ${theLine}"
+                if ( theLine.endsWith( "\r\n" ) ) { println "line ends with CRLF" 
+                } else if ( theLine.endsWith( "\n" ) )  { println "line ends with LF" 
+                } else if ( theLine.endsWith( "\r" ) )  { println "line ends with CR" 
+                } else { println "line ends with something else" }
+                if ( theLine.matches( ".*\n" ) ) { println "regex says line ends with LF" }
+                
             }
             println "Here is theLine: ${theLine}"
-            if ( theLine.endsWith( "\r\n" ) ) { println "line ends with CRLF" }
+            if ( theLine.endsWith( "\r\n" ) ) { println "line ends with CRLF" 
+            } else if ( theLine.endsWith( "\r" ) )  { println "line ends with CR" }
             println "Done iterating"
 
             def buffer = "hello" // sBuffer.toString()
@@ -38,3 +45,4 @@ while ( true ) {
         println "processing/thread complete------------------------"
     }
 }
+

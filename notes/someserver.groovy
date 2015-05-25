@@ -122,9 +122,9 @@ while ( true ) {
             def byte[] tmp = [ ]
             println "input.available(): ${input.available()}"
             int i = 100
-            while ( i > 0) {
+            while ( i > 0 ) {
                  i = input.read(tmp, 0, 1);
-                 if (i < 0)
+                 if ( i < 0 )
                       break;
                  strBuff.append(new String(tmp, 0, i));
             }
@@ -325,9 +325,10 @@ while ( true ) {
         println "processing/thread complete------------------------"
     }
 }
+${new Date().toString()}
 s = new Socket( "localhost", 4444 );
 s.withStreams { input, output ->
-  output << "fyyudd \nechoghg  testing ...\nanothergh  line\nXX\r\n"
+  output << "${new Date().toString()} yyudd \nechoghg  testing ...\nanothergh  line\nXX\r\n"
   buffer = input.newReader().readLine()
   println "response = $buffer"
 }
