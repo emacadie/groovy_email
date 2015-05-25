@@ -1,12 +1,22 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'groovy'
+apply plugin: 'com.github.tkruse.groovysh'
 // do not run this every single time
 // apply plugin: 'checkstyle'
 
 repositories {
   mavenCentral()
   jcenter()
+}
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.5'
+    }
 }
 
 allprojects {
@@ -120,6 +130,12 @@ task( console, dependsOn: 'classes', type: JavaExec ) {
 checkstyle {
    configProperties.put('translation.severity', 'warning')
    println("configProperties is a " + configProperties.getClass().getName())
+}
+*/
+/*
+groovysh {
+    // groovyVersion determines the features of the shell and buildShell tasks.
+    groovyVersion = '2.4.0'
 }
 */
 // 

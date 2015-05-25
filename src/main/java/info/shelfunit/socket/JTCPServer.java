@@ -20,7 +20,36 @@ class JTCPServer {
                new BufferedReader( new InputStreamReader( connectionSocket.getInputStream() ) );
             System.out.println( "Got a connection" );
             DataOutputStream outToClient = new DataOutputStream( connectionSocket.getOutputStream() );
+            
+            StringBuilder sb = new StringBuilder();
+            String line = "";
+            while ( ( line = inFromClient.readLine() ) != null ) {
+                System.out.println( "Here is line: " + line );
+                // sb.append( line );
+                // sb.append( '\n' );
+            }
+            
+            System.out.println( "Here is sb: " + sb.toString() );
+            clientSentence = sb.toString();
+                /*
             clientSentence = inFromClient.readLine();
+            
+            System.out.println( "Here is clientSentence: " + clientSentence );
+            /*
+            while ( clientSentence != null ) {
+                System.out.println( "Here is clientSentence before read: " + clientSentence );
+                clientSentence = inFromClient.readLine();
+                if ( clientSentence == null ) { break; }
+                System.out.println( "Here is clientSentence after read: " + clientSentence );
+            }
+            /*
+            while ( ( clientSentence = inFromClient.readLine() ) != null ) {
+                System.out.println( "Here is clientSentence: " + clientSentence );
+            }
+            */
+            System.out.println( "Done reading" );
+            
+            
             System.out.println( "Received: " + clientSentence );
             capitalizedSentence = clientSentence.toUpperCase() + '\n';
             outToClient.writeBytes( capitalizedSentence );

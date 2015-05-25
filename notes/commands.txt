@@ -9,10 +9,15 @@ To run with Groovy:
 gradle runGroovy -PmainClass="org.lookup"    
 
 To run with Java:       
-gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=6789  
+gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=4444  
 gradle runJava -PmainClass=info.shelfunit.socket.JTCPClient -PmainArgs=6789  
 gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=25
 
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner -PmainArgs="src/main/resources/application.conf"
+
+To use shell:
+gradle -q shell
+gradle -q buildShell
+gradle -q buildDevShell
 

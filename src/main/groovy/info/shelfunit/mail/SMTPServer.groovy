@@ -24,7 +24,7 @@ class SMTPServer {
                     SMTPSocketWorker sSockW = new SMTPSocketWorker( input, output, server )
                     sSockW.doWork(  )
                 }
-                println "processing/thread complete."
+                println "processing/thread complete......................"
             }
         }
 

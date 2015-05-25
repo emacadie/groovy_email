@@ -35,9 +35,7 @@ class SMTPSocketWorker {
         println "reader is a ${reader.class.name}"
         // def buffer = reader.readLine()
         /*
-	while ( ( sCurrentLine = reader.readLine() ) != null ) {
-            println( sCurrentLine );
-        }
+	
 
         */
         // println "server received: $buffer"
@@ -47,24 +45,39 @@ class SMTPSocketWorker {
         
         println "can reader still be read after output? ${reader.ready()}"
         
-        def holdString = new StringBuffer()
+        
         def responseString
         while ( !gotQuitCommand ) {
-	        holdString.delete( 0, holdString.length() )
+	        // holdString.delete( 0, holdString.length() )
+	        def holdString = new StringBuffer()
 	        responseString = ''
 	        // reader = input.newReader()
 	        println "About to read input in the loop"
 	        // def newString =  input.newReader().getText() 
-	        def newString =  input.newReader().readLine() 
-	        println "Here is newString: ${newString}"
+	        // def newString =  input.newReader().readLine() 
+	        // def lineList = input.newReader().readLines() 
+	        // println "Here is lineList: ${lineList}"
+	        // def newString = lineList.join()
+	        def lineList = []
+	        def readerA = input.newReader()
+	        while ( ( sCurrentLine = readerA.readLine() ) != null ) {
+		        println "sCurrentLine: ${sCurrentLine}"
+		        lineList << sCurrentLine
+	        }
+
+	        def newString = new String()
+	        println "Here is lineList: ${lineList}"
+	        
+	        newString = lineList.join()
 	        /*
 	        reader.eachLine { theLine ->
+		        // newString = newString + theLine
 		        holdString.append( theLine )
 		        // println "Here is theLine: ${theLine}"
 		        
 	        }
-	        println "here is holdString: ${holdString.toString()}"
 	        */
+	        println "Here is newString: ${newString}"
 	        
 	        if ( newString.startsWith( 'QUIT' ) ) {
 		        gotQuitCommand = true
