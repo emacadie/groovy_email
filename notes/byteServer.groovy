@@ -9,7 +9,7 @@ while ( true ) {
             println "About to try reading buffer"
             // def buffer = input.newReader().readLine() // okay
             // def byte[] byteArray = [ ]
-            def a = new byte[ 1024 ] 
+            def a = byte[  ] // was def a = new byte[ 1024 ] 
             def numBytes = input.read( a )
             println "numBytes: ${numBytes}"
             def holder = new String( a )
@@ -34,4 +34,6 @@ s.withStreams { input, output ->
   buffer = input.newReader().readLine()
   println "response = $buffer"
 }
+/////////////////////////////////////////////////
+
 
