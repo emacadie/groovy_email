@@ -1,5 +1,8 @@
 package info.shelfunit.socket
 
+// good version: 
+// https://github.com/emacadie/groovy_email/blob/cd2a0d27d88e7eee54c9315ce7d6e6b52808840c/src/main/groovy/info/shelfunit/socket/SMTPSocketWorker.groovy
+
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
