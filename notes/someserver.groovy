@@ -293,32 +293,28 @@ while ( true ) {
     server.accept { socket ->
         println "processing new connection..."
         socket.withStreams { input, output ->
-            
-            // buffer = reader.readLine()
             println "About to try reading buffer"
-            // def buffer = input.newReader().readLine() // okay
-            // def buffer = input.newReader().readLines() // no good
-            // def buffer = input.newReader().getText() // no good
             def sBuffer = new StringBuffer()
             def holdLine
             def reader = input.newReader()
             def theLine = reader.readLine()
+            sBuffer << theLine
             println "First line: ${theLine}"
             while ( !theLine.startsWith( "XX" ) ) {
                 println "Here is theLine before read: ${theLine}"
                 try {
-                theLine = reader?.readLine()
+                    theLine = reader?.readLine()
+                    sBuffer << theLine
                 } catch ( Exception ex ) {
                     println "exception: ${ex.printMessage()}"
                     ex.printStackTrace()
                 }
                 println "Here is theLine after read: ${theLine}"
             }
-            println "Here is theLine: ${theLine}"
-            println "Done iterating"
+            println "Here is theLine: ${theLine}\tDone iterating"
 
-            def buffer = "hello" // sBuffer.toString()
-            println "server received: ${buffer}"
+            def buffer = sBuffer.replaceAll( '\n', "::" ) // sBuffer.toString()
+            println "server received: ${theLine}"
             now = new Date()
             output << "echo-response($now): " + buffer + "\n"
         }
@@ -328,7 +324,9 @@ while ( true ) {
 ${new Date().toString()}
 s = new Socket( "localhost", 4444 );
 s.withStreams { input, output ->
-  output << "${new Date().toString()} yyudd \nechoghg  testing ...\nanothergh  line\nXX\r\n"
+  output << "${new Date().toString()} yyudd \nthis seems to be working ...\nanothergh  line\nXX\r\n"
+  println "done sending, waiting for response"
   buffer = input.newReader().readLine()
   println "response = $buffer"
 }
+

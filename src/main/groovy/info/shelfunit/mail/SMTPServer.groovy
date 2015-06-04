@@ -5,11 +5,11 @@ import info.shelfunit.socket.SMTPSocketWorker
 
 class SMTPServer {
     
-    private String server
+    private String serverName
     
     def SMTPServer( def argServer ) {
-        server = argServer
-        println "the server is ${argServer}"
+        serverName = argServer
+        println "the server is ${argServer}, now it's ${serverName}"
     }
     
     def doStuff( port ) {
@@ -19,9 +19,8 @@ class SMTPServer {
             server.accept {  socket ->
                 println "processing new connection..."
                 socket.withStreams { input, output ->
-                    println "input is a ${input.class.name}"
-                    println "output is a ${output.class.name}"
-                    SMTPSocketWorker sSockW = new SMTPSocketWorker( input, output, server )
+                    println "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverName}"
+                    SMTPSocketWorker sSockW = new SMTPSocketWorker( input, output, serverName )
                     sSockW.doWork(  )
                 }
                 println "processing/thread complete......................"
