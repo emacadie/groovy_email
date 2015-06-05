@@ -39,13 +39,15 @@ s.withStreams { input, output ->
 /////////////////////////////////////////////////
 import java.net.ServerSocket
 def server = new ServerSocket( 4444 )
- StringBuffer.metaClass.endsWith = { endString ->
-            if ( delegate.substring( ( delegate.length() - endString.length() ), delegate.length() ).equals( endString ) ) {
-                return true
-            } else {
-                return false
-            }   
-        }
+StringBuffer.metaClass.endsWith = { eString ->
+    if ( delegate.length() < eString.length() ) {
+        return false
+    } else if ( delegate.substring( ( delegate.length() - eString.length() ), delegate.length() ).equals( eString ) ) {
+        return true
+    } else {
+        return false
+    }   
+}
         
 while ( true ) {
     server.accept { socket ->
@@ -55,15 +57,26 @@ while ( true ) {
             println "About to try reading buffer, input is a ${input.getClass().getName()}"
 
             def a = byte[  ] // was def a = new byte[ 1024 ] 
-            
-            
+            def theByte
+            theByte = input.read()
+                println "theByte as char: ${theByte as char}"
+                theByte = input.read()
+                println "theByte as char: ${theByte as char}"
+            while ( ( !sBuff.endsWith( "\r\n" ) ) ) {
+                theByte = input.read()
+                println "theByte as char: ${theByte as char}"
+                sBuff << ( theByte as char )
+                if ( sBuff.length() > 20 ) { println "sBuff bigger than 20: ${sBuff}" }
+            }
+            /*
             input.eachByte {
                 println "here is the byte: ${it as char}"
                 sBuff << (it as char)
                 if ( sBuff.length() > 20 ) { println "sBuff bigger than 20: ${sBuff}" }
             }
-            println "numBytes: ${numBytes} and it's a ${numBytes.getClass().getName()}"
-            def holder = new String( numBytes ) // def holder = new String( a )
+            */
+            // println "numBytes: ${numBytes} and it's a ${numBytes.getClass().getName()}"
+            def holder = new String( sBuff.toString() ) // def holder = new String( a )
             println "here is holder: ${holder}"
             def buffer 
             
