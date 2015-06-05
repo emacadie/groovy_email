@@ -5,6 +5,13 @@ import groovy.util.ConfigSlurper
 class MailRunner {
     
     static main( args ) {
+        StringBuffer.metaClass.endsWith = { endString ->
+            if ( delegate.substring( ( delegate.length() - endString.length() ), delegate.length() ).equals( endString ) ) {
+                return true
+            } else {
+                return false
+            }   
+        }
         // def fGS = new FirstGroovyServer()
         // fGS.doStuff( Integer.parseInt( args[ 0 ] ) )
         println "in MailRunner"
