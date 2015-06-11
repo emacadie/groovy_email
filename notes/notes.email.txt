@@ -82,5 +82,7 @@ sent response
 buffer after responding to ELHO: MAIL FROM:<eric@MacAdie.net>
 ending doWork
 processing/thread complete.
+http://stackoverflow.com/questions/7729302/how-to-read-a-file-in-groovy-into-a-string
+http://docs.groovy-lang.org/latest/html/api/groovy/util/Eval.html
 
 
