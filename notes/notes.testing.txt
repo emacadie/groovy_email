@@ -5,3 +5,6 @@ I had to add testCompile 'cglib:cglib-nodep:3.1' to build.gradle
 gradle test --tests info.shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.SMTPSocketWorkerSpec -info
 
+gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
+gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info
+

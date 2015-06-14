@@ -1,4 +1,4 @@
-package info.shelfunit.mail
+package shelfunit.mail
 
 import groovy.util.ConfigSlurper
 import groovy.util.logging.Slf4j 

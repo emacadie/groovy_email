@@ -1,4 +1,4 @@
-package info.shelfunit.socket
+package shelfunit.socket
 
 import spock.lang.Specification
 import spock.lang.Ignore

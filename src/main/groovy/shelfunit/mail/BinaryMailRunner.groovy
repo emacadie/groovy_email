@@ -1,10 +1,10 @@
-package info.shelfunit.mail
+package shelfunit.mail
 
 import groovy.util.ConfigSlurper
 import groovy.util.logging.Slf4j 
 
 @Slf4j
-class MailRunner {
+class BinaryMailRunner {
     
     static main( args ) {
         StringBuffer.metaClass.endsWith = { end ->
@@ -28,6 +28,7 @@ class MailRunner {
         StringBuffer.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
         }
+
         log.info "in MailRunner"
         URL theURL = getClass().getResource( "/log4j.properties" );
         log.info "theURL is a ${theURL.class.name}"
@@ -35,7 +36,7 @@ class MailRunner {
         def stuff = config.smtp.server.name
         log.info "Here is config.smtp.server.name: ${config.smtp.server.name}"
         log.info "Here is stuff: ${stuff} and it's a ${stuff.class.name}"
-        SMTPServer smtp = new SMTPServer( stuff )
+        BinarySMTPServer smtp = new BinarySMTPServer( stuff )
         smtp.doStuff( 25 )
     }
 }

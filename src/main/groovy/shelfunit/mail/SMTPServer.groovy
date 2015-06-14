@@ -1,7 +1,8 @@
-package info.shelfunit.mail
+package shelfunit.mail
 
 import java.net.ServerSocket
-import info.shelfunit.socket.SMTPSocketWorker
+import shelfunit.socket.SMTPSocketWorker
+
 import groovy.util.logging.Slf4j 
 
 @Slf4j

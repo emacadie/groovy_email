@@ -1,15 +1,15 @@
-package info.shelfunit.mail
+package shelfunit.mail
 
 import java.net.ServerSocket
-import info.shelfunit.socket.SMTPSocketWorker
+import shelfunit.socket.BinarySMTPSocketWorker
 import groovy.util.logging.Slf4j 
 
 @Slf4j
-class SMTPServer {
+class BinarySMTPServer {
     
     private String serverName
     
-    def SMTPServer( def argServer ) {
+    def BinarySMTPServer( def argServer ) {
         serverName = argServer
         log.info "the server is ${argServer}, now it's ${serverName}"
     }
@@ -22,7 +22,7 @@ class SMTPServer {
                 log.info "processing new connection..."
                 socket.withStreams { input, output ->
                     log.info "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverName}"
-                    SMTPSocketWorker sSockW = new SMTPSocketWorker( input, output, serverName )
+                    BinarySMTPSocketWorker sSockW = new BinarySMTPSocketWorker( input, output, serverName )
                     sSockW.doWork(  )
                 }
                 log.info "processing/thread complete......................"

@@ -1,13 +1,12 @@
-package info.shelfunit.socket
+package shelfunit.socket
 
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
-
 import groovy.util.logging.Slf4j 
 
 @Slf4j
-class SMTPSocketWorker {
+class BinarySMTPSocketWorker {
 
     private InputStream input
     private OutputStream output
@@ -16,8 +15,8 @@ class SMTPSocketWorker {
     private String serverName
 	private String prevCommand
 
-	SMTPSocketWorker( argIn, argOut, argServerName ) {
-        input = argIn
+	BinarySMTPSocketWorker( argIn, argOut, argServerName ) {
+        input  = argIn
         output = argOut
         serverName = argServerName
         log.info "server name is ${serverName}"
@@ -45,16 +44,36 @@ class SMTPSocketWorker {
         log.info "can reader still be read after output? ${reader.ready()}"
         
         def holdString = new StringBuffer()
+        def sBuff = new StringBuffer()
         def responseString
+        def delimiter = '\r\n'
+        def newString = ""
+        def theByte
+        def byteList = []
+        def buffer 
+
+        
         while ( !gotQuitCommand ) {
 	        holdString.clear()
+	        byteList.clear()
+	        sBuff.clear()
 	        responseString = ''
-	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
-	        reader = input.newReader()
-	        log.info "Got the reader, and it's a ${reader.getClass().getName()}"
-	        def newString =  reader.readLine() 
-	        log.info "Here is newString: ${newString}"
+	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}, prevCommand: ${prevCommand}, delimiter: ${delimiter}"
+	        //  reader = input.newReader()
+	        // log.info "Got the reader, and it's a ${reader.getClass().getName()}"
+	        // def newString =  reader.readLine() 
+	        // log.info "Here is newString: ${newString}"
 	        
+	        while ( ( !sBuff.endsWith( delimiter ) ) && ( !sBuff.startsWith( 'RSET' ) ) ) {
+	            theByte = input.read()
+	            // log.info "theByte as char: ${theByte as char}"
+	            byteList << theByte
+	            sBuff << ( theByte as char )
+	            // if ( sBuff.length() > 20 ) { log.info "sBuff bigger than 20: ${sBuff}" }
+	            log.info "sBuff bigger than 20: ${sBuff}"
+            }
+	        newString = sBuff.toString()
+	        log.info "after the read, here is newString: ${newString}"
 	        if ( newString.startsWith( 'QUIT' ) ) {
 		        log.info "got QUIT, here is prevCommand: ${prevCommand}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
@@ -65,25 +84,26 @@ class SMTPSocketWorker {
 		        responseString = this.handleMessage( newString )
 		        log.info "responseString: ${responseString}"
 		        prevCommand = 'DATA'
+		        delimiter = "\r\n.\r\n"
 		        output << responseString
 	        } else if ( prevCommand == 'DATA' ) {
-		        def sBuffer = new StringBuffer()
+		        /*
+	            def sBuffer = new StringBuffer()
 		        sBuffer << newString
 		        while ( !newString.startsWith( "." ) ) {
-			        
 			        try {
 				        newString = reader?.readLine()
 				        sBuffer << newString
 				        sBuffer << '\n'
-				        log.info "in DATA loop, available: ${input.available()}, reader?.ready: ${reader?.ready()}"
 			        } catch ( Exception ex ) {
 				        log.info "exception: ${ex.printMessage()}"
 				        ex.printStackTrace()
 			        }
-			        
 		        }
-		        responseString = this.handleMessage( sBuffer.toString() )
+		        */
+		        responseString = this.handleMessage( newString )
 		        prevCommand = 'THE MESSAGE'
+		        delimiter = "\r\n"
 		        log.info "responseString after message: ${responseString}"
 		        output << responseString
 		        
@@ -93,7 +113,6 @@ class SMTPSocketWorker {
 		        output << responseString
 	        }
         }
-        
         log.info "ending doWork"
 	}
 

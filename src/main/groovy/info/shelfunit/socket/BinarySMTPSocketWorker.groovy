@@ -58,20 +58,22 @@ class BinarySMTPSocketWorker {
 	        byteList.clear()
 	        sBuff.clear()
 	        responseString = ''
-	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
+	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}, prevCommand: ${prevCommand}, delimiter: ${delimiter}"
 	        //  reader = input.newReader()
 	        // log.info "Got the reader, and it's a ${reader.getClass().getName()}"
 	        // def newString =  reader.readLine() 
 	        // log.info "Here is newString: ${newString}"
 	        
-	        while ( ( !sBuff.endsWith( delimiter ) ) ) {
+	        while ( ( !sBuff.endsWith( delimiter ) ) && ( !sBuff.startsWith( 'RSET' ) ) ) {
 	            theByte = input.read()
 	            // log.info "theByte as char: ${theByte as char}"
 	            byteList << theByte
 	            sBuff << ( theByte as char )
 	            // if ( sBuff.length() > 20 ) { log.info "sBuff bigger than 20: ${sBuff}" }
+	            log.info "sBuff bigger than 20: ${sBuff}"
             }
 	        newString = sBuff.toString()
+	        log.info "after the read, here is newString: ${newString}"
 	        if ( newString.startsWith( 'QUIT' ) ) {
 		        log.info "got QUIT, here is prevCommand: ${prevCommand}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
@@ -106,6 +108,7 @@ class BinarySMTPSocketWorker {
 		        output << responseString
 		        
 	        } else {
+	            delimiter = "\r\n"
 		        responseString = this.handleMessage( newString )
 		        log.info "responseString: ${responseString}"
 		        output << responseString
@@ -116,7 +119,7 @@ class BinarySMTPSocketWorker {
 
 	def handleMessage( theMessage ) {
 		theResponse = ""
-		print "Incoming message: ${theMessage}"
+		log.info "Incoming message: ${theMessage}"
 		if ( theMessage.startsWith( 'EHLO' ) ) {
 			domain = theMessage.replaceFirst( 'EHLO ', '' )
 			log.info "Here is the domain: ${domain}"
@@ -136,8 +139,10 @@ class BinarySMTPSocketWorker {
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
 		} else if ( prevCommand == 'DATA' ) {
-			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
+			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
+		} else if ( theMessage.startsWith( 'RSET' ) ) {
+			theResponse = "250 OK"
 		} else if ( prevCommand == 'THE MESSAGE' && theMessage.startsWith( 'QUIT' ) ) {
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		}

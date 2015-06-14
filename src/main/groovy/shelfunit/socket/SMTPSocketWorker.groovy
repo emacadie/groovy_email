@@ -1,4 +1,4 @@
-package info.shelfunit.socket
+package shelfunit.socket
 
 import java.io.InputStream
 import java.io.OutputStream
@@ -70,17 +70,16 @@ class SMTPSocketWorker {
 		        def sBuffer = new StringBuffer()
 		        sBuffer << newString
 		        while ( !newString.startsWith( "." ) ) {
-			        
+
 			        try {
 				        newString = reader?.readLine()
 				        sBuffer << newString
 				        sBuffer << '\n'
-				        log.info "in DATA loop, available: ${input.available()}, reader?.ready: ${reader?.ready()}"
 			        } catch ( Exception ex ) {
 				        log.info "exception: ${ex.printMessage()}"
 				        ex.printStackTrace()
 			        }
-			        
+
 		        }
 		        responseString = this.handleMessage( sBuffer.toString() )
 		        prevCommand = 'THE MESSAGE'
