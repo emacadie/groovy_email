@@ -5,10 +5,10 @@ import groovy.util.ConfigSlurper
 class BinaryMailRunner {
     
     static main( args ) {
-        StringBuffer.metaClass.endsWith = { eString ->
-            if ( delegate.length() < eString.length() ) {
+        StringBuffer.metaClass.endsWith = { end ->
+            if ( delegate.length() < end.length() ) {
                 return false
-            } else if ( delegate.substring( ( delegate.length() - eString.length() ), delegate.length() ).equals( eString ) ) {
+            } else if ( delegate.substring( ( delegate.length() - end.length() ), delegate.length() ).equals( end ) ) {
                 return true
             } else {
                 return false

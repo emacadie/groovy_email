@@ -3,7 +3,7 @@ This project will have code for concurrency in Java and a few other JVM language
 To run a single test, do this:  
 gradle -Dtest.single=HelloSpock test -info   
 gradle -Dtest.single=DSRecordSpockTest test -info  
-   
+
 
 To run with Groovy:   
 gradle runGroovy -PmainClass="org.lookup"    
@@ -15,6 +15,7 @@ gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=25
 
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner -PmainArgs="src/main/resources/application.conf"
+gradle runGroovy -PmainClass=info.shelfunit.mail.BinaryMailRunner -PmainArgs="src/main/resources/application.conf"
 
 To use shell:
 gradle -q shell

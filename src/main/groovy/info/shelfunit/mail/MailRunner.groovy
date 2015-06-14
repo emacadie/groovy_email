@@ -5,10 +5,10 @@ import groovy.util.ConfigSlurper
 class MailRunner {
     
     static main( args ) {
-        StringBuffer.metaClass.endsWith = { eString ->
-            if ( delegate.length() < eString.length() ) {
+        StringBuffer.metaClass.endsWith = { end ->
+            if ( delegate.length() < end.length() ) {
                 return false
-            } else if ( delegate.substring( ( delegate.length() - eString.length() ), delegate.length() ).equals( eString ) ) {
+            } else if ( delegate.substring( ( delegate.length() - end.length() ), delegate.length() ).equals( end ) ) {
                 return true
             } else {
                 return false
@@ -17,10 +17,7 @@ class MailRunner {
         StringBuffer.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
         }
-        // def fGS = new FirstGroovyServer()
-        // fGS.doStuff( Integer.parseInt( args[ 0 ] ) )
         println "in MailRunner"
-        // def theURL = getClass().getResource( args[ 0 ] )
         URL theURL = getClass().getResource( "/log4j.properties" );
         println "theURL is a ${theURL.class.name}"
         def config = new ConfigSlurper().parse( new File( args[ 0 ] ).toURL() )

@@ -46,7 +46,7 @@ class SMTPSocketWorker {
         def holdString = new StringBuffer()
         def responseString
         while ( !gotQuitCommand ) {
-	        holdString.delete( 0, holdString.length() )
+	        holdString.clear()
 	        responseString = ''
 	        println "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
 	        reader = input.newReader()

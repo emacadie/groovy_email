@@ -26,17 +26,25 @@ allprojects {
     // From Maven, it's GroupId:ArtifactId:Version 
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
     testCompile 'cglib:cglib-nodep:3.1'
-    compile 'log4j:log4j:1.2.17'
+    testCompile 'com.google.guava:guava:18.0'
+    // compile 'log4j:log4j:1.2.17'
 
     // logging
-    compile 'org.slf4j:slf4j-api:1.7.+'
-    testRuntime 'org.slf4j:slf4j-ext:1.7.+'
-    testRuntime 'org.slf4j:jcl-over-slf4j:1.7.+'
-    testRuntime 'org.slf4j:jul-to-slf4j:1.7.+'
-    testRuntime 'org.slf4j:log4j-over-slf4j:1.7.+'
+    // compile 'org.slf4j:slf4j-api:1.7.+'
+    // testRuntime 'org.slf4j:slf4j-ext:1.7.+'
+    // testRuntime 'org.slf4j:jcl-over-slf4j:1.7.+'
+    // testRuntime 'org.slf4j:jul-to-slf4j:1.7.+'
+    // testRuntime 'org.slf4j:log4j-over-slf4j:1.7.+'
     
-    testRuntime 'ch.qos.logback:logback-core:1.0.+'
-    testRuntime 'ch.qos.logback:logback-classic:1.0.+'
+    // testRuntime 'ch.qos.logback:logback-core:1.0.+'
+    // testRuntime 'ch.qos.logback:logback-classic:1.0.+'
+    
+    // Using sfl4j allows us to replace different loggers later, if desired
+    compile group: 'org.slf4j', name:'slf4j-api', version: '1.7.2'
+    // sfl4j is just a facade for loggers. To actually get logging to work, you need to
+    // tie it in with some actual implementation, e.g., logback
+    compile group: 'ch.qos.logback', name:'logback-classic', version: '1.0.9'
+    compile group: 'ch.qos.logback', name:'logback-core', version: '1.0.9'
 
     compile 'org.codehaus.groovy:groovy-all:2.4.0'
 

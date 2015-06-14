@@ -1,9 +1,9 @@
 package info.shelfunit.mail
 
 import java.net.ServerSocket
-import info.shelfunit.socket.SMTPSocketWorker
+import info.shelfunit.socket.BinarySMTPSocketWorker
 
-class BnarySMTPServer {
+class BinarySMTPServer {
     
     private String serverName
     

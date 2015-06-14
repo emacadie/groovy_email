@@ -139,9 +139,9 @@ constructor.newInstance(  ).asImmutable()
 // qq.newInstance().asImmutable()
 
 java.util.ArrayList.metaClass.constructor = { int arg ->
-println "Intercepting int constructor call"
-constructor = ArrayList.class.getConstructor( int )
-constructor.newInstance( arg ).asImmutable()
+    println "Intercepting int constructor call"
+    constructor = ArrayList.class.getConstructor( int )
+    constructor.newInstance( arg ).asImmutable()
 }
 java.util.ArrayList.metaClass.constructor = { java.util.Collection arg ->
     println "Intercepting Collection call"
@@ -151,9 +151,9 @@ java.util.ArrayList.metaClass.constructor = { java.util.Collection arg ->
 }
 
 java.util.ArrayList.metaClass.constructor = {  ->
-println "Intercepting constructor call"
-constructor = ArrayList.class.getConstructor( null )
-constructor.newInstance(  ).asImmutable()
+    println "Intercepting constructor call"
+    constructor = ArrayList.class.getConstructor( null )
+    constructor.newInstance(  ).asImmutable()
 }
 
 rr = []

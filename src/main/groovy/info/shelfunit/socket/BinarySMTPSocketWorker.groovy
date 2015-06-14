@@ -4,8 +4,6 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
 
-// 
-
 class BinarySMTPSocketWorker {
 
     private InputStream input
@@ -16,7 +14,7 @@ class BinarySMTPSocketWorker {
 	private String prevCommand
 
 	BinarySMTPSocketWorker( argIn, argOut, argServerName ) {
-        input = argIn
+        input  = argIn
         output = argOut
         serverName = argServerName
         println "server name is ${serverName}"
@@ -49,12 +47,13 @@ class BinarySMTPSocketWorker {
         def delimiter = '\r\n'
         def newString = ""
         def theByte
-        def holder
+        def byteList = []
         def buffer 
 
         
         while ( !gotQuitCommand ) {
 	        holdString.clear()
+	        byteList.clear()
 	        responseString = ''
 	        println "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
 	        //  reader = input.newReader()
@@ -65,6 +64,7 @@ class BinarySMTPSocketWorker {
 	        while ( ( !sBuff.endsWith( delimiter ) ) ) {
 	            theByte = input.read()
 	            // println "theByte as char: ${theByte as char}"
+	            byteList << theByte
 	            sBuff << ( theByte as char )
 	            // if ( sBuff.length() > 20 ) { println "sBuff bigger than 20: ${sBuff}" }
             }
@@ -108,7 +108,6 @@ class BinarySMTPSocketWorker {
 		        output << responseString
 	        }
         }
-        
         println "ending doWork"
 	}
 
