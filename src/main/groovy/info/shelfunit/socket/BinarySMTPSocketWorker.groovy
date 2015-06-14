@@ -54,13 +54,14 @@ class BinarySMTPSocketWorker {
         while ( !gotQuitCommand ) {
 	        holdString.clear()
 	        byteList.clear()
+	        sBuff.clear()
 	        responseString = ''
 	        println "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
 	        //  reader = input.newReader()
 	        // println "Got the reader, and it's a ${reader.getClass().getName()}"
 	        // def newString =  reader.readLine() 
 	        // println "Here is newString: ${newString}"
-	        sBuff.clear()
+	        
 	        while ( ( !sBuff.endsWith( delimiter ) ) ) {
 	            theByte = input.read()
 	            // println "theByte as char: ${theByte as char}"

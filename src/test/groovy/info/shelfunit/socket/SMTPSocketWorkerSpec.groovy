@@ -1,6 +1,7 @@
 package info.shelfunit.socket
 
 import spock.lang.Specification
+import spock.lang.Ignore
 import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
@@ -64,6 +65,7 @@ class SMTPSocketWorkerSpec extends Specification {
 	        ehloResponse == "250 Hello ${domain}\r\n"
 	}
 	
+	@Ignore
 	def "test streams"() {
 	    println "--- Starting test ${name.methodName}"
 	    when:
@@ -72,29 +74,24 @@ class SMTPSocketWorkerSpec extends Specification {
             def mIs = Mock( InputStream )
             def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
-            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes();
+            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
     
             InputStream input = new ByteArrayInputStream( data );
             OutputStream output = new ByteArrayOutputStream() 
-            InputStream first = new ByteArrayInputStream( new byte[ 1024 ] )
             
             def ssWorker = new SMTPSocketWorker( input, output, serverName )
             ssWorker.doWork()
-            byte[] dataA = "DATA${crlf}JJJ${crlf}.${crlf}".getBytes();
-            
-            // InputStream inputA = new ByteArrayInputStream( dataA );
-            InputStream inputA = new ByteArrayInputStream( dataA );
-            
-            
-	            def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
-	        then:
-	            def exA = thrown( Exception )
-	            println "exA.message: ${exA.message}"
-	            exA.printStackTrace()
-	            println "output to string: ${output.toString()}"
-	            // def copy = ByteStreams.copy( first, output )
-	            // println "Here is copy: ${copy}"
-	            ehloResponse == "250 Hello ${domain}\r\n"
+            input = new ByteArrayInputStream( "DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes() )
+            def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
+	    then:
+            // def exA = thrown( Exception )
+            // println "exA.message: ${exA.message}"
+            // exA.printStackTrace()
+            println "output to string: ++++\n${output.toString()}"
+            println "++++ end of output"
+            // def copy = ByteStreams.copy( first, output )
+            // println "Here is copy: ${copy}"
+            ehloResponse == "250 Hello ${domain}\r\n"
 	    
 	}
 }

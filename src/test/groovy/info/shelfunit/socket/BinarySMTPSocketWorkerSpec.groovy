@@ -69,32 +69,20 @@ class BinarySMTPSocketWorkerSpec extends Specification {
 	    when:
             def serverName = "www.groovymail.org"
             def crlf = "\r\n"
-            def mIs = Mock( InputStream )
-            def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
-            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes();
+            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
     
-            InputStream input = new ByteArrayInputStream( data );
+            InputStream input   = new ByteArrayInputStream( data );
             OutputStream output = new ByteArrayOutputStream() 
-            InputStream first = new ByteArrayInputStream( new byte[ 1024 ] )
             
             def ssWorker = new BinarySMTPSocketWorker( input, output, serverName )
             ssWorker.doWork()
-            byte[] dataA = "DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes();
-            
-            // InputStream inputA = new ByteArrayInputStream( dataA );
-            InputStream inputA = new ByteArrayInputStream( dataA );
-            
-            
-	            def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
-	        then:
-	            def exA = thrown( Exception )
-	            println "exA.message: ${exA.message}"
-	            exA.printStackTrace()
-	            println "output to string: ${output.toString()}"
-	            // def copy = ByteStreams.copy( first, output )
-	            // println "Here is copy: ${copy}"
-	            ehloResponse == "250 Hello ${domain}\r\n"
+            def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
+        then:
+
+            println "output to string: +++++\n${output.toString()}"
+            println "+++++ end of output"
+            ehloResponse == "250 Hello ${domain}\r\n"
 	    
 	}
 	
