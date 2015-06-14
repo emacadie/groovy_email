@@ -6,17 +6,19 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
 
-import com.google.common.io.ByteStreams
+//  import com.google.common.io.ByteStreams
 
 import org.junit.Rule
 import org.junit.rules.TestName
+
 
 class SMTPSocketWorkerSpec extends Specification {
     
     def setup() {}          // run before every feature method
     def cleanup() {}        // run after every feature method
-    def setupSpec() {    
-                StringBuffer.metaClass.endsWith = { end ->
+    def setupSpec() {
+        /*
+        StringBuffer.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {
                 return false
             } else if ( delegate.substring( ( delegate.length() - end.length() ), delegate.length() ).equals( end ) ) {
@@ -28,6 +30,7 @@ class SMTPSocketWorkerSpec extends Specification {
         StringBuffer.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
         }
+        */
     }     // run before the first feature method
     def cleanupSpec() {}   // run after the last feature method
     

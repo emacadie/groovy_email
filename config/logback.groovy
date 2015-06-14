@@ -17,19 +17,19 @@ import ch.qos.logback.core.rolling.TimeBasedRollingPolicy
 
 import static ch.qos.logback.classic.Level.DEBUG
 
-appender("STDOUT", ConsoleAppender) {
-  encoder(PatternLayoutEncoder) {
+appender( "STDOUT", ConsoleAppender ) {
+  encoder( PatternLayoutEncoder ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
-appender("FILE", RollingFileAppender) {
-  rollingPolicy(TimeBasedRollingPolicy) {
+appender( "FILE", RollingFileAppender ) {
+  rollingPolicy( TimeBasedRollingPolicy ) {
     fileNamePattern = "log/MyExample.%d{yyyy-MM-dd}.log"
     maxHistory = 7
   }
-  encoder(PatternLayoutEncoder) {
+  encoder( PatternLayoutEncoder ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
-root(DEBUG, ["FILE", "STDOUT"])
+root( DEBUG, [ "FILE", "STDOUT" ] )
 

@@ -26,7 +26,8 @@ allprojects {
     // From Maven, it's GroupId:ArtifactId:Version 
     testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
     testCompile 'cglib:cglib-nodep:3.1'
-    testCompile 'com.google.guava:guava:18.0'
+    // dependencies used by examples in this project (not required for using Spock)
+    // testRuntime "com.h2database:h2:1.2.147"
     // compile 'log4j:log4j:1.2.17'
 
     // logging
@@ -41,8 +42,7 @@ allprojects {
     
     // Using sfl4j allows us to replace different loggers later, if desired
     compile group: 'org.slf4j', name:'slf4j-api', version: '1.7.2'
-    // sfl4j is just a facade for loggers. To actually get logging to work, you need to
-    // tie it in with some actual implementation, e.g., logback
+    // sfl4j is just a facade for loggers. To get logging to work, tie it in with an implementation, e.g., logback
     compile group: 'ch.qos.logback', name:'logback-classic', version: '1.0.9'
     compile group: 'ch.qos.logback', name:'logback-core', version: '1.0.9'
 
@@ -72,7 +72,10 @@ test {
   forkEvery = 50
   // this will make it run the test every time you run 'gradle test'
   outputs.upToDateWhen { false }
+
 }
+
+
 
 task runJava( type: JavaExec ) {
      println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )
