@@ -67,6 +67,9 @@ class BinarySMTPSocketWorker {
 	        while ( ( !sBuff.endsWith( delimiter ) ) && ( !sBuff.startsWith( 'RSET' ) ) ) {
 	            theByte = input.read()
 	            // log.info "theByte as char: ${theByte as char}"
+	            if ( theByte == -1 ) {
+	                break
+	            }
 	            byteList << theByte
 	            sBuff << ( theByte as char )
 	            // if ( sBuff.length() > 20 ) { log.info "sBuff bigger than 20: ${sBuff}" }
@@ -123,8 +126,7 @@ class BinarySMTPSocketWorker {
 		if ( theMessage.startsWith( 'EHLO' ) ) {
 			domain = theMessage.replaceFirst( 'EHLO ', '' )
 			log.info "Here is the domain: ${domain}"
-			theResponse = "250-Hello ${domain}\n"
-			theResponse += "250 HELP"
+			theResponse = "250-Hello ${domain}\n250 HELP"
 			// log.info "Here is the response:\n${theResponse}"
 		} else if ( theMessage.startsWith( 'HELO' ) ) {
 			domain = theMessage.replaceFirst( 'HELO ', '' )
@@ -145,6 +147,9 @@ class BinarySMTPSocketWorker {
 			theResponse = "250 OK"
 		} else if ( prevCommand == 'THE MESSAGE' && theMessage.startsWith( 'QUIT' ) ) {
 			theResponse = "221 ${serverName} Service closing transmission channel"
+		} else {
+			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
+			theResponse = '250 OK'
 		}
 		theResponse + "\r\n"
 	}
