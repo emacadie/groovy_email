@@ -89,7 +89,7 @@ class SMTPSocketWorkerSpec extends Specification {
             def domain = "hot-groovy.com"
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
     
-            InputStream input = new ByteArrayInputStream( data );
+            InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
             def ssWorker = new SMTPSocketWorker( input, output, serverName )
@@ -118,7 +118,8 @@ class SMTPSocketWorkerSpec extends Specification {
             def domain = "hot-groovy.com"
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
     
-            InputStream input = IOUtils.toInputStream( "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}", "UTF8" )
+            // InputStream input = IOUtils.toInputStream( "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}", "UTF8" )
+            InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
             def ssWorker = new SMTPSocketWorker( input, output, serverName )
