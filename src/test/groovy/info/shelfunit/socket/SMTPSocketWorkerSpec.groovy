@@ -6,6 +6,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.io.BufferedReader
 
+import org.apache.commons.io.IOUtils
 //  import com.google.common.io.ByteStreams
 
 import org.junit.Rule
@@ -47,7 +48,7 @@ class SMTPSocketWorkerSpec extends Specification {
     TestName name = new TestName()
 
 	def "test handling EHLO"() {
-	    println "--- Starting test ${name.methodName}"
+	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
 	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    
@@ -63,7 +64,7 @@ class SMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    println "--- XX Starting test ${name.methodName}"
+	    println "\n--- XX Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
 	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    
@@ -79,7 +80,7 @@ class SMTPSocketWorkerSpec extends Specification {
 	
 	@Ignore
 	def "test streams"() {
-	    println "--- Starting test ${name.methodName}"
+	    println "\n--- Starting test ${name.methodName}"
 	    when:
             def serverName = "www.groovymail.org"
             def crlf = "\r\n"
@@ -89,6 +90,35 @@ class SMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
     
             InputStream input = new ByteArrayInputStream( data );
+            OutputStream output = new ByteArrayOutputStream() 
+            
+            def ssWorker = new SMTPSocketWorker( input, output, serverName )
+            ssWorker.doWork()
+            input = new ByteArrayInputStream( "DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes() )
+            def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
+	    then:
+            // def exA = thrown( Exception )
+            // println "exA.message: ${exA.message}"
+            // exA.printStackTrace()
+            println "output to string: ++++\n${output.toString()}"
+            println "++++ end of output"
+            // def copy = ByteStreams.copy( first, output )
+            // println "Here is copy: ${copy}"
+            ehloResponse == "250 Hello ${domain}\r\n"
+	    
+	}
+	
+	def "test common streams"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    when:
+            def serverName = "www.groovymail.org"
+            def crlf = "\r\n"
+            def mIs = Mock( InputStream )
+            def mOs = Mock( OutputStream )
+            def domain = "hot-groovy.com"
+            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
+    
+            InputStream input = IOUtils.toInputStream( "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}", "UTF8" )
             OutputStream output = new ByteArrayOutputStream() 
             
             def ssWorker = new SMTPSocketWorker( input, output, serverName )

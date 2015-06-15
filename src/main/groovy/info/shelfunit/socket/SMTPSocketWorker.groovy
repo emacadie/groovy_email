@@ -50,7 +50,7 @@ class SMTPSocketWorker {
 	        holdString.clear()
 	        responseString = ''
 	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
-	        reader = input.newReader()
+	        // reader = input.newReader()
 	        log.info "Got the reader, and it's a ${reader.getClass().getName()}"
 	        def newString =  reader.readLine() 
 	        log.info "Here is newString: ${newString}"
