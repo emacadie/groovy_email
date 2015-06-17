@@ -78,6 +78,35 @@ class SMTPSocketWorkerSpec extends Specification {
 	        ehloResponse == "250 Hello ${domain}\r\n"
 	}
 	
+	
+	def "test handling old commands"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    def serverName = "www.groovymail.org"
+	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    
+	    expect:
+	        ssWorker.serverName == "www.groovymail.org"
+	    
+	    def domain = "hot-groovy.com"
+	    when: "Sending SAML"
+	        def ehloResponse = ssWorker.handleMessage( "SAML ${domain}" )
+	    then:
+	        ehloResponse == "502 Command not implemented\r\n"
+	    when: "Sending SEND"
+	        ehloResponse = ssWorker.handleMessage( "SEND ${domain}" )
+	    then:
+	        ehloResponse == "502 Command not implemented\r\n"
+	    when: "Sending SOML"
+	        ehloResponse = ssWorker.handleMessage( "SOML ${domain}" )
+	    then:
+	        ehloResponse == "502 Command not implemented\r\n"
+	    when: "Sending TURN"
+	        ehloResponse = ssWorker.handleMessage( "TURN ${domain}" )
+	    then: 
+	        ehloResponse == "502 Command not implemented\r\n"
+	        
+	}
+	
 	@Ignore
 	def "test streams"() {
 	    println "\n--- Starting test ${name.methodName}"

@@ -58,44 +58,33 @@ class SMTPSocketWorker {
 	        if ( newString.startsWith( 'QUIT' ) ) {
 		        log.info "got QUIT, here is prevCommand: ${prevCommand}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
-		        log.info "responseString: ${responseString}"
-		        output << responseString
 		        gotQuitCommand = true
 	        } else if ( newString.startsWith( 'DATA' ) ) {
 		        responseString = this.handleMessage( newString )
-		        log.info "responseString: ${responseString}"
 		        prevCommand = 'DATA'
-		        output << responseString
 	        } else if ( prevCommand == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        sBuffer << newString
 		        while ( !newString.startsWith( "." ) ) {
-			        
 			        try {
 				        newString = reader?.readLine()
-				        sBuffer << newString
-				        sBuffer << '\n'
+				        sBuffer << newString << '\n'
 				        log.info "in DATA loop, available: ${input.available()}, reader?.ready: ${reader?.ready()}"
 			        } catch ( Exception ex ) {
 				        log.info "exception: ${ex.printMessage()}"
 				        ex.printStackTrace()
 			        }
-			        
 		        }
 		        responseString = this.handleMessage( sBuffer.toString() )
 		        prevCommand = 'THE MESSAGE'
-		        log.info "responseString after message: ${responseString}"
-		        output << responseString
-		        
 	        } else {
 		        responseString = this.handleMessage( newString )
-		        log.info "responseString: ${responseString}"
-		        output << responseString
 	        }
+	        log.info "responseString: ${responseString}"
+	        output << responseString
         }
-        
         log.info "ending doWork"
-	}
+	} 
 
 	def handleMessage( theMessage ) {
 		theResponse = ""
@@ -125,8 +114,11 @@ class SMTPSocketWorker {
 			theResponse = "250 OK"
 		} else if ( prevCommand == 'THE MESSAGE' && theMessage.startsWith( 'QUIT' ) ) {
 			theResponse = "221 ${serverName} Service closing transmission channel"
+		} else if ( theMessage.substring( 0, 4 ).matches( "SAML|SEND|SOML|TURN" ) ) {
+		    theResponse = '502 Command not implemented'
 		} else {
 			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
+			// this should probably not stay 250
 			theResponse = '250 OK'
 		}
 		theResponse + "\r\n"
