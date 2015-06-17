@@ -25,6 +25,10 @@ http://tools.ietf.org/html/rfc6531: SMTP Extension for Internationalized Email
 http://tools.ietf.org/html/rfc6854: Update to Internet Message Format (updates but does not obsolete 5322)
 
 http://tools.ietf.org/html/rfc5234: Augmented BNF for Syntax Specifications: ABNF
+https://cafe.bevocal.com/docs/grammar/abnf.html
+http://www.freesoft.org/CIE/RFC/1945/7.htm
+https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form
+
 
 http://www.iana.org/assignments/mail-parameters/mail-parameters.xhtml
 List of James RFCs: http://james.apache.org/server/rfclist.html
@@ -43,8 +47,9 @@ https://systembash.com/a-simple-java-tcp-server-and-tcp-client/
 
 Nice table:
 http://www.greenend.org.uk/rjk/tech/smtpreplies.html
-
+http://www.omnisecu.com/tcpip/smtp-simple-mail-transfer-protocol-how-smtp-works.php
 http://www.samlogic.net/articles/smtp-commands-reference.htm
+https://technet.microsoft.com/en-us/magazine/2005.11.howitworkssmtp.aspx
 
 java.net.SocketInputStream:
 http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/java/net/SocketInputStream.java?av=f
@@ -61,6 +66,15 @@ NOOP
 QUIT
 VRFY
 .
+Others:
+SEND obsolete: 502	Command not implemented
+SOML obsolete: 502	Command not implemented
+SAML obsolete: 502	Command not implemented
+EXPN
+HELP
+TURN Deprecated	502	Command not implemented
+
+
 PING shelfunit.info (45.33.18.182) 56(84) bytes of data
 02/05/15 12:42:04 INFO  James.Mailet: RemoteDelivery: Exception reading response
 02/05/15 12:42:04 INFO  James.Mailet: RemoteDelivery: Temporary exception delivering mail (Mail1430588344601-218-to-shelfunit.info: 

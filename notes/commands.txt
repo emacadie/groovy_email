@@ -1,6 +1,6 @@
 This project will make the best mail server I have ever made.
 
-gradle clean; gradle build 
+gradle clean; gradle build ; rm -v log/MyExample.*
 
 To run a single test, do this:  
 gradle -Dtest.single=HelloSpock test -info   
@@ -15,13 +15,11 @@ gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=4444
 gradle runJava -PmainClass=info.shelfunit.socket.JTCPClient -PmainArgs=6789  
 gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=25
 
+
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner -PmainArgs="src/main/resources/application.conf"
 gradle runGroovy -PmainClass=info.shelfunit.mail.BinaryMailRunner -PmainArgs="src/main/resources/application.conf"
 
-gradle runGroovy -PmainClass=shelfunit.mail.MailRunner
-gradle runGroovy -PmainClass=shelfunit.mail.MailRunner -PmainArgs="src/main/resources/application.conf"
-gradle runGroovy -PmainClass=shelfunit.mail.BinaryMailRunner -PmainArgs="src/main/resources/application.conf"
 
 
 To use shell:

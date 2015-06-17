@@ -125,6 +125,9 @@ class SMTPSocketWorker {
 			theResponse = "250 OK"
 		} else if ( prevCommand == 'THE MESSAGE' && theMessage.startsWith( 'QUIT' ) ) {
 			theResponse = "221 ${serverName} Service closing transmission channel"
+		} else {
+			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
+			theResponse = '250 OK'
 		}
 		theResponse + "\r\n"
 	}
