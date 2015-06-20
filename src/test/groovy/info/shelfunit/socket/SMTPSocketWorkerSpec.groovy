@@ -19,6 +19,13 @@ class SMTPSocketWorkerSpec extends Specification {
     def cleanup() {}        // run after every feature method
     def setupSpec() {
         
+        // ExpandoMetaClass.enableGlobally()
+        java.util.List.metaClass.lastItem = {
+            if ( delegate.size() != 0 ) { 
+                delegate.last()
+            }
+        }
+        
         StringBuffer.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {
                 return false

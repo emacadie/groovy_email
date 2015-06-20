@@ -14,13 +14,15 @@ class SMTPSocketWorker {
 	private String domain
     private String theResponse
     private String serverName
-	private String prevCommand
+	// private String prevCommand
+	private def prevCommandList 
 
 	SMTPSocketWorker( argIn, argOut, argServerName ) {
         input = argIn
         output = argOut
         serverName = argServerName
         log.info "server name is ${serverName}"
+        prevCommandList = []
 	}
     
 	// make sure private fields are truly private
@@ -28,7 +30,8 @@ class SMTPSocketWorker {
 	def setOutput( arg ) {}
 	def setDomain( arg ) {}
 	def setTheResponse( arg ) {}
-	def setPrevCommand( arg ) {}
+	// def setPrevCommand( arg ) {}
+	def setPrevCommandList( arg ) {}
 
 	def doWork() {
         String sCurrentLine
@@ -50,19 +53,18 @@ class SMTPSocketWorker {
 	        holdString.clear()
 	        responseString = ''
 	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
-	        // reader = input.newReader()
 	        log.info "Got the reader, and it's a ${reader.getClass().getName()}"
 	        def newString =  reader.readLine() 
 	        log.info "Here is newString: ${newString}"
 	        
 	        if ( newString.startsWith( 'QUIT' ) ) {
-		        log.info "got QUIT, here is prevCommand: ${prevCommand}, here is newString: ${newString}"
+		        log.info "got QUIT, here is prevCommandList: ${prevCommandList}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
 	        } else if ( newString.startsWith( 'DATA' ) ) {
 		        responseString = this.handleMessage( newString )
-		        prevCommand = 'DATA'
-	        } else if ( prevCommand == 'DATA' ) {
+		        prevCommandList << 'DATA'
+	        } else if ( prevCommandList.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        sBuffer << newString
 		        while ( !newString.startsWith( "." ) ) {
@@ -76,7 +78,7 @@ class SMTPSocketWorker {
 			        }
 		        }
 		        responseString = this.handleMessage( sBuffer.toString() )
-		        prevCommand = 'THE MESSAGE'
+		        prevCommandList << 'THE MESSAGE'
 	        } else {
 		        responseString = this.handleMessage( newString )
 	        }
@@ -107,12 +109,13 @@ class SMTPSocketWorker {
 			theResponse = "250 OK"
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
-		} else if ( prevCommand == 'DATA' ) {
+		} else if ( prevCommandList.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
+		    prevCommandList.clear()
 			theResponse = "250 OK"
-		} else if ( prevCommand == 'THE MESSAGE' && theMessage.startsWith( 'QUIT' ) ) {
+		} else if ( prevCommandList.lastItem() == 'THE MESSAGE' && theMessage.startsWith( 'QUIT' ) ) {
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.substring( 0, 4 ).matches( "SAML|SEND|SOML|TURN" ) ) {
 		    theResponse = '502 Command not implemented'

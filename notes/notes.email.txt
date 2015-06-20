@@ -67,12 +67,12 @@ QUIT
 VRFY
 .
 Others:
-SEND obsolete: 502	Command not implemented
-SOML obsolete: 502	Command not implemented
-SAML obsolete: 502	Command not implemented
+x SEND obsolete: 502	Command not implemented
+x SOML obsolete: 502	Command not implemented
+x SAML obsolete: 502	Command not implemented
 EXPN
 HELP
-TURN Deprecated	502	Command not implemented
+x TURN Deprecated	502	Command not implemented
 
 
 PING shelfunit.info (45.33.18.182) 56(84) bytes of data

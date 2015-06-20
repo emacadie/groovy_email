@@ -1,0 +1,9 @@
+https://www.linode.com/docs/databases/postgresql/
+https://www.linode.com/docs/databases/postgresql/ubuntu-12-04-precise-pangolin
+
+apt-get install postgresql postgresql-contrib
+passwd postgres
+su - postgres
+psql -d template1 -c "ALTER USER postgres WITH PASSWORD 'changeme';"
+
+

@@ -7,6 +7,11 @@ import groovy.util.logging.Slf4j
 class MailRunner {
     
     static main( args ) {
+        java.util.List.metaClass.lastItem = {
+            if ( delegate.size() != 0 ) {
+                delegate.last()
+            }
+        }
         StringBuffer.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {
                 return false
