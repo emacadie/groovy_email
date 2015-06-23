@@ -71,8 +71,8 @@ class SMTPSocketWorker {
 		        def sBuffer = new StringBuffer()
 		        sBuffer << newString
 		        def readerReady = true
-		        while ( readerReady ) { 
-		        // while ( !newString.startsWith( "." ) ) {
+		        // while ( readerReady ) { // in "prod" 
+		        while ( !newString.startsWith( "." ) ) { // for automated tests
 		        
 			        try {
 				        newString = reader?.readLine()

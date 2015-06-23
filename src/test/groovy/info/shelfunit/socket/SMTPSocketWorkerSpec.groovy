@@ -187,8 +187,8 @@ class SMTPSocketWorkerSpec extends Specification {
             // InputStream input = IOUtils.toInputStream( "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}", "UTF8" )
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def theReader = Stub(java.io.BufferedReader)
-            theReader.ready(_) >>> [  false ]
+            // def theReader = Stub(java.io.BufferedReader)
+            // theReader.ready(_) >>> [  false ]
             def ssWorker = new SMTPSocketWorker( input, output, serverName )
             ssWorker.doWork()
             input = new ByteArrayInputStream( "DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes() )

@@ -1,0 +1,5 @@
+WRT the lines with the dot:
+If a line is a period, but it's not the last line of the message, I think that SMTP servers will add another period to that line.
+So I don't need to mess with reader.ready(). I might be able to make something that I can run AND I can test.
+
+
