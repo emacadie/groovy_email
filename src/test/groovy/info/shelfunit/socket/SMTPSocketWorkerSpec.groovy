@@ -173,5 +173,36 @@ class SMTPSocketWorkerSpec extends Specification {
             ehloResponse == "250 Hello ${domain}\r\n"
 	    
 	}
+	
+	
+	def "test common streams with reader mocking"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    when:
+            def serverName = "www.groovymail.org"
+            def crlf = "\r\n"
+            
+            def domain = "hot-groovy.com"
+            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
+    
+            // InputStream input = IOUtils.toInputStream( "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}", "UTF8" )
+            InputStream input = new ByteArrayInputStream( data )
+            OutputStream output = new ByteArrayOutputStream() 
+            def theReader = Stub(java.io.BufferedReader)
+            theReader.ready(_) >>> [  false ]
+            def ssWorker = new SMTPSocketWorker( input, output, serverName )
+            ssWorker.doWork()
+            input = new ByteArrayInputStream( "DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes() )
+            def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
+	    then:
+            // def exA = thrown( Exception )
+            // println "exA.message: ${exA.message}"
+            // exA.printStackTrace()
+            println "output to string: ++++\n${output.toString()}"
+            println "++++ end of output"
+            // def copy = ByteStreams.copy( first, output )
+            // println "Here is copy: ${copy}"
+            ehloResponse == "250 Hello ${domain}\r\n"
+	    
+	}
 }
 

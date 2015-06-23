@@ -61,22 +61,31 @@ class SMTPSocketWorker {
 		        log.info "got QUIT, here is prevCommandList: ${prevCommandList}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
-	        } else if ( newString.startsWith( 'DATA' ) ) {
+		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
+	        } else if ( newString.startsWith( 'RSET' ) ) {
+		        responseString = this.handleMessage( newString )
+		    } else if ( newString.startsWith( 'DATA' ) ) {
 		        responseString = this.handleMessage( newString )
 		        prevCommandList << 'DATA'
 	        } else if ( prevCommandList.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        sBuffer << newString
-		        while ( !newString.startsWith( "." ) ) {
+		        def readerReady = true
+		        while ( readerReady ) { 
+		        // while ( !newString.startsWith( "." ) ) {
+		        
 			        try {
 				        newString = reader?.readLine()
 				        sBuffer << newString << '\n'
-				        log.info "in DATA loop, available: ${input.available()}, reader?.ready: ${reader?.ready()}"
+				        readerReady = reader?.ready()
+				        log.info "in DATA loop, available: ${input.available()}, reader?.ready: ${readerReady}"
+				        log.info "Here is sBuffer in while loop: ${sBuffer}"
 			        } catch ( Exception ex ) {
 				        log.info "exception: ${ex.printMessage()}"
 				        ex.printStackTrace()
 			        }
 		        }
+		        log.info( "broke out of while loop for DATA" )
 		        responseString = this.handleMessage( sBuffer.toString() )
 		        prevCommandList << 'THE MESSAGE'
 	        } else {
