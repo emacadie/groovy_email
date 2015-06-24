@@ -199,6 +199,12 @@ class SMTPSocketWorkerSpec extends Specification {
             // exA.printStackTrace()
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
+            output.toString() == "220 www.groovymail.org Simple Mail Transfer Service Ready\r\n" +
+                "250-Hello hot-groovy.com\n" +
+                "250 HELP\r\n" +
+                "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
+                "250 OK\r\n" +
+                "221 www.groovymail.org Service closing transmission channel\r\n"
             // def copy = ByteStreams.copy( first, output )
             // println "Here is copy: ${copy}"
             ehloResponse == "250 Hello ${domain}\r\n"
