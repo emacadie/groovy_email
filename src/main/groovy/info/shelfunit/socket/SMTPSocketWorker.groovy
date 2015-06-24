@@ -14,8 +14,7 @@ class SMTPSocketWorker {
 	private String domain
     private String theResponse
     private String serverName
-	// private String prevCommand
-	private def prevCommandList 
+	private prevCommandList 
 
 	SMTPSocketWorker( argIn, argOut, argServerName ) {
         input = argIn
@@ -30,7 +29,6 @@ class SMTPSocketWorker {
 	def setOutput( arg ) {}
 	def setDomain( arg ) {}
 	def setTheResponse( arg ) {}
-	// def setPrevCommand( arg ) {}
 	def setPrevCommandList( arg ) {}
 
 	def doWork() {
@@ -41,16 +39,10 @@ class SMTPSocketWorker {
         log.info "available: ${input.available()}"
         def reader = input.newReader()
         log.info "reader is a ${reader.class.name}"
-        log.info "can reader still be read before output? ${reader.ready()}"
-        def now = new Date()
         output << "220 ${serverName} Simple Mail Transfer Service Ready\r\n"
-        
-        log.info "can reader still be read after output? ${reader.ready()}"
-        
-        def holdString = new StringBuffer()
+
         def responseString
         while ( !gotQuitCommand ) {
-	        holdString.clear()
 	        responseString = ''
 	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
 	        log.info "Got the reader, and it's a ${reader.getClass().getName()}"
@@ -69,19 +61,10 @@ class SMTPSocketWorker {
 		        prevCommandList << 'DATA'
 	        } else if ( prevCommandList.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
-		        
-		        def readerReady = true
-		        def moreToMessage = true
-		        // while ( readerReady ) { // in "prod" 
-		        // while ( !newString == "."  ) { // no good
 		        while ( !newString.equals( "." ) ) {
-		        // while ( !newString.startsWith( "." ) ) {
 		            sBuffer << newString << '\n'
 			        try {
 				        newString = reader?.readLine()
-				        // sBuffer << newString << "\n"
-				        // readerReady = reader?.ready()
-				        log.info "in DATA loop, available: ${input.available()}, reader?.ready: ${readerReady}"
 				        log.info "Here is sBuffer in while loop: ${sBuffer}"
 			        } catch ( Exception ex ) {
 				        log.info "exception: ${ex.printMessage()}"
@@ -127,10 +110,12 @@ class SMTPSocketWorker {
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    prevCommandList.clear()
 			theResponse = "250 OK"
-		} else if ( prevCommandList.lastItem() == 'THE MESSAGE' && theMessage.startsWith( 'QUIT' ) ) {
+		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandList.lastItem() == 'THE MESSAGE' && 
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.substring( 0, 4 ).matches( "SAML|SEND|SOML|TURN" ) ) {
 		    theResponse = '502 Command not implemented'
+		} else if ( theMessage.startsWith( 'NOOP' ) ) {
+		    theReponse = '250 OK'
 		} else {
 			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			// this should probably not stay 250

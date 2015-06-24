@@ -87,7 +87,6 @@ class SMTPSocketWorkerSpec extends Specification {
 	        ehloResponse == "250 Hello ${domain}\r\n"
 	}
 	
-	
 	def "test handling old commands"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
@@ -119,9 +118,6 @@ class SMTPSocketWorkerSpec extends Specification {
 	    println "\n--- Starting test ${name.methodName}"
 	    when:
             def serverName = "www.groovymail.org"
-            
-            def mIs = Mock( InputStream )
-            def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
             def bString = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}" +
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
@@ -141,6 +137,31 @@ class SMTPSocketWorkerSpec extends Specification {
                 "250 OK\r\n" +
                 "221 www.groovymail.org Service closing transmission channel\r\n"
 	    
+	}
+	
+	def "test obsolete commands"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    when:
+            def serverName = "www.groovymail.org"
+            def mIs = Mock( InputStream )
+            def mOs = Mock( OutputStream )
+            def domain = "hot-groovy.com"
+            byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
+            InputStream input = new ByteArrayInputStream( data )
+            OutputStream output = new ByteArrayOutputStream() 
+            new SMTPSocketWorker( input, output, serverName ).doWork()
+            
+	    then:
+            println "output to string: ++++\n${output.toString()}"
+            println "++++ end of output"
+            output.toString() == "220 www.groovymail.org Simple Mail Transfer Service Ready\r\n" +
+                "250-Hello hot-groovy.com\n" +
+                "250 HELP\r\n" +
+                "502 Command not implemented\r\n" +
+                "502 Command not implemented\r\n" +
+                "502 Command not implemented\r\n" +
+                "502 Command not implemented\r\n" +
+                "221 www.groovymail.org Service closing transmission channel\r\n"
 	}
 	
 	def "test common streams"() {
