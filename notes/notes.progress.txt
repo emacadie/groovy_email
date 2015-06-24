@@ -1,5 +1,6 @@
 WRT the lines with the dot:
-If a line is a period, but it's not the last line of the message, I think that SMTP servers will add another period to that line.
+If a line is a period, but it's not the last line of the message, I think that SMTP servers will add another period to that line. If a line is two periods, the server will send three.
 So I don't need to mess with reader.ready(). I might be able to make something that I can run AND I can test.
+I will look at the RFC to see whose responsibility it is to add and remove the period.
 
 

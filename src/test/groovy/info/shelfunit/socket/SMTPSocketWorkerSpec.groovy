@@ -182,7 +182,7 @@ class SMTPSocketWorkerSpec extends Specification {
             def crlf = "\r\n"
             
             def domain = "hot-groovy.com"
-            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
+            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ\nKKK${crlf}.${crlf}QUIT${crlf}".getBytes()
     
             // InputStream input = IOUtils.toInputStream( "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}", "UTF8" )
             InputStream input = new ByteArrayInputStream( data )
