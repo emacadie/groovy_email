@@ -69,16 +69,17 @@ class SMTPSocketWorker {
 		        prevCommandList << 'DATA'
 	        } else if ( prevCommandList.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
-		        sBuffer << newString << '\n'
+		        
 		        def readerReady = true
 		        def moreToMessage = true
 		        // while ( readerReady ) { // in "prod" 
-		        // while ( !newString == "."  ) { // for automated tests
-		        while ( !newString.startsWith( "." ) ) {
-		        
+		        // while ( !newString == "."  ) { // no good
+		        while ( !newString.equals( "." ) ) {
+		        // while ( !newString.startsWith( "." ) ) {
+		            sBuffer << newString << '\n'
 			        try {
 				        newString = reader?.readLine()
-				        sBuffer << newString << "\n"
+				        // sBuffer << newString << "\n"
 				        // readerReady = reader?.ready()
 				        log.info "in DATA loop, available: ${input.available()}, reader?.ready: ${readerReady}"
 				        log.info "Here is sBuffer in while loop: ${sBuffer}"
