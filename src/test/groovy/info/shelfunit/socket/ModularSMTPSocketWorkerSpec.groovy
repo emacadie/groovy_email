@@ -13,7 +13,7 @@ import org.junit.Rule
 import org.junit.rules.TestName
 
 
-class SMTPSocketWorkerSpec extends Specification {
+class ModularSMTPSocketWorkerSpec extends Specification {
     
     def crlf = "\r\n"
     
@@ -59,7 +59,7 @@ class SMTPSocketWorkerSpec extends Specification {
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
-	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    
 	    expect:
 	        ssWorker.serverName == "www.groovymail.org"
@@ -75,7 +75,7 @@ class SMTPSocketWorkerSpec extends Specification {
 	def "test handling HELO"() {
 	    println "\n--- XX Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
-	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    
 	    expect:
 	        ssWorker.serverName == "www.groovymail.org"
@@ -90,7 +90,7 @@ class SMTPSocketWorkerSpec extends Specification {
 	def "test handling old commands"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
-	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    
 	    expect:
 	        ssWorker.serverName == "www.groovymail.org"
@@ -126,7 +126,7 @@ class SMTPSocketWorkerSpec extends Specification {
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new SMTPSocketWorker( input, output, serverName )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, serverName )
             ssWorker.doWork()
             
 	    then:
@@ -149,7 +149,7 @@ class SMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new SMTPSocketWorker( input, output, serverName ).doWork()
+            new ModularSMTPSocketWorker( input, output, serverName ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -174,7 +174,7 @@ class SMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new SMTPSocketWorker( input, output, serverName ).doWork()
+            new ModularSMTPSocketWorker( input, output, serverName ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -195,7 +195,7 @@ class SMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def ssWorker = new SMTPSocketWorker( input, output, serverName )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, serverName )
             ssWorker.doWork()
             
 	    then:

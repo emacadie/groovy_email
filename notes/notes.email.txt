@@ -14,6 +14,7 @@ http://tools.ietf.org/html/rfc3207: SMTP Service Extension for Secure SMTP over 
 http://tools.ietf.org/html/rfc3463: Enhanced Mail System Status Codes
 http://tools.ietf.org/html/rfc3461:Simple Mail Transfer Protocol (SMTP) Service Extension for Delivery Status Notifications (DSNs) 
 http://tools.ietf.org/html/rfc3464: An Extensible Message Format for Delivery Status Notifications
+https://tools.ietf.org/html/rfc3696#section-3 - covers email addresses
 http://tools.ietf.org/html/rfc3974: SMTP Operational Experience in Mixed IPv4/v6 Environments
 http://tools.ietf.org/html/rfc4954: SMTP Service Extension for Authentication
 http://tools.ietf.org/html/rfc5034: The Post Office Protocol (POP3) (Updates 2449) (authentication)
@@ -99,4 +100,9 @@ processing/thread complete.
 http://stackoverflow.com/questions/7729302/how-to-read-a-file-in-groovy-into-a-string
 http://docs.groovy-lang.org/latest/html/api/groovy/util/Eval.html
 
+http://staging.terrencemiao.com/technology/how-to-validate-email-address-with-regular-expression-in-groovy/
+emailPattern = /[_A-Za-z0-9-]+(.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(.[A-Za-z0-9]+)*(.[A-Za-z]{2,})/
+email = 'god@heaven.org'
+ 
+return email ==~ emailPattern
 

@@ -6,7 +6,7 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class MailRunner {
     
-    static main( args ) {
+    static runMetaProgramming() {
         java.util.List.metaClass.lastItem = {
             if ( delegate.size() != 0 ) {
                 delegate.last()
@@ -33,14 +33,17 @@ class MailRunner {
         StringBuffer.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
         }
+    }
+    
+    static main( args ) {
+        MailRunner.runMetaProgramming()
         log.info "in MailRunner"
         URL theURL = getClass().getResource( "/log4j.properties" );
         log.info "theURL is a ${theURL.class.name}"
         def config = new ConfigSlurper().parse( new File( args[ 0 ] ).toURL() )
-        def stuff = config.smtp.server.name
+        def serverName = config.smtp.server.name
         log.info "Here is config.smtp.server.name: ${config.smtp.server.name}"
-        log.info "Here is stuff: ${stuff} and it's a ${stuff.class.name}"
-        SMTPServer smtp = new SMTPServer( stuff )
+        SMTPServer smtp = new SMTPServer( serverName )
         smtp.doStuff( 25 )
     }
 }

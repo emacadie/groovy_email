@@ -7,7 +7,7 @@ import java.io.BufferedReader
 import groovy.util.logging.Slf4j 
 
 @Slf4j
-class SMTPSocketWorker {
+class ModularSMTPSocketWorker {
 
     private InputStream input
     private OutputStream output
@@ -16,7 +16,7 @@ class SMTPSocketWorker {
     private String serverName
 	private prevCommandList 
 
-	SMTPSocketWorker( argIn, argOut, argServerName ) {
+	ModularSMTPSocketWorker( argIn, argOut, argServerName ) {
         input = argIn
         output = argOut
         serverName = argServerName
