@@ -6,6 +6,9 @@ import java.io.BufferedReader
 
 import groovy.util.logging.Slf4j 
 
+import info.shelfunit.socket.command.EHLOCommand
+import info.shelfunit.socket.command.MAILCommand
+
 @Slf4j
 class ModularSMTPSocketWorker {
 
@@ -15,6 +18,9 @@ class ModularSMTPSocketWorker {
     private String theResponse
     private String serverName
 	private prevCommandList 
+	private mailCommand
+	private ehloCommand
+	private commandResultMap
 
 	ModularSMTPSocketWorker( argIn, argOut, argServerName ) {
         input = argIn
@@ -22,6 +28,9 @@ class ModularSMTPSocketWorker {
         serverName = argServerName
         log.info "server name is ${serverName}"
         prevCommandList = []
+        commandResultMap = [:]
+        mailCommand = new MAILCommand()
+        ehloCommand = new EHLOCommand()
 	}
     
 	// make sure private fields are truly private
@@ -86,20 +95,14 @@ class ModularSMTPSocketWorker {
 	def handleMessage( theMessage ) {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
-		if ( theMessage.startsWith( 'EHLO' ) ) {
-		    prevCommandList << 'EHLO'
-			domain = theMessage.replaceFirst( 'EHLO ', '' )
-			log.info "Here is the domain: ${domain}"
-			theResponse = "250-Hello ${domain}\n"
-			theResponse += "250 HELP"
-			// log.info "Here is the response:\n${theResponse}"
-		} else if ( theMessage.startsWith( 'HELO' ) ) {
-		    prevCommandList << 'HELO'
-			domain = theMessage.replaceFirst( 'HELO ', '' )
-			log.info "Here is the domain: ${domain}"
-			theResponse = "250 Hello ${domain}"
+		if ( theMessage.startsWith( 'EHLO' ) || theMessage.startsWith( 'HELO' )  ) {
+		    commandResultMap.clear()
+		    commandResultMap = ehloCommand.process( theMessage, prevCommandList ) 
+		    prevCommandList = commandResultMap.prevCommandList.clone()
+			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
 			// temporary
+			// commandResultMap = mailCommand.process( theMessage, prevCommandList )
 			theResponse = "250 OK"
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
 			// temporary

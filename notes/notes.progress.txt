@@ -3,4 +3,9 @@ If a line is a period, but it's not the last line of the message, I think that S
 So I don't need to mess with reader.ready(). I might be able to make something that I can run AND I can test.
 I will look at the RFC to see whose responsibility it is to add and remove the period.
 
+DNS:
+groovy:000> addrQ = Address.getByName("www.shelfunit.infoc")
+===> www.shelfunit.infoc/198.105.254.228
+?????
+
 

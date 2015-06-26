@@ -33,6 +33,9 @@ class MailRunner {
         StringBuffer.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
         }
+        String.metaClass.firstFour = { ->
+            return delegate.substring( 0, 4 )
+        }
     }
     
     static main( args ) {
