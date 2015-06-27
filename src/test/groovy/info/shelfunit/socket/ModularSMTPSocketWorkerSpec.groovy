@@ -1,12 +1,9 @@
 package info.shelfunit.socket
 
 import spock.lang.Specification
-import spock.lang.Ignore
+// import spock.lang.Ignore
 import java.io.InputStream
 import java.io.OutputStream
-import java.io.BufferedReader
-
-import org.apache.commons.io.IOUtils
 
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -15,21 +12,22 @@ import info.shelfunit.mail.MailRunner
 import info.shelfunit.socket.command.EHLOCommand
 
 class ModularSMTPSocketWorkerSpec extends Specification {
+    @Rule 
+    TestName name = new TestName()
     
     def crlf = "\r\n"
     
-    def setup() {}          // run before every feature method
+    def setup() {
+        println "\n--- Starting test ${name.methodName}"
+    }          // run before every feature method
     def cleanup() {}        // run after every feature method
     def setupSpec() {
         MailRunner.runMetaProgramming()
         // ExpandoMetaClass.enableGlobally()
-        
-        
     }     // run before the first feature method
     def cleanupSpec() {}   // run after the last feature method
     
-    @Rule 
-    TestName name = new TestName()
+    
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
@@ -51,7 +49,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
 	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    def ehloCommand = new EHLOCommand()
@@ -69,7 +66,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling old commands"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
 	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    
@@ -96,7 +92,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test with a line containing two periods"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    when:
             def serverName = "www.groovymail.org"
             def domain = "hot-groovy.com"
@@ -121,7 +116,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test obsolete commands"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    when:
             def serverName = "www.groovymail.org"
             def mIs = Mock( InputStream )
@@ -146,7 +140,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test common streams"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    when:
             def serverName = "www.groovymail.org"
             def mIs = Mock( InputStream )
@@ -169,7 +162,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test common streams with reader mocking"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    when:
             def serverName = "www.groovymail.org"
             def domain = "hot-groovy.com"

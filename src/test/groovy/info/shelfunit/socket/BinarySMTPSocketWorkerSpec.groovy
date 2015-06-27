@@ -3,9 +3,6 @@ package info.shelfunit.socket
 import spock.lang.Specification
 import java.io.InputStream
 import java.io.OutputStream
-import java.io.BufferedReader
-
-// import com.google.common.io.ByteStreams
 
 import org.junit.Rule
 import org.junit.rules.TestName

@@ -1,8 +1,5 @@
 package info.shelfunit.socket.command
 
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.BufferedReader
 import org.xbill.DNS.Address
 
 import groovy.util.logging.Slf4j 

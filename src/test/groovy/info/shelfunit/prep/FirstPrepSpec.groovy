@@ -1,23 +1,12 @@
 package info.shelfunit.prep
 
-
 import spock.lang.Specification
-import spock.lang.Ignore
-import java.io.InputStream
-import java.io.OutputStream
-import java.io.BufferedReader
-
-import org.apache.commons.io.IOUtils
+// import spock.lang.Ignore
 
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import info.shelfunit.mail.MailRunner
-import info.shelfunit.socket.command.EHLOCommand
-
-import org.xbill.DNS.Address
-
-import groovy.mock.interceptor.StubFor
+// import groovy.mock.interceptor.StubFor
 
 class FirstPrepSpec extends Specification {
     

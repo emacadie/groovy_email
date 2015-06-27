@@ -1,6 +1,6 @@
 package info.shelfunit.mail
 
-import java.net.ServerSocket
+// import java.net.ServerSocket
 import info.shelfunit.socket.BinarySMTPSocketWorker
 import groovy.util.logging.Slf4j 
 

@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'groovy'
+apply plugin: 'codenarc'
 apply plugin: 'com.github.tkruse.groovysh'
 // do not run this every single time
 // apply plugin: 'checkstyle'
@@ -52,7 +53,6 @@ allprojects {
     compile 'org.codehaus.groovy:groovy-all:2.4.0'
     compile 'dnsjava:dnsjava:2.1.7'
 
-    // compile 'org.codehaus.gpars:gpars:1.2.0'
   }
 
   tasks.withType( GroovyCompile ) { GroovyCompile compile ->
@@ -78,20 +78,20 @@ task hello  {
 
 
 test {
-  maxParallelForks = 5
-  forkEvery = 50
-  // this will make it run the test every time you run 'gradle test'
-  outputs.upToDateWhen { false }
-  // from https://github.com/mvcatsifma/spring-ctx-props-file/blob/master/build.gradle
-  // use this to set the database prepare/teardown props
-  systemProperties = System.getProperties()
-  systemProperties['foo'] = 'bar'
-  doFirst {
-      println "Hello +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-  }
-  doLast {
-      println "goodbye ------------------------------------------------------------------------------"
-  }
+    maxParallelForks = 5
+    forkEvery = 50
+    // this will make it run the test every time you run 'gradle test'
+    outputs.upToDateWhen { false }
+    // from https://github.com/mvcatsifma/spring-ctx-props-file/blob/master/build.gradle
+    // use this to set the database prepare/teardown props
+    systemProperties = System.getProperties()
+    systemProperties['foo'] = 'bar'
+    doFirst {
+        println "Hello +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+    }
+    doLast {
+        println "goodbye ------------------------------------------------------------------------------"
+    }
 
 }
 
@@ -145,16 +145,16 @@ task runGroovy( type: JavaExec ) {
 }
 
 task showProperties {
-  doLast {
-    println "Version: $version"
-    println "Custom property: $customProperty"
-  }
+    doLast {
+        println "Version: $version"
+        println "Custom property: $customProperty"
+    }
 }
 
 // you can type "gradle console" and get a console with all your classes
 task( console, dependsOn: 'classes', type: JavaExec ) {
-  main = 'groovy.ui.Console'
-  classpath = sourceSets.main.runtimeClasspath
+    main = 'groovy.ui.Console'
+    classpath = sourceSets.main.runtimeClasspath
 }
 
 /*
