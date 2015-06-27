@@ -10,10 +10,15 @@ gradle test --tests info.shelfunit.socket.command.EHLOCommandSpec -info
 gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info
 
+gradle test --tests info.shelfunit.prep.FirstPrepSpec -info -Ddatabase.prep=true
+
 http://stackoverflow.com/questions/24223631/h2-postgresql-mode-seems-not-working-for-me  
 I agree. Why not use postgres for testing?    
 http://stackoverflow.com/questions/7872693/running-postgresql-in-memory-only  
 I suggest simply writing your tests to expect a particular hostname/username/password to work, and having the test harness CREATE DATABASE a throwaway database, then DROP DATABASE at the end of the run. Get the database connection details from a properties file, build target properties, environment variable, etc.  
 
 Here is prevCommandList: [EHLO, DATA, THE MESSAGE]
+
+https://github.com/jamescarr/h2-gradle-plugin
+
 

@@ -17,6 +17,8 @@ buildscript {
     dependencies {
         classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.5'
     }
+    
+    
 }
 
 allprojects {
@@ -69,15 +71,31 @@ allprojects {
 
 }
 
+task hello  {
+    println 'Hello world!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
+
+}
+
+
 test {
   maxParallelForks = 5
   forkEvery = 50
   // this will make it run the test every time you run 'gradle test'
   outputs.upToDateWhen { false }
+  // from https://github.com/mvcatsifma/spring-ctx-props-file/blob/master/build.gradle
+  // use this to set the database prepare/teardown props
+  systemProperties = System.getProperties()
+  systemProperties['foo'] = 'bar'
+  doFirst {
+      println "Hello +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+  }
+  doLast {
+      println "goodbye ------------------------------------------------------------------------------"
+  }
 
 }
 
-
+// :compileTestGroovy', task ':processTestResources', task ':testClasses', task ':test',
 
 task runJava( type: JavaExec ) {
      println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )

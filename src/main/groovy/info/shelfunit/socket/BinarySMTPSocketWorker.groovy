@@ -73,7 +73,7 @@ class BinarySMTPSocketWorker {
 	            byteList << theByte
 	            sBuff << ( theByte as char )
 	            // if ( sBuff.length() > 20 ) { log.info "sBuff bigger than 20: ${sBuff}" }
-	            log.info "sBuff bigger than 20: ${sBuff}"
+	            // log.info "sBuff bigger than 20: ${sBuff}"
             }
 	        newString = sBuff.toString()
 	        log.info "after the read, here is newString: ${newString}"

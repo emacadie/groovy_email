@@ -215,21 +215,19 @@ groovy:000>
 	def "test without mocks or stubs"() {
 	    
 	    when:
-            def longString = ("f" * 256) + '.com'
+            def longString = ( "f" * 256 ) + '.com'
             def serverName = "www.groovymail.org"
             def ehloCommand = new EHLOCommand()
             def result = ehloCommand.processDomain( 'www.shelfunit.info' )
             println "here is result: ${result}"
 	    then:
 	        result == '45.33.18.182'
-	    
 	}
 	
 	// this works even if not connected to internet
 	def "test good domain with mocks or stubs"() {
-	    
 	    when:
-            def longString = ("f" * 256) + '.com'
+            def longString = ( "f" * 256 ) + '.com'
             def serverName = "www.groovymail.org"
             def ehloCommand = new EHLOCommand()
             def inetAddress = GroovyStub( InetAddress )
