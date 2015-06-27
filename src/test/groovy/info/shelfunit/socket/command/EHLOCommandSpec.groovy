@@ -16,7 +16,7 @@ import info.shelfunit.socket.command.EHLOCommand
 
 import org.xbill.DNS.Address
 
-import groovy.mock.interceptor.*
+import groovy.mock.interceptor.StubFor
 
 class EHLOCommandSpec extends Specification {
     
@@ -43,7 +43,7 @@ class EHLOCommandSpec extends Specification {
 	    def domain = "hot-groovy.com"
 	    when:
 	        def resultMap = ehloCommand.process( "EHLO ${domain}", [] )
-	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
+	        def ehloResponse = resultMap.resultString + "\r\n" 
 	    then:
 	        ehloResponse == "250-Hello ${domain}\n" +
 	        "250 HELP\r\n"
@@ -57,7 +57,7 @@ class EHLOCommandSpec extends Specification {
 	    def domain = "hot-groovy.com"
 	    when:
 	        def resultMap = ehloCommand.process( "HELO ${domain}", [] )
-	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
+	        def ehloResponse = resultMap.resultString + "\r\n" 
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
 	        println "Here is the map: ${resultMap.prevCommandList}"
@@ -201,32 +201,14 @@ groovy:000>
 	def "test getting address"() {
 	    def serverName = "www.groovymail.org"
 	    def ehloCommand = new EHLOCommand()
-	    // def inetAddress = InetAddress.getLocalHost()
 	    def inetAddress = Stub( InetAddress )
 	    def address = GroovyStub( Address )
 	    address.getByName(_) >> inetAddress
 	    inetAddress.hostAddress >> 'X.X.X.X'
 	    def result = ehloCommand.processDomain( "XYZ" )
 	    println "here is result: ${result}"
-	    
-	    //////////////
-	    /*
-	    def stub = new StubFor(Person)      
-        stub.demand.with {                  
-            getLast{ 'name' }
-            getFirst{ 'dummy' }
-        }
-        stub.use {                          
-            def john = new Person(first:'John', last:'Smith')
-            def f = new Family(father:john)
-            assert f.father.first == 'dummy'
-            assert f.father.last == 'name'
-        }
-        */
-	    //////////////
-	    
 	    expect:
-	        // stub.expect.verify() 
+	        result == 'X.X.X.X'
 	        1 == 1
 	}
 	
@@ -242,22 +224,6 @@ groovy:000>
 	        result == '45.33.18.182'
 	    
 	}
-	
-	//////////////
-	    /*
-	    def stub = new StubFor(Person)      
-        stub.demand.with {                  
-            getLast{ 'name' }
-            getFirst{ 'dummy' }
-        }
-        stub.use {                          
-            def john = new Person(first:'John', last:'Smith')
-            def f = new Family(father:john)
-            assert f.father.first == 'dummy'
-            assert f.father.last == 'name'
-        }
-        */
-	    //////////////
 	
 	// this works even if not connected to internet
 	def "test good domain with mocks or stubs"() {
@@ -275,7 +241,6 @@ groovy:000>
             }
             stub.use {                          
                 result = ehloCommand.processDomain( 'www.shelfunit.info' )
-                
             }
             println "here is result: ${result}"
 	    then:
