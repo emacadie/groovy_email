@@ -3,7 +3,9 @@ Mocking of non-interface types requires the CGLIB library. Please put cglib-node
 I had to add testCompile 'cglib:cglib-nodep:3.1' to build.gradle
 
 gradle test --tests info.shelfunit.socket.BinarySMTPSocketWorkerSpec -info
+gradle test --tests info.shelfunit.socket.ModularSMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.SMTPSocketWorkerSpec -info
+gradle test --tests info.shelfunit.socket.command.EHLOCommandSpec -info
 
 gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info
@@ -12,4 +14,6 @@ http://stackoverflow.com/questions/24223631/h2-postgresql-mode-seems-not-working
 I agree. Why not use postgres for testing?    
 http://stackoverflow.com/questions/7872693/running-postgresql-in-memory-only  
 I suggest simply writing your tests to expect a particular hostname/username/password to work, and having the test harness CREATE DATABASE a throwaway database, then DROP DATABASE at the end of the run. Get the database connection details from a properties file, build target properties, environment variable, etc.  
+
+Here is prevCommandList: [EHLO, DATA, THE MESSAGE]
 

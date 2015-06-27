@@ -7,22 +7,26 @@ import java.io.OutputStream
 import java.io.BufferedReader
 
 import org.apache.commons.io.IOUtils
-//  import com.google.common.io.ByteStreams
 
 import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.MailRunner
+import info.shelfunit.socket.command.EHLOCommand
 
-class SMTPSocketWorkerSpec extends Specification {
+import org.xbill.DNS.Address
+
+import groovy.mock.interceptor.*
+
+class EHLOCommandSpec extends Specification {
     
     def crlf = "\r\n"
     
     def setup() {}          // run before every feature method
     def cleanup() {}        // run after every feature method
     def setupSpec() {
-        // ExpandoMetaClass.enableGlobally()
         MailRunner.runMetaProgramming()
+        // ExpandoMetaClass.enableGlobally()
     }     // run before the first feature method
     def cleanupSpec() {}   // run after the last feature method
     
@@ -32,38 +36,43 @@ class SMTPSocketWorkerSpec extends Specification {
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
-	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
-	    
-	    expect:
-	        ssWorker.serverName == "www.groovymail.org"
+	    def ehloCommand = new EHLOCommand()
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def ehloResponse = ssWorker.handleMessage( "EHLO ${domain}" )
+	        def resultMap = ehloCommand.process( "EHLO ${domain}", [] )
+	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250-Hello ${domain}\n" +
 	        "250 HELP\r\n"
+	        resultMap.prevCommandList == ["EHLO"]
 	}
 	
 	def "test handling HELO"() {
-	    println "\n--- XX Starting test ${name.methodName}"
+	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
-	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
-	    
-	    expect:
-	        ssWorker.serverName == "www.groovymail.org"
+	    def ehloCommand = new EHLOCommand()
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def ehloResponse = ssWorker.handleMessage( "HELO ${domain}" )
+	        def resultMap = ehloCommand.process( "HELO ${domain}", [] )
+	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
+	        println "Here is the map: ${resultMap.prevCommandList}"
 	}
 	
+	/*
+	groovy:000> longString = ("f" * 256) + '.com'
+===> ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff.com
+groovy:000> 
+
+	*/
+	/*
 	def "test handling old commands"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
-	    def ssWorker = new SMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
 	    
 	    expect:
 	        ssWorker.serverName == "www.groovymail.org"
@@ -86,7 +95,8 @@ class SMTPSocketWorkerSpec extends Specification {
 	    then: 
 	        ehloResponse == "502 Command not implemented\r\n"
 	}
-	
+	*/
+	/*
 	def "test with a line containing two periods"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    when:
@@ -99,7 +109,7 @@ class SMTPSocketWorkerSpec extends Specification {
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new SMTPSocketWorker( input, output, serverName )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, serverName )
             ssWorker.doWork()
             
 	    then:
@@ -111,7 +121,8 @@ class SMTPSocketWorkerSpec extends Specification {
                 "221 www.groovymail.org Service closing transmission channel\r\n"
 	    
 	}
-	
+	*/
+	/*
 	def "test obsolete commands"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    when:
@@ -122,7 +133,7 @@ class SMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new SMTPSocketWorker( input, output, serverName ).doWork()
+            new ModularSMTPSocketWorker( input, output, serverName ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -136,7 +147,8 @@ class SMTPSocketWorkerSpec extends Specification {
                 "502 Command not implemented\r\n" + // TURN
                 "221 www.groovymail.org Service closing transmission channel\r\n" // QUIT
 	}
-	
+	*/
+	/*
 	def "test common streams"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    when:
@@ -147,7 +159,7 @@ class SMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new SMTPSocketWorker( input, output, serverName ).doWork()
+            new ModularSMTPSocketWorker( input, output, serverName ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -159,7 +171,8 @@ class SMTPSocketWorkerSpec extends Specification {
                 "250 OK\r\n" +
                 "221 www.groovymail.org Service closing transmission channel\r\n"
 	}
-	
+	*/
+	/*
 	def "test common streams with reader mocking"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    when:
@@ -168,7 +181,7 @@ class SMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def ssWorker = new SMTPSocketWorker( input, output, serverName )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, serverName )
             ssWorker.doWork()
             
 	    then:
@@ -181,6 +194,40 @@ class SMTPSocketWorkerSpec extends Specification {
                 "250 OK\r\n" +
                 "221 www.groovymail.org Service closing transmission channel\r\n"
 	    
+	}
+	*/
+	
+	def "test getting address"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    def serverName = "www.groovymail.org"
+	    def ehloCommand = new EHLOCommand()
+	    // def inetAddress = InetAddress.getLocalHost()
+	    def inetAddress = Stub( InetAddress )
+	    def address = GroovyStub( Address )
+	    address.getByName(_) >> inetAddress
+	    inetAddress.hostAddress >> 'X.X.X.X'
+	    def result = ehloCommand.processDomain( "XYZ" )
+	    println "here is result: ${result}"
+	    
+	    //////////////
+	    /*
+	    def stub = new StubFor(Person)      
+        stub.demand.with {                  
+            getLast{ 'name' }
+            getFirst{ 'dummy' }
+        }
+        stub.use {                          
+            def john = new Person(first:'John', last:'Smith')
+            def f = new Family(father:john)
+            assert f.father.first == 'dummy'
+            assert f.father.last == 'name'
+        }
+        */
+	    //////////////
+	    
+	    expect:
+	        // stub.expect.verify() 
+	        1 == 1
 	}
 }
 

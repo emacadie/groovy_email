@@ -89,6 +89,7 @@ class ModularSMTPSocketWorker {
 	        log.info "responseString: ${responseString}"
 	        output << responseString
         }
+        log.info "Here is prevCommandList: ${prevCommandList}"
         log.info "ending doWork"
 	} 
 
