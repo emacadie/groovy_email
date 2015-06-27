@@ -267,8 +267,6 @@ groovy:000>
             def serverName = "www.groovymail.org"
             def ehloCommand = new EHLOCommand()
             def inetAddress = GroovyStub( InetAddress )
-            def address = GroovyStub( Address )
-            address.getByName(_) >> inetAddress
             inetAddress.hostAddress >> '45.33.18.182'
             def result = ''
             def stub = new StubFor( Address )      
