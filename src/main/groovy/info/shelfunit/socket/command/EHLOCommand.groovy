@@ -49,9 +49,12 @@ class EHLOCommand {
             InetAddress addr = Address.getByName( domain )
             hostAddress = addr.hostAddress
         } catch ( java.net.UnknownHostException uhEx ) {
+            println "Got UnknownHostException in processDomain"
+            uhEx.printStackTrace()
             addressGood = false
             hostAddress = 'X.X.X.X'
         }
+        println "is addressGood? ${addressGood}"
         hostAddress
     }
 }

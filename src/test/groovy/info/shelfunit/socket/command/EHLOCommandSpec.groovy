@@ -21,20 +21,22 @@ import groovy.mock.interceptor.*
 class EHLOCommandSpec extends Specification {
     
     def crlf = "\r\n"
+
+    @Rule 
+    TestName name = new TestName()
     
-    def setup() {}          // run before every feature method
+    def setup() {
+        println "\n--- Starting test ${name.methodName}"
+    }          // run before every feature method
     def cleanup() {}        // run after every feature method
     def setupSpec() {
         MailRunner.runMetaProgramming()
         // ExpandoMetaClass.enableGlobally()
     }     // run before the first feature method
-    def cleanupSpec() {}   // run after the last feature method
     
-    @Rule 
-    TestName name = new TestName()
+    def cleanupSpec() {}   // run after the last feature method
 
 	def "test handling EHLO"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
 	    def ehloCommand = new EHLOCommand()
 	    
@@ -49,7 +51,6 @@ class EHLOCommandSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
 	    def ehloCommand = new EHLOCommand()
 	    
@@ -198,7 +199,6 @@ groovy:000>
 	*/
 	
 	def "test getting address"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    def serverName = "www.groovymail.org"
 	    def ehloCommand = new EHLOCommand()
 	    // def inetAddress = InetAddress.getLocalHost()
@@ -228,6 +228,62 @@ groovy:000>
 	    expect:
 	        // stub.expect.verify() 
 	        1 == 1
+	}
+	
+	def "test without mocks or stubs"() {
+	    
+	    when:
+            def longString = ("f" * 256) + '.com'
+            def serverName = "www.groovymail.org"
+            def ehloCommand = new EHLOCommand()
+            def result = ehloCommand.processDomain( 'www.shelfunit.info' )
+            println "here is result: ${result}"
+	    then:
+	        result == '45.33.18.182'
+	    
+	}
+	
+	//////////////
+	    /*
+	    def stub = new StubFor(Person)      
+        stub.demand.with {                  
+            getLast{ 'name' }
+            getFirst{ 'dummy' }
+        }
+        stub.use {                          
+            def john = new Person(first:'John', last:'Smith')
+            def f = new Family(father:john)
+            assert f.father.first == 'dummy'
+            assert f.father.last == 'name'
+        }
+        */
+	    //////////////
+	
+	// this works even if not connected to internet
+	def "test good domain with mocks or stubs"() {
+	    
+	    when:
+            def longString = ("f" * 256) + '.com'
+            def serverName = "www.groovymail.org"
+            def ehloCommand = new EHLOCommand()
+            def inetAddress = GroovyStub( InetAddress )
+            def address = GroovyStub( Address )
+            address.getByName(_) >> inetAddress
+            inetAddress.hostAddress >> '45.33.18.182'
+            def result = ''
+            def stub = new StubFor( Address )      
+            stub.demand.with {                  
+                getByName{ inetAddress }
+            }
+            stub.use {                          
+                result = ehloCommand.processDomain( 'www.shelfunit.info' )
+                
+            }
+            println "here is result: ${result}"
+	    then:
+	        stub.expect.verify() 
+	        result == '45.33.18.182'
+	    
 	}
 }
 

@@ -18,7 +18,12 @@ class SMTPSocketWorkerSpec extends Specification {
     
     def crlf = "\r\n"
     
-    def setup() {}          // run before every feature method
+    @Rule 
+    TestName name = new TestName()
+    
+    def setup() {
+        println "\n--- Starting test ${name.methodName}"
+    }          // run before every feature method
     def cleanup() {}        // run after every feature method
     def setupSpec() {
         // ExpandoMetaClass.enableGlobally()
@@ -26,8 +31,7 @@ class SMTPSocketWorkerSpec extends Specification {
     }     // run before the first feature method
     def cleanupSpec() {}   // run after the last feature method
     
-    @Rule 
-    TestName name = new TestName()
+
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
