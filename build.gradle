@@ -3,8 +3,6 @@ apply plugin: 'maven'
 apply plugin: 'groovy'
 apply plugin: 'codenarc'
 apply plugin: 'com.github.tkruse.groovysh'
-// do not run this every single time
-// apply plugin: 'checkstyle'
 
 repositories {
   mavenCentral()
@@ -18,64 +16,58 @@ buildscript {
     dependencies {
         classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.5'
     }
-    
-    
 }
 
 allprojects {
-  dependencies {
-    testCompile 'junit:junit:4.10'
-    testCompile 'org.mockito:mockito-all:[1.8.5,)'
-    // From Maven, it's GroupId:ArtifactId:Version 
-    testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
-    testCompile 'cglib:cglib-nodep:3.1'
-    testCompile 'org.apache.directory.studio:org.apache.commons.io:2.4'
-    // dependencies used by examples in this project (not required for using Spock)
-    // testRuntime "com.h2database:h2:1.2.147"
-    // compile 'log4j:log4j:1.2.17'
-
-    // logging
-    // compile 'org.slf4j:slf4j-api:1.7.+'
-    // testRuntime 'org.slf4j:slf4j-ext:1.7.+'
-    // testRuntime 'org.slf4j:jcl-over-slf4j:1.7.+'
-    // testRuntime 'org.slf4j:jul-to-slf4j:1.7.+'
-    // testRuntime 'org.slf4j:log4j-over-slf4j:1.7.+'
+    dependencies {
+        testCompile 'junit:junit:4.10'
+        testCompile 'org.mockito:mockito-all:[1.8.5,)'
+        // From Maven, it's GroupId:ArtifactId:Version 
+        testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+        testCompile 'cglib:cglib-nodep:3.1'
+        testCompile 'org.apache.directory.studio:org.apache.commons.io:2.4'
+        // dependencies used by examples in this project (not required for using Spock)
+        // testRuntime "com.h2database:h2:1.2.147"
     
-    // testRuntime 'ch.qos.logback:logback-core:1.0.+'
-    // testRuntime 'ch.qos.logback:logback-classic:1.0.+'
+        // logging
+        // testRuntime 'org.slf4j:slf4j-ext:1.7.+'
+        // testRuntime 'org.slf4j:jcl-over-slf4j:1.7.+'
+        // testRuntime 'org.slf4j:jul-to-slf4j:1.7.+'
+        // testRuntime 'org.slf4j:log4j-over-slf4j:1.7.+'
     
-    // Using sfl4j allows us to replace different loggers later, if desired
-    compile group: 'org.slf4j', name:'slf4j-api', version: '1.7.2'
-    // sfl4j is just a facade for loggers. To get logging to work, tie it in with an implementation, e.g., logback
-    compile group: 'ch.qos.logback', name:'logback-classic', version: '1.1.3'
-    compile group: 'ch.qos.logback', name:'logback-core', version: '1.1.3'
-
-    compile 'org.codehaus.groovy:groovy-all:2.4.0'
-    compile 'dnsjava:dnsjava:2.1.7'
-
-  }
-
-  tasks.withType( GroovyCompile ) { GroovyCompile compile ->
-    compile.options.debug = true
-    compile.options.compilerArgs = [
-      '-Xlint:deprecation',
-      '-Xlint:unchecked'
-      // '-implicit:class',
-      // '-Awarns', '-Xmaxwarns', '10000',
-      // '-J-Xbootclasspath/p:$CHECKERS/binary/jsr308-all.jar',
-      // '-processor', 'checkers.nullness.NullnessChecker',
-      // '-Xbootclasspath/p:$CHECKERS/jdk/jdk.jar',	
-      // '-version'
-      ]
-  }
+        // testRuntime 'ch.qos.logback:logback-core:1.0.+'
+        // testRuntime 'ch.qos.logback:logback-classic:1.0.+'
+        
+        // Using sfl4j allows us to replace different loggers later, if desired
+        compile group: 'org.slf4j', name:'slf4j-api', version: '1.7.2'
+        // sfl4j is just a facade for loggers. To get logging to work, tie it in with an implementation, e.g., logback
+        compile group: 'ch.qos.logback', name:'logback-classic', version: '1.1.3'
+        compile group: 'ch.qos.logback', name:'logback-core', version: '1.1.3'
+    
+        compile 'org.codehaus.groovy:groovy-all:2.4.0'
+        compile 'dnsjava:dnsjava:2.1.7'
+        compile 'org.postgresql:postgresql:9.3-1101-jdbc41'
+    }
+    
+    tasks.withType( GroovyCompile ) { GroovyCompile compile ->
+        compile.options.debug = true
+        compile.options.compilerArgs = [
+        '-Xlint:deprecation',
+        '-Xlint:unchecked'
+        // '-implicit:class',
+        // '-Awarns', '-Xmaxwarns', '10000',
+        // '-J-Xbootclasspath/p:$CHECKERS/binary/jsr308-all.jar',
+        // '-processor', 'checkers.nullness.NullnessChecker',
+        // '-Xbootclasspath/p:$CHECKERS/jdk/jdk.jar',	
+        // '-version'
+        ]
+    }
 
 }
 
 task hello  {
     println 'Hello world!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!'
-
 }
-
 
 test {
     maxParallelForks = 5
@@ -92,56 +84,55 @@ test {
     doLast {
         println "goodbye ------------------------------------------------------------------------------"
     }
-
 }
 
 // :compileTestGroovy', task ':processTestResources', task ':testClasses', task ':test',
 
 task runJava( type: JavaExec ) {
-     println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )
-     dependsOn classes
-     description = 'Run gradle.sample.SampleApp'
-     // Java main class to execute.
-     if ( rootProject.hasProperty("mainClass") ) {     
-     	main = mainClass
-     } else {
-       main = 'org.lookup'
-     }
-     // We need to set the classpath.
-     classpath sourceSets.main.runtimeClasspath
-     // Extra options can be set.
-     systemProperty 'sysProp', 'notUsed'
-     println System.properties['iterations'] 
-     // systemProperty 'iterations', System.getProperty('iterations')
-     systemProperty 'iterations', System.properties['iterations'] 
-     // you can use this if nothing is set via command line
-     // systemProperties = System.getProperties()
-     jvmArgs '-server'
-     // We can pass arguments to the main() method
-     // of gradle.sample.SampleApp.
-     if ( rootProject.hasProperty( "mainArgs" ) ) {     
-     	args = mainArgs.tokenize() // args wants a List, so split by spaces if need be
-     } 
+    println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )
+    dependsOn classes
+    description = 'Run gradle.sample.SampleApp'
+    // Java main class to execute.
+    if ( rootProject.hasProperty("mainClass") ) {
+        main = mainClass
+    } else {
+        main = 'org.lookup'
+    }
+    // We need to set the classpath.
+    classpath sourceSets.main.runtimeClasspath
+    // Extra options can be set.
+    systemProperty 'sysProp', 'notUsed'
+    println System.properties['iterations'] 
+    // systemProperty 'iterations', System.getProperty('iterations')
+    systemProperty 'iterations', System.properties['iterations'] 
+    // you can use this if nothing is set via command line
+    // systemProperties = System.getProperties()
+    jvmArgs '-server'
+    // We can pass arguments to the main() method
+    // of gradle.sample.SampleApp.
+    if ( rootProject.hasProperty( "mainArgs" ) ) {     
+        args = mainArgs.tokenize() // args wants a List, so split by spaces if need be
+    } 
 }
 
 task runGroovy( type: JavaExec ) {
-     println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )
-     dependsOn classes
-     description = 'Run gradle.sample.SampleApp'
-     // main class to execute.
-     if ( rootProject.hasProperty( "mainClass" ) ) {     
-     	main = mainClass
-     } else {
-       main = 'org.lookup'
-     }
-     // We need to set the classpath.
-     classpath sourceSets.main.runtimeClasspath
-     // Extra options can be set.
-     systemProperty 'sysProp', 'notUsed'
-     jvmArgs '-client'
-     if ( rootProject.hasProperty( "mainArgs" ) ) {     
-     	args = mainArgs.tokenize() // args wants a List, so split by spaces if need be
-     } 
+    println( "-- Groovy version: " + groovy.lang.GroovySystem.getVersion() )
+    dependsOn classes
+    description = 'Run gradle.sample.SampleApp'
+    // main class to execute.
+    if ( rootProject.hasProperty( "mainClass" ) ) {
+        main = mainClass
+    } else {
+        main = 'org.lookup'
+    }
+    // We need to set the classpath.
+    classpath sourceSets.main.runtimeClasspath
+    // Extra options can be set.
+    systemProperty 'sysProp', 'notUsed'
+    jvmArgs '-client'
+    if ( rootProject.hasProperty( "mainArgs" ) ) {
+        args = mainArgs.tokenize() // args wants a List, so split by spaces if need be
+    } 
 }
 
 task showProperties {
@@ -157,12 +148,6 @@ task( console, dependsOn: 'classes', type: JavaExec ) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-/*
-checkstyle {
-   configProperties.put('translation.severity', 'warning')
-   println("configProperties is a " + configProperties.getClass().getName())
-}
-*/
 /*
 groovysh {
     // groovyVersion determines the features of the shell and buildShell tasks.

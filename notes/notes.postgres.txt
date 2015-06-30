@@ -19,4 +19,44 @@ grant all privileges on database gemail_test_db to gemail_test;
 
 psql -h localhost -U gemail_test -d gemail_test_db
 
+http://stackoverflow.com/questions/9789736/how-to-implement-a-many-to-many-relationship-in-postgresql
+CREATE TABLE product (
+  product_id serial8 PRIMARY KEY  -- implicit primary key constraint
+, product    text NOT NULL
+, price      numeric NOT NULL DEFAULT 0
+);
+
+CREATE TABLE bill (
+  bill_id  serial8 PRIMARY KEY
+, bill     text NOT NULL
+, billdate date NOT NULL DEFAULT now()::date
+);
+
+CREATE TABLE bill_product (
+  bill_id    int REFERENCES bill (bill_id) ON UPDATE CASCADE ON DELETE CASCADE
+, product_id int REFERENCES product (product_id) ON UPDATE CASCADE
+, amount     numeric NOT NULL DEFAULT 1
+  -- explicit pk
+, CONSTRAINT bill_product_pkey PRIMARY KEY (bill_id, product_id)
+);
+
+pg_dump --no-acl --no-owner -h localhost -U active_gwudev --data-only active_gw_dev_001 > table.dump
+: psql -h localhost -U shro_dev -d shro_grls_dev_001
+
+pg_dump --no-acl --no-owner -h localhost -U shro_dev shro_grls_dev_001 --schema-only --table=book > book.table.dump
+create user shro_dev with password 'active-stand-12';
+
+http://www.neilconway.org/docs/sequences/
+SELECT currval(pg_get_serial_sequence('users', 'id'));
+
+
+CREATE TABLE email_user (
+    userid serial primary key NOT NULL,
+    username character varying(64) not null unique,
+    password_hash character varying(150) not null,
+    password_algo character varying(32) not null,
+    first_name character varying(30) not null,
+    last_name character varying(30) not null
+    version bigint NOT NULL
+);
 

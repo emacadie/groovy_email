@@ -47,7 +47,7 @@ class MailRunner {
         def serverName = config.smtp.server.name
         log.info "Here is config.smtp.server.name: ${config.smtp.server.name}"
         SMTPServer smtp = new SMTPServer( serverName )
-        smtp.doStuff( 25 )
+        smtp.doStuff( config.smtp.server.port.toInteger() )
     }
 }
 

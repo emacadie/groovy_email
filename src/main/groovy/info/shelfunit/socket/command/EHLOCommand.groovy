@@ -10,7 +10,7 @@ class EHLOCommand {
     
     // RFC 5321 Sec.4.1.4: If the EHLO command is not acceptable to the SMTP server, 501, 500,
     //    502, or 550 failure replies MUST be returned as appropriate. 
-    // https://tools.ietf.org/html/rfc3696#section-3: Domain cannot be more than 255 chars
+    // https://tools.ietf.org/html/rfc3696#section-3  Domain cannot be more than 255 chars
     // RFC 5321, 3.2.  Client Initiation: You must return simple HELO 
     def process( theMessage, prevCommandList ) {
         def resultString
