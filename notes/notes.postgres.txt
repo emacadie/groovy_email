@@ -13,7 +13,7 @@ grant all privileges on database gemail_dev_db to gemail_dev;
 
 psql -h localhost -U gemail_dev -d gemail_dev_db
 
-create user gemail_test with password 'dev-word-to-pass001';
+create user gemail_test with password 'dev-word-to-pass002';
 create database gemail_test_db with owner gemail_test;
 grant all privileges on database gemail_test_db to gemail_test;
 
@@ -56,7 +56,15 @@ CREATE TABLE email_user (
     password_hash character varying(150) not null,
     password_algo character varying(32) not null,
     first_name character varying(30) not null,
-    last_name character varying(30) not null
+    last_name character varying(30) not null,
     version bigint NOT NULL
 );
+def db = [url: "jdbc:mysql://$props.host_and_port/$props.dbname?useUnicode=true&characterEncoding=UTF-8",
+          user: props.dbuser, password: props.dbpassword, driver: 'com.mysql.jdbc.Driver']
+def sql = Sql.newInstance(db.url, db.user, db.password, db.driver)
+println "DB connection ready"
 
+def db = [url: "jdbc:postgresql://localhost:5432/shro_grls_dev_002",
+          user: props.dbuser, password: props.dbpassword, driver: 'org.postgresql.Driver']
+def sql = Sql.newInstance(db.url, db.user, db.password, db.driver)
+println "DB connection ready"

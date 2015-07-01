@@ -77,11 +77,19 @@ test {
     // from https://github.com/mvcatsifma/spring-ctx-props-file/blob/master/build.gradle
     // use this to set the database prepare/teardown props
     systemProperties = System.getProperties()
-    systemProperties['foo'] = 'bar'
+    systemProperties[ 'foo' ] = 'bar'
     doFirst {
         println "Hello +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        if ( systemProperties[ 'database.prep' ] == 'true' ) {
+            systemProperties[ 'dbname' ]        = 'gemail_test_db'
+            systemProperties[ 'host_and_port' ] = 'localhost:5432'
+            systemProperties[ 'dbuser' ]        = 'gemail_test'
+            systemProperties[ 'dbpassword' ]    = 'dev-word-to-pass002'
+        }
     }
     doLast {
+        println "System.properties[ 'database.prep' ]: ${System.properties[ 'database.prep' ]}"
+        println "systemProperties[ 'database.prep' ]: ${systemProperties[ 'database.prep' ]}"
         println "goodbye ------------------------------------------------------------------------------"
     }
 }
