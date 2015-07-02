@@ -17,7 +17,7 @@ create user gemail_test with password 'dev-word-to-pass002';
 create database gemail_test_db with owner gemail_test;
 grant all privileges on database gemail_test_db to gemail_test;
 
-psql -h localhost -U gemail_test -d gemail_test_db
+
 
 http://stackoverflow.com/questions/9789736/how-to-implement-a-many-to-many-relationship-in-postgresql
 CREATE TABLE product (

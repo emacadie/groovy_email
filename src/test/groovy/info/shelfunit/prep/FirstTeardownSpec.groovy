@@ -1,4 +1,4 @@
-package info.shelfunit.prep
+package info.shelfunit.teardown
 
 import spock.lang.Specification
 import spock.lang.Stepwise
@@ -13,10 +13,10 @@ import org.junit.rules.TestName
 import groovy.sql.Sql
 
 @Stepwise
-class FirstPrepSpec extends Specification {
+class FirstTeardownSpec extends Specification {
     
     @Shared
-    static prepDatabase = false
+    static teardownDatabase = false
     
     static sql
     
@@ -30,24 +30,18 @@ class FirstPrepSpec extends Specification {
     
     def setupSpec() {
         println "In ${this.class.name}"
-        println "System.properties[ 'database.prep' ]: ${System.properties[ 'database.prep' ]}"
-        println "System.properties['database.prep']: ${System.properties['database.prep']}"
-        if ( System.getProperty( "database.prep" ) == 'true' ) {
-            println "database.prep is true"
-            prepDatabase = true
-            /*
-            systemProperties[ 'dbname' ]        = 'gemail_test_db'
-            systemProperties[ 'host_and_port' ] = 'localhost:5432'
-            systemProperties[ 'dbuser' ]        = 'gemail_test'
-            systemProperties[ 'dbpassword' ]    = 'dev-word-to-pass001'
-            */
+        println "System.properties[ 'database.teardown' ]: ${System.properties[ 'database.teardown' ]}"
+        println "System.properties['database.teardown']: ${System.properties['database.teardown']}"
+        if ( System.getProperty( "database.teardown" ) == 'true' ) {
+            println "database.teardown is true"
+            teardownDatabase = true
             def db = [url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
             user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver']
             sql = Sql.newInstance(db.url, db.user, db.password, db.driver)
             
         } else {
-            println "database.prep not set"
-            prepDatabase = false
+            println "database.teardown not set"
+            teardownDatabase = false
         }
     }     // run before the first feature method
     
@@ -72,26 +66,17 @@ class FirstPrepSpec extends Specification {
     // in the closure for Requires, you can use "properties" instead of "System.properties"
     // you could also make a private static method to check the prop:
     // http://mrhaki.blogspot.com/2014/06/spocklight-ignore-specifications-based.html
-    @Requires({ properties[ 'database.prep' ] == 'true' })
-    def "run if database prep is true"() {
-        println "prepDatabase: ${prepDatabase}"
+    @Requires({ properties[ 'database.teardown' ] == 'true' })
+    def "run if database teardown is true"() {
+        println "teardownDatabase: ${teardownDatabase}"
         expect:
             4 == 4
     }
     
-    @Requires({ properties[ 'database.prep' ] == 'true' })
-    def "create user table"() {
+    @Requires({ properties[ 'database.teardown' ] == 'true' })
+    def "drop user table"() {
         
-        sql.execute '''
-            CREATE TABLE email_user (
-                userid serial primary key NOT NULL,
-                username character varying(64) not null unique,
-                password_hash character varying(150) not null,
-                password_algo character varying(32) not null,
-                first_name character varying(30) not null,
-                last_name character varying(30) not null,
-                version bigint NOT NULL
-            )'''
+        sql.execute "DROP TABLE IF EXISTS  email_user CASCADE"
          expect:
             5 == 5
     }

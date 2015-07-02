@@ -11,6 +11,7 @@ gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info
 
 gradle test --tests info.shelfunit.prep.FirstPrepSpec -info -Ddatabase.prep=true
+gradle test --tests info.shelfunit.teardown.FirstTeardownSpec -info -Ddatabase.teardown=true
 
 http://stackoverflow.com/questions/24223631/h2-postgresql-mode-seems-not-working-for-me  
 I agree. Why not use postgres for testing?    

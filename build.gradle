@@ -80,7 +80,7 @@ test {
     systemProperties[ 'foo' ] = 'bar'
     doFirst {
         println "Hello +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
-        if ( systemProperties[ 'database.prep' ] == 'true' ) {
+        if ( systemProperties[ 'database.prep' ] == 'true' || systemProperties['database.teardown'] == 'true' ) {
             systemProperties[ 'dbname' ]        = 'gemail_test_db'
             systemProperties[ 'host_and_port' ] = 'localhost:5432'
             systemProperties[ 'dbuser' ]        = 'gemail_test'
@@ -90,6 +90,7 @@ test {
     doLast {
         println "System.properties[ 'database.prep' ]: ${System.properties[ 'database.prep' ]}"
         println "systemProperties[ 'database.prep' ]: ${systemProperties[ 'database.prep' ]}"
+        println "systemProperties[ 'database.teardown' ]: ${systemProperties[ 'database.teardown' ]}"
         println "goodbye ------------------------------------------------------------------------------"
     }
 }
