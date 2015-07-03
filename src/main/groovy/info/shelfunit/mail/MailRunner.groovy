@@ -21,10 +21,10 @@ class MailRunner {
                 return false
             }   
         }
-        StringBuffer.metaClass.startsWith = { strt ->
-            if ( delegate.length() < strt.length() ) {
+        StringBuffer.metaClass.startsWith = { start ->
+            if ( delegate.length() < start.length() ) {
                 return false
-            } else if ( delegate.substring( 0, strt.length() ).equals( strt ) ) {
+            } else if ( delegate.substring( 0, start.length() ).equals( start ) ) {
                 return true
             } else {
                 return false

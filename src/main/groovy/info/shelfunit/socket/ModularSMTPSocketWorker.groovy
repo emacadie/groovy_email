@@ -17,6 +17,7 @@ class ModularSMTPSocketWorker {
     private String theResponse
     private String serverName
 	private prevCommandList 
+	private bufferMap
 	private mailCommand
 	private ehloCommand
 	private commandResultMap
@@ -28,6 +29,7 @@ class ModularSMTPSocketWorker {
         log.info "server name is ${serverName}"
         prevCommandList = []
         commandResultMap = [:]
+        bufferMap = [:]
         mailCommand = new MAILCommand()
         ehloCommand = new EHLOCommand()
 	}
@@ -97,8 +99,9 @@ class ModularSMTPSocketWorker {
 		log.info "Incoming message: ${theMessage}"
 		if ( theMessage.startsWith( 'EHLO' ) || theMessage.startsWith( 'HELO' )  ) {
 		    commandResultMap.clear()
-		    commandResultMap = ehloCommand.process( theMessage, prevCommandList ) 
+		    commandResultMap = ehloCommand.process( theMessage, prevCommandList, bufferMap ) 
 		    prevCommandList = commandResultMap.prevCommandList.clone()
+		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
 			// temporary

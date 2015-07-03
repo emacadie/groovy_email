@@ -40,7 +40,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${domain}", [] )
+	        def resultMap = ehloCommand.process( "EHLO ${domain}", [], [:] )
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250-Hello ${domain}\n" +
@@ -58,7 +58,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "HELO ${domain}", [] )
+	        def resultMap = ehloCommand.process( "HELO ${domain}", [], [:] )
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"

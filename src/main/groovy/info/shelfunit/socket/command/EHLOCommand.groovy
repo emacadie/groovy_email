@@ -12,9 +12,11 @@ class EHLOCommand {
     //    502, or 550 failure replies MUST be returned as appropriate. 
     // https://tools.ietf.org/html/rfc3696#section-3  Domain cannot be more than 255 chars
     // RFC 5321, 3.2.  Client Initiation: You must return simple HELO 
-    def process( theMessage, prevCommandList ) {
+    def process( theMessage, prevCommandList, bufferMap ) {
         def resultString
         resultMap.clear()
+        bufferMap.clear()
+        resultMap.bufferMap = bufferMap
         def domain = theMessage.replaceFirst( 'EHLO |HELO ', '' )
         log.info "Here is the domain: ${domain}"
         if ( domain.length() > 255 ) {
@@ -36,8 +38,6 @@ class EHLOCommand {
     
     // RFC 5321, Section 4.1.4.: Order of Commands and Section 7.9.: Scope of Operation of SMTP Servers: 
     // Do not reject a message due to a bad address. The internet might stop working.
-    
-    
     def processDomain( domain ) {
         def addressGood = true
         def hostAddress
