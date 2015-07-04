@@ -7,6 +7,7 @@ import groovy.util.logging.Slf4j
 class MailRunner {
     
     static runMetaProgramming() {
+        ExpandoMetaClass.enableGlobally()
         java.util.List.metaClass.lastItem = {
             if ( delegate.size() != 0 ) {
                 delegate.last()
@@ -36,6 +37,27 @@ class MailRunner {
         String.metaClass.firstFour = { ->
             return delegate.substring( 0, 4 )
         }
+        String.metaClass.getDomain = { ->
+            if ( ( delegate.firstFour().equals( 'EHLO' ) ) || ( delegate.firstFour().equals( 'HELO' ) ) ) {
+                return delegate.replaceFirst( 'EHLO |HELO ', '' )
+            } else {
+                return null
+            }
+        }
+        String.metaClass.startsWithEHLO = { ->
+            return delegate.startsWith( 'EHLO' )
+        }
+        String.metaClass.startsWithHELO = { ->
+            return delegate.startsWith( 'HELO' ) 
+        }
+        // for domain in EHLOCommand
+        String.metaClass.isMoreThan255Char = { ->
+            delegate.length() > 255
+        }
+        String.metaClass.is255CharOrLess = { ->
+            delegate.length() <= 255
+        }
+        
     }
     
     static main( args ) {

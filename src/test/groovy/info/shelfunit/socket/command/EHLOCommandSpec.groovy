@@ -57,15 +57,43 @@ class EHLOCommandSpec extends Specification {
 	        def ehloResponse = resultMap.resultString + "\r\n" 
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
-	        println "Here is the map: ${resultMap.prevCommandList}"
 	}
 	
-	/*
-	groovy:000> longString = ("f" * 256) + '.com'
-===> ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff.com
-groovy:000> 
-
-	*/
+	def "test handling domain more than 255 char"() {
+	    def serverName = "www.groovymail.org"
+	    def ehloCommand = new EHLOCommand()
+	    
+	    def longString = ( "f" * 252 ) + '.com'
+	    when:
+	        def resultMap = ehloCommand.process( "EHLO ${longString}", [], [:] )
+	        def ehloResponse = resultMap.resultString + "\r\n" 
+	    then:
+	        ehloResponse == "501 Domain name length beyond 255 char limit per RFC 3696\r\n"
+	}
+	
+	def "test that command list and buffer map are cleared"() {
+	    def domain = "www.groovymail.org"
+	    def ehloCommand = new EHLOCommand()
+	    
+	    when:
+	        def prevCommandList = [ 'Get the hell off my ship', 'keep us under the radar, Wash' ]
+	        def bufferMap = [ name:'Jayne', location: 'bunk' ]
+	    then:
+	        prevCommandList.size() == 2
+	        bufferMap.size() == 2
+	    when:
+	        def resultMap = ehloCommand.process( "EHLO ${domain}", prevCommandList, bufferMap )
+	        def ehloResponse = resultMap.resultString + "\r\n" 
+	        def newList = resultMap.prevCommandList
+	        def newMap = resultMap.bufferMap
+	    then:
+	        ehloResponse == "250-Hello ${domain}\n" +
+	        "250 HELP\r\n"
+	        newList.size() == 1
+	        newList[ 0 ] == "EHLO"
+	        newMap.size() == 0
+	        
+	}
 	/*
 	def "test handling old commands"() {
 	    println "\n--- Starting test ${name.methodName}"
@@ -241,7 +269,6 @@ groovy:000>
 	    then:
 	        stub.expect.verify() 
 	        result == '45.33.18.182'
-	    
 	}
 }
 
