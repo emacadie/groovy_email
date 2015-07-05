@@ -97,7 +97,7 @@ class ModularSMTPSocketWorker {
 	def handleMessage( theMessage ) {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
-		if ( theMessage.startsWith( 'EHLO' ) || theMessage.startsWith( 'HELO' )  ) {
+		if ( theMessage.isHelloCommand() ) {
 		    commandResultMap.clear()
 		    commandResultMap = ehloCommand.process( theMessage, prevCommandList, bufferMap ) 
 		    prevCommandList = commandResultMap.prevCommandList.clone()
@@ -120,7 +120,7 @@ class ModularSMTPSocketWorker {
 			theResponse = "250 OK"
 		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandList.lastItem() == 'THE MESSAGE' && 
 			theResponse = "221 ${serverName} Service closing transmission channel"
-		} else if ( theMessage.substring( 0, 4 ).matches( "SAML|SEND|SOML|TURN" ) ) {
+		} else if ( theMessage.isObsoleteCommand() ) { 
 		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'EXPN' ) ) {
 		    theResponse = '502 Command not implemented'

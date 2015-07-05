@@ -37,19 +37,24 @@ class MailRunner {
         String.metaClass.firstFour = { ->
             return delegate.substring( 0, 4 )
         }
-        String.metaClass.getDomain = { ->
-            if ( ( delegate.firstFour().equals( 'EHLO' ) ) || ( delegate.firstFour().equals( 'HELO' ) ) ) {
-                return delegate.replaceFirst( 'EHLO |HELO ', '' )
-            } else {
-                return null
-            }
-        }
         String.metaClass.startsWithEHLO = { ->
             return delegate.startsWith( 'EHLO' )
         }
         String.metaClass.startsWithHELO = { ->
             return delegate.startsWith( 'HELO' ) 
         }
+        String.metaClass.isHelloCommand = { ->
+            ( delegate.startsWithEHLO() || delegate.startsWithHELO() )
+        }
+        String.metaClass.getDomain = { ->
+            // if ( ( delegate.firstFour().equals( 'EHLO' ) ) || ( delegate.firstFour().equals( 'HELO' ) ) ) {
+            if ( delegate.startsWithEHLO() || delegate.startsWithHELO() ) {
+                return delegate.replaceFirst( 'EHLO |HELO ', '' )
+            } else {
+                return null
+            }
+        }
+        
         // for domain in EHLOCommand
         String.metaClass.isMoreThan255Char = { ->
             delegate.length() > 255
@@ -57,7 +62,9 @@ class MailRunner {
         String.metaClass.is255CharOrLess = { ->
             delegate.length() <= 255
         }
-        
+        String.metaClass.isObsoleteCommand = { ->
+            delegate.firstFour().matches( "SAML|SEND|SOML|TURN" )
+        }
     }
     
     static main( args ) {
