@@ -10,13 +10,6 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class MAILCommand {
     
-    static rg =  '''(?ix)          # enable case-insensitive matches, extended patterns
-            (\\d+)         # 1: The disk space we want
-            \\s+           # some whitespace
-            \\d+%          # a number followed by %
-            \\s+           # some more whitespace
-            (/nfs/data.*)  # 2: partition name'''
-           
     static regex = '''~/^(MAIL FROM:)<
      [_A-Za-z0-9-\\+]+	# must start with string in the bracket [ ], must contains one or more - the plus sign
      (			        # start of group 1
@@ -51,6 +44,15 @@ class MAILCommand {
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !prevCommandList.last.matches( 'EHLO|HELO|RSET' ) ) {
             resultMap.resultString = "503 Bad sequence of commands"
+        } else if ( !( theMessage ==~ pattern) ) {
+            resultMap.resultString = "501 Command not in proper form"
+        } else {
+            prevCommandList << 'MAIL'
+            resultMap.prevCommandList = prevCommandList
+            resultMap.resultString = '250 OK'
+            def q = theMessage ==~ patterm
+            bufferMap.reversePath = q[0][1] + "@" + q[0][2]
+            resultMap.bufferMap = bufferMap
         }
         /*
 pattern = ~/^.*?groovy.*$/
@@ -66,13 +68,33 @@ mPattern = ~/MAIL\sFROM:<\s[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\
 mP = ~/^MAIL FROM:<(.+)@(.+)>$/
 
 ~/^(MAIL FROM:)<(.+)@(.+)>$/
+~/^(MAIL FROM:)<(.+)@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})>$/
+
+~/^(MAIL FROM:)<[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})?$/
+
 ~/^(MAIL FROM:)<[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})>$/
 q = mm =~ mP // get the matcher as q
 to view the matches
 q[0][1]
 I have no idea why you need a 2-dimensional array
+~/^(MAIL FROM:)<(.+)@(.+)>$(?x)/ (?x) for comments at the end
 
+EMAIL_PATTERN = ~/^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/
+
+^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})
+
+EMAIL_PATTERN = ~/[a-z[._-][\\d]]*[@][a-z[.][\\d]]*[.][a-z[.][\\d]]* /
+EMAIL_PATTERN =~/.+@.+\\.[a-z]+/
+['mkyong@yahoo.com', 'mkyong-100@yahoo.com', 'mkyong.100@yahoo.com',
+'mkyong111@mkyong.com', 'mkyong-100@mkyong.net', 'mkyong.100@mkyong.com.au',
+'mkyong@1.com', 'mkyong@gmail.com.com', 'mkyong+100@gmail.com', 'mkyong-100@yahoo-test.com'].each {
+    println "looking at ${it}"
+    print it ==~ EMAIL_PATTERN
+    println "; done with ${it}"
+} 
+compile 'commons-validator:commons-validator:1.4.1'
         */
+        /*
         def domain = theMessage.replaceFirst( 'EHLO |HELO ', '' )
         log.info "Here is the domain: ${domain}"
         if ( domain.length() > 255 ) {
@@ -89,6 +111,7 @@ I have no idea why you need a 2-dimensional array
 		}
 		resultMap.prevCommandList = prevCommandList
 		resultMap.bufferMap = bufferMap
+		*/
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap
     }
