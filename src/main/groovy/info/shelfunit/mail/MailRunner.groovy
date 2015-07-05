@@ -47,7 +47,6 @@ class MailRunner {
             ( delegate.startsWithEHLO() || delegate.startsWithHELO() )
         }
         String.metaClass.getDomain = { ->
-            // if ( ( delegate.firstFour().equals( 'EHLO' ) ) || ( delegate.firstFour().equals( 'HELO' ) ) ) {
             if ( delegate.startsWithEHLO() || delegate.startsWithHELO() ) {
                 return delegate.replaceFirst( 'EHLO |HELO ', '' )
             } else {
