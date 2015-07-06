@@ -11,8 +11,8 @@ import groovy.util.logging.Slf4j
 class MAILCommand {
     
     // http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
-    static regex = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}>$(?x)'''
+    static regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
+*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6})>$(?x)'''
 /*
  regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
 *+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+([a-zA-Z]{2,6}))>$(?x)'''
@@ -40,8 +40,10 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
         } else {
             prevCommandList << 'MAIL'
             resultMap.resultString = '250 OK'
-            def q = theMessage ==~ pattern
-            bufferMap.reversePath =  q[ 0 ][ 2 ]
+            def q = theMessage =~ pattern
+            // log.info "Here is q: ${q}"
+            // log.info "Here is q[0][2]: ${q[0][2]}"
+            bufferMap.reversePath =  q[0][2]
             resultMap.bufferMap = bufferMap
         }
         resultMap.prevCommandList = prevCommandList

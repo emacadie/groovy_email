@@ -29,7 +29,7 @@ class MAILCommandSpec extends Specification {
     
     def cleanupSpec() {}   // run after the last feature method
 
-	def "test handling EHLO"() {
+	def "test handling wrong command"() {
 	    def mailCommand = new MAILCommand()
 	    
 	    when:
@@ -38,6 +38,19 @@ class MAILCommandSpec extends Specification {
 	    then:
 	        mailResponse == "503 Bad sequence of commands\r\n"
 	        resultMap.prevCommandList == [ "RCPT" ]
+	}
+	
+	def "test happy path"() {
+	    def mailCommand = new MAILCommand()
+	    
+	    when:
+	        def resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", ['EHLO'], [:] )
+	        def mailResponse = resultMap.resultString + crlf 
+	        def bMap = resultMap.bufferMap
+	    then:
+	        mailResponse == "250 OK\r\n"
+	        resultMap.prevCommandList == [ "EHLO", "MAIL" ]
+	        bMap.reversePath == 'oneill@stargate.mil'
 	}
 	/*
 	def "test handling HELO"() {
