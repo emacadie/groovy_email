@@ -1,0 +1,60 @@
+// from http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/:
+mkyongGood = ['MAIL FROM:<mkyong@yahoo.com>', 'MAIL FROM:<mkyong-100@yahoo.com>', 'MAIL FROM:<mkyong.100@yahoo.com>', 'MAIL FROM:<mkyong111@mkyong.com>', 'MAIL FROM:<mkyong-100@mkyong.net>', 'MAIL FROM:<mkyong.100@mkyong.com.au>', 'MAIL FROM:<mkyong@1.com>', 'MAIL FROM:<mkyong@gmail.com.com>', 'MAIL FROM:<mkyong+100@gmail.com>', 'MAIL FROM:<mkyong-100@yahoo-test.com>']
+mkyongBad = ['MAIL FROM:<mkyong>', 'MAIL FROM:<mkyong@.com.my>', 'MAIL FROM:<mkyong123@gmail.a>', 'MAIL FROM:<mkyong123@.com>', 'MAIL FROM:<mkyong123@.com.com>', 'MAIL FROM:<.mkyong@mkyong.com>', 'MAIL FROM:<mkyong()*@gmail.com>', 'MAIL FROM:<mkyong@%*.com>', 'MAIL FROM:<mkyong..2002@gmail.com>', 'MAIL FROM:<mkyong.@gmail.com>', 'MAIL FROM:<mkyong@mkyong@gmail.com>', 'MAIL FROM:<mkyong@gmail.com.1a>' ]
+
+// from http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
+howToGood = ['MAIL FROM:<user@domain.com>', 'MAIL FROM:<user@domain.co.in>', 'MAIL FROM:<user1@domain.com>', 'MAIL FROM:<user.name@domain.com>', 'MAIL FROM:<user_name@domain.co.in>', 'MAIL FROM:<user-name@domain.co.in>', 'MAIL FROM:<user@domaincom>', 'MAIL FROM:<user@domain.com>', 'MAIL FROM:<user@domain.co.in>', 'MAIL FROM:<user.name@domain.com>', "MAIL FROM:<user'name@domain.co.in>", 'MAIL FROM:<user@domain.com>', 'MAIL FROM:<user@domain.co.in>', 'MAIL FROM:<user.name@domain.com>', 'MAIL FROM:<user_name@domain.com>', 'MAIL FROM:<username@yahoo.corporate.in>']
+howToBad = [ 'MAIL FROM:<@yahoo.com>', 'MAIL FROM:<.username@yahoo.com>', 'MAIL FROM:<username@yahoo.com.>', 'MAIL FROM:<username@yahoo..com>', 'MAIL FROM:<.username@yahoo.com>', 'MAIL FROM:<username@yahoo.com.>', 'MAIL FROM:<username@yahoo..com>', 'MAIL FROM:<username@yahoo.c>', 'MAIL FROM:<username@yahoo.corporate>']
+
+regex = ''' ^(MAIL FROM):<([\w!#$%&’*+/=?`{|}~^-]+(?:\.[\w!#$%&’ # WTF?
+    *+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\.)+([a-zA-Z]{2,6}))>$(?x)
+'''
+regexClosure = {
+    println "looking at ${it}"
+    q = it =~ regex
+    print it ==~ regex
+    print "; " + ( it?: q[0][2] )
+    println "; done with ${it}"
+} 
+        /*
+pattern = ~/^.*?groovy.*$/
+===> ^.*?groovy.*$
+pattern.class.name
+===> java.util.regex.Pattern
+input = 'i love me some groovy code'
+input ==~ pattern
+===> true
+groovy:000> input =~ pattern
+mPattern = ~/MAIL\sFROM:<\s[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})>$/
+                                                [_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})
+mP = ~/^MAIL FROM:<(.+)@(.+)>$/
+
+~/^(MAIL FROM:)<(.+)@(.+)>$/
+~/^(MAIL FROM:)<(.+)@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})>$/
+
+~/^(MAIL FROM:)<[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})?$/
+
+~/^(MAIL FROM:)<[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})>$/
+q = mm =~ mP // get the matcher as q
+to view the matches
+q[0][1]
+I have no idea why you need a 2-dimensional array
+~/^(MAIL FROM:)<(.+)@(.+)>$(?x)/ (?x) for comments at the end
+
+EMAIL_PATTERN = ~/^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$/
+
+^[_A-Za-z0-9-]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-z0-9-]+)*(\\.[A-Za-z]{2,})
+
+EMAIL_PATTERN = ~/[a-z[._-][\\d]]*[@][a-z[.][\\d]]*[.][a-z[.][\\d]]* /
+EMAIL_PATTERN =~/.+@.+\\.[a-z]+/
+EMAIL_PATTERN =~ /^[A-Z0-9+_.-]+@[A-Z0-9.-]+$/
+['mkyong@yahoo.com', 'mkyong-100@yahoo.com', 'mkyong.100@yahoo.com',
+'mkyong111@mkyong.com', 'mkyong-100@mkyong.net', 'mkyong.100@mkyong.com.au',
+'mkyong@1.com', 'mkyong@gmail.com.com', 'mkyong+100@gmail.com', 'mkyong-100@yahoo-test.com'].each {
+    println "looking at ${it}"
+    print it ==~ EMAIL_PATTERN
+    println "; done with ${it}"
+} 
+compile 'commons-validator:commons-validator:1.4.1'
+*/
+
