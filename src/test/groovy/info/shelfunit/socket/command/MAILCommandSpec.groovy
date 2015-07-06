@@ -41,19 +41,23 @@ class MAILCommandSpec extends Specification {
 	        resultMap.prevCommandList == [ "RCPT" ]
 	}
 	
-	@Unroll( "#command should result in 503" )
+	@Unroll( "#command should result in #mailResponse" )
 	def "#command results in 503"() {
 	    def resultMap
 	    def mailCommand = new MAILCommand()
 	    expect:
-	    mailResponse == mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ], [:] ).resultString
+	        mailResponse == mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ], [:] ).resultString
 	    
 	    where:
-	    command || mailResponse
-	    'MAIL'  || "503 Bad sequence of commands"
-	    'EXPN'  || "503 Bad sequence of commands"
-	    'VRFY'  || "503 Bad sequence of commands"
-	    'NOOP'  || "503 Bad sequence of commands"
+            command || mailResponse
+            'MAIL'  || "503 Bad sequence of commands"
+            'EXPN'  || "503 Bad sequence of commands"
+            'VRFY'  || "503 Bad sequence of commands"
+            'NOOP'  || "503 Bad sequence of commands"
+            'RCPT'  || "503 Bad sequence of commands"
+            'EHLO'  || "250 OK"
+            'HELO'  || "250 OK"
+            'RSET'  || "250 OK"
 	}
 	
 	def "test happy path"() {
