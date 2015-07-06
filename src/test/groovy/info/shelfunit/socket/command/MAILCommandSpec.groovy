@@ -1,6 +1,7 @@
 package info.shelfunit.socket
 
 import spock.lang.Specification
+import spock.lang.Unroll
 
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -38,6 +39,21 @@ class MAILCommandSpec extends Specification {
 	    then:
 	        mailResponse == "503 Bad sequence of commands\r\n"
 	        resultMap.prevCommandList == [ "RCPT" ]
+	}
+	
+	@Unroll( "#command should result in 503" )
+	def "#command results in 503"() {
+	    def resultMap
+	    def mailCommand = new MAILCommand()
+	    expect:
+	    mailResponse == mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ], [:] ).resultString
+	    
+	    where:
+	    command || mailResponse
+	    'MAIL'  || "503 Bad sequence of commands"
+	    'EXPN'  || "503 Bad sequence of commands"
+	    'VRFY'  || "503 Bad sequence of commands"
+	    'NOOP'  || "503 Bad sequence of commands"
 	}
 	
 	def "test happy path"() {
