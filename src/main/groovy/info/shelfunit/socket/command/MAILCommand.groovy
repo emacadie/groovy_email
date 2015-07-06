@@ -10,20 +10,12 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class MAILCommand {
     
-    static regex = '''~/^(MAIL FROM:)<
-     [_A-Za-z0-9-\\+]+	# must start with string in the bracket [ ], must contains one or more - the plus sign
-     (			        # start of group 1
-     \\.[_A-Za-z0-9-]+	# follow by a dot  and string in the bracket [ ], must contains one or more 
-     )*			        # end of group 1, this group is optional = the star
-     @			        # must contains a "@" symbol
-     [A-Za-z0-9-]+      # follow by string in the bracket [ ], must contains one or more 
-     (			        # start of group 2 - first level TLD checking
-     \\.[A-Za-z0-9]+    # follow by a dot "." and string in the bracket [ ], must contains one or more 
-     )*		            # end of group 2, this group is optional 
-     (			        # start of group 3 - second level TLD checking
-     \\.[A-Za-z]{2,}    # follow by a dot  and string in the bracket [ ], with minimum length of 2
-     )			        # end of group 3
-    >$/'''
+    // http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
+    static regex = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
+*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}>$(?x)'''
+/*
+regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}>$'''
+*/
     static pattern = ~regex
     
     def resultMap = [:]
@@ -85,6 +77,7 @@ EMAIL_PATTERN = ~/^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\\.[A-Za-
 
 EMAIL_PATTERN = ~/[a-z[._-][\\d]]*[@][a-z[.][\\d]]*[.][a-z[.][\\d]]* /
 EMAIL_PATTERN =~/.+@.+\\.[a-z]+/
+EMAIL_PATTERN =~ /^[A-Z0-9+_.-]+@[A-Z0-9.-]+$/
 ['mkyong@yahoo.com', 'mkyong-100@yahoo.com', 'mkyong.100@yahoo.com',
 'mkyong111@mkyong.com', 'mkyong-100@mkyong.net', 'mkyong.100@mkyong.com.au',
 'mkyong@1.com', 'mkyong@gmail.com.com', 'mkyong+100@gmail.com', 'mkyong-100@yahoo-test.com'].each {
