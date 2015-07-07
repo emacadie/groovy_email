@@ -60,6 +60,31 @@ class MAILCommandSpec extends Specification {
             'RSET'  || "250 OK"
 	}
 	
+	@Unroll( "#command gives #value with address #resultAddress" )
+	def "#command gives #value with address #resultAddress"() {
+	    // work on this later
+	    def resultMap
+	    def mailCommand = new MAILCommand()
+	    def resultString
+
+            when:
+                resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ], [:] )
+            then:
+                println "command was ${command}, resultString is ${resultMap.resultString}"
+                resultMap.resultString == value
+                resultMap.bufferMap?.reversePath == resultAddress
+            where:
+            command | value                          |resultAddress
+            'EHLO'  | "250 OK"                       |'oneill@stargate.mil'
+            'HELO'  | "250 OK"                       |'oneill@stargate.mil'
+            'RSET'  | "250 OK"                       |'oneill@stargate.mil'
+            'MAIL'  | "503 Bad sequence of commands" |null
+            'EXPN'  | "503 Bad sequence of commands" |null
+            'VRFY'  | "503 Bad sequence of commands" |null
+            'NOOP'  | "503 Bad sequence of commands" |null
+            'RCPT'  | "503 Bad sequence of commands" |null
+	}
+	
 	def "test happy path"() {
 	    def mailCommand = new MAILCommand()
 	    when:
