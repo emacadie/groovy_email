@@ -107,7 +107,60 @@ class MAILCommandSpec extends Specification {
             'mkyong@1.com'              | "250 OK" 
             'mkyong@gmail.com.com'      | "250 OK" 
             'mkyong+100@gmail.com'      | "250 OK" 
-            'mkyong-100@yahoo-test.com' | "250 OK" 
+            'mkyong-100@yahoo-test.com' | "250 OK"
+            'howTuser@domain.com'       | "250 OK" 
+            'user@domain.co.in'         | "250 OK" 
+            'user1@domain.com'          | "250 OK" 
+            'user.name@domain.com'      | "250 OK" 
+            'user_name@domain.co.in'    | "250 OK" 
+            'user-name@domain.co.in'    | "250 OK" 
+            // 'user@domaincom'            | "250 OK" 
+            'user@domain.com'           | "250 OK" 
+            'user@domain.co.in'         | "250 OK" 
+            'user.name@domain.com'      | "250 OK"
+            // "user'name@domain.co.in"    | "250 OK"
+            'user@domain.com'           | "250 OK" 
+            'user@domain.co.in'         | "250 OK" 
+            'user.name@domain.com'      | "250 OK" 
+            'user_name@domain.com'      | "250 OK" 
+            'username@yahoo.corporate.in'   | "250 OK"
+	}
+	
+	@Unroll( "invalid address #inputAddress gives #value" )
+	def "invalid address #inputAddress gives #value"() {
+	    def resultMap
+	    def mailCommand = new MAILCommand()
+	    def resultString
+
+            when:
+                resultMap = mailCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ], [:] )
+            then:
+                println "command was EHLO, resultString is ${resultMap.resultString}"
+                resultMap.resultString == value
+                resultMap.bufferMap?.reversePath == resultAddress
+            where:
+            inputAddress                | value                             | resultAddress
+            'mkyong'                    | "501 Command not in proper form"  | null 
+            'mkyong@.com.my'            | "501 Command not in proper form"  | null 
+            'mkyong123@gmail.a'         | "501 Command not in proper form"  | null 
+            'mkyong123@.com'            | "501 Command not in proper form"  | null 
+            'mkyong123@.com.com'        | "501 Command not in proper form"  | null 
+            '.mkyong@mkyong.com'        | "501 Command not in proper form"  | null 
+            'mkyong()*@gmail.com'       | "501 Command not in proper form"  | null 
+            'mkyong@%*.com'             | "501 Command not in proper form"  | null 
+            'mkyong..2002@gmail.com'    | "501 Command not in proper form"  | null 
+            'mkyong.@gmail.com'         | "501 Command not in proper form"  | null 
+            'mkyong@mkyong@gmail.com'   | "501 Command not in proper form"  | null 
+            'mkyong@gmail.com.1a'       | "501 Command not in proper form"  | null 
+            '@yahoo.com'                | "501 Command not in proper form"  | null 
+            '.username@yahoo.com'       | "501 Command not in proper form"  | null 
+            'username@yahoo.com.'       | "501 Command not in proper form"  | null 
+            'username@yahoo..com'       | "501 Command not in proper form"  | null 
+            '.username@yahoo.com'       | "501 Command not in proper form"  | null 
+            'username@yahoo.com.'       | "501 Command not in proper form"  | null 
+            'username@yahoo..com'       | "501 Command not in proper form"  | null 
+            'username@yahoo.c'          | "501 Command not in proper form"  | null 
+            'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
 	}
 	
 	def "test happy path"() {
