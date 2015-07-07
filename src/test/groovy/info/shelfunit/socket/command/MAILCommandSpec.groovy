@@ -49,20 +49,19 @@ class MAILCommandSpec extends Specification {
 	        mailResponse == mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ], [:] ).resultString
 	    
 	    where:
-            command || mailResponse
-            'MAIL'  || "503 Bad sequence of commands"
-            'EXPN'  || "503 Bad sequence of commands"
-            'VRFY'  || "503 Bad sequence of commands"
-            'NOOP'  || "503 Bad sequence of commands"
-            'RCPT'  || "503 Bad sequence of commands"
-            'EHLO'  || "250 OK"
-            'HELO'  || "250 OK"
-            'RSET'  || "250 OK"
+            command | mailResponse
+            'MAIL'  | "503 Bad sequence of commands"
+            'EXPN'  | "503 Bad sequence of commands"
+            'VRFY'  | "503 Bad sequence of commands"
+            'NOOP'  | "503 Bad sequence of commands"
+            'RCPT'  | "503 Bad sequence of commands"
+            'EHLO'  | "250 OK"
+            'HELO'  | "250 OK"
+            'RSET'  | "250 OK"
 	}
 	
 	@Unroll( "#command gives #value with address #resultAddress" )
 	def "#command gives #value with address #resultAddress"() {
-	    // work on this later
 	    def resultMap
 	    def mailCommand = new MAILCommand()
 	    def resultString
@@ -74,15 +73,41 @@ class MAILCommandSpec extends Specification {
                 resultMap.resultString == value
                 resultMap.bufferMap?.reversePath == resultAddress
             where:
-            command | value                          |resultAddress
-            'EHLO'  | "250 OK"                       |'oneill@stargate.mil'
-            'HELO'  | "250 OK"                       |'oneill@stargate.mil'
-            'RSET'  | "250 OK"                       |'oneill@stargate.mil'
-            'MAIL'  | "503 Bad sequence of commands" |null
-            'EXPN'  | "503 Bad sequence of commands" |null
-            'VRFY'  | "503 Bad sequence of commands" |null
-            'NOOP'  | "503 Bad sequence of commands" |null
-            'RCPT'  | "503 Bad sequence of commands" |null
+            command | value                          | resultAddress
+            'EHLO'  | "250 OK"                       | 'oneill@stargate.mil'
+            'HELO'  | "250 OK"                       | 'oneill@stargate.mil'
+            'RSET'  | "250 OK"                       | 'oneill@stargate.mil'
+            'MAIL'  | "503 Bad sequence of commands" | null
+            'EXPN'  | "503 Bad sequence of commands" | null
+            'VRFY'  | "503 Bad sequence of commands" | null
+            'NOOP'  | "503 Bad sequence of commands" | null
+            'RCPT'  | "503 Bad sequence of commands" | null
+	}
+	
+	@Unroll( "#inputAddress gives #value with result Address the same" )
+	def "#inputAddress gives #value with result Address the same"() {
+	    def resultMap
+	    def mailCommand = new MAILCommand()
+	    def resultString
+
+            when:
+                resultMap = mailCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ], [:] )
+            then:
+                println "command was EHLO, resultString is ${resultMap.resultString}"
+                resultMap.resultString == value
+                resultMap.bufferMap?.reversePath == inputAddress
+            where:
+            inputAddress                | value    
+            'mkyong@yahoo.com'          | "250 OK" 
+            'mkyong-100@yahoo.com'      | "250 OK" 
+            'mkyong.100@yahoo.com'      | "250 OK" 
+            'mkyong111@mkyong.com'      | "250 OK" 
+            'mkyong-100@mkyong.net'     | "250 OK" 
+            'mkyong.100@mkyong.com.au'  | "250 OK" 
+            'mkyong@1.com'              | "250 OK" 
+            'mkyong@gmail.com.com'      | "250 OK" 
+            'mkyong+100@gmail.com'      | "250 OK" 
+            'mkyong-100@yahoo-test.com' | "250 OK" 
 	}
 	
 	def "test happy path"() {

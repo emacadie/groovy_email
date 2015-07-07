@@ -43,6 +43,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             def q = theMessage =~ pattern
             // log.info "Here is q: ${q}"
             // log.info "Here is q[0][2]: ${q[0][2]}"
+            bufferMap.clear()
             bufferMap.reversePath =  q[ 0 ][ 2 ]
             resultMap.bufferMap = bufferMap
         }
