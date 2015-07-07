@@ -96,6 +96,7 @@ class MAILCommandSpec extends Specification {
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value
                 resultMap.bufferMap?.reversePath == inputAddress
+                resultMap.prevCommandList == [ 'EHLO', 'MAIL' ]
             where:
             inputAddress                | value    
             'mkyong@yahoo.com'          | "250 OK" 
@@ -138,6 +139,7 @@ class MAILCommandSpec extends Specification {
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value
                 resultMap.bufferMap?.reversePath == resultAddress
+                resultMap.prevCommandList == [ 'EHLO' ]
             where:
             inputAddress                | value                             | resultAddress
             'mkyong'                    | "501 Command not in proper form"  | null 
