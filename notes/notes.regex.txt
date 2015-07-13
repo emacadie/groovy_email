@@ -69,8 +69,8 @@ mkyongGood.each{regexClosure(it)}
 
 q.eachWithIndex { match, i ->
     print "match ${i}: "
-    match.each { group ->
-        println "$group"
+    match.eachWithIndex { group, x ->
+        println "group ${x}: $group"
     }
 }
 

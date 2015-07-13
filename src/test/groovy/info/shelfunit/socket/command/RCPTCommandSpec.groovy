@@ -18,6 +18,7 @@ class RCPTCommandSpec extends Specification {
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
+    static rcptCommand
 
     @Rule 
     TestName name = new TestName()
@@ -33,6 +34,7 @@ class RCPTCommandSpec extends Specification {
         user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
         this.addUsers()
+        rcptCommand = new RCPTCommand( sql, domainList )
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -56,7 +58,7 @@ class RCPTCommandSpec extends Specification {
     }
     
 	def "test handling wrong command"() {
-	    def rcptCommand = new RCPTCommand( sql, domainList )
+	    // def rcptCommand = new RCPTCommand( sql, domainList )
 	    
 	    when:
 	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ], [:] )
@@ -69,7 +71,7 @@ class RCPTCommandSpec extends Specification {
 	@Unroll( "#command should result in #mailResponse" )
 	def "#command results in #mailResponse"() {
 	    def resultMap
-	    def rcptCommand = new RCPTCommand( sql, domainList )
+	    // def rcptCommand = new RCPTCommand( sql, domainList )
 	    expect:
 	        mailResponse == rcptCommand.process( "RCPT TO:<oneill@stargate.mil>", [ command ], [:] ).resultString
 	    
@@ -88,7 +90,7 @@ class RCPTCommandSpec extends Specification {
 	@Unroll( "#command gives #value with address #resultAddress" )
 	def "#command gives #value with address #resultAddress"() {
 	    def resultMap
-	    def rcptCommand = new RCPTCommand( sql, domainList )
+	    // def rcptCommand = new RCPTCommand( sql, domainList )
 	    def resultString
 
             when:
@@ -112,7 +114,7 @@ class RCPTCommandSpec extends Specification {
 	@Unroll( "#inputAddress gives #value with result Address the same" )
 	def "#inputAddress gives #value with result Address the same"() {
 	    def resultMap
-	    def rcptCommand = new RCPTCommand( sql, domainList )
+	    // def rcptCommand = new RCPTCommand( sql, domainList )
 	    def resultString
 
             when:
@@ -155,7 +157,7 @@ class RCPTCommandSpec extends Specification {
 	@Unroll( "invalid address #inputAddress gives #value" )
 	def "invalid address #inputAddress gives #value"() {
 	    def resultMap
-	    def rcptCommand = new RCPTCommand( sql, domainList )
+	    // def rcptCommand = new RCPTCommand( sql, domainList )
 	    def resultString
 
             when:
@@ -191,7 +193,7 @@ class RCPTCommandSpec extends Specification {
 	}
 	
 	def "test happy path"() {
-	    def rcptCommand = new RCPTCommand( sql, domainList )
+	    // def rcptCommand = new RCPTCommand( sql, domainList )
 	    when:
 	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'EHLO' ], [:] )
 	        def mailResponse = resultMap.resultString + crlf 
