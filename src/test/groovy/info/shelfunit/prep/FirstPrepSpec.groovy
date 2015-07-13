@@ -35,12 +35,6 @@ class FirstPrepSpec extends Specification {
         if ( System.getProperty( "database.prep" ) == 'true' ) {
             println "database.prep is true"
             prepDatabase = true
-            /*
-            systemProperties[ 'dbname' ]        = 'gemail_test_db'
-            systemProperties[ 'host_and_port' ] = 'localhost:5432'
-            systemProperties[ 'dbuser' ]        = 'gemail_test'
-            systemProperties[ 'dbpassword' ]    = 'dev-word-to-pass001'
-            */
             def db = [url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
             user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver']
             sql = Sql.newInstance(db.url, db.user, db.password, db.driver)
@@ -88,6 +82,7 @@ class FirstPrepSpec extends Specification {
                 username character varying(64) not null unique,
                 password_hash character varying(150) not null,
                 password_algo character varying(32) not null,
+                iterations bigint not null,
                 first_name character varying(30) not null,
                 last_name character varying(30) not null,
                 version bigint NOT NULL

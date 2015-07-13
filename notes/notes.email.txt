@@ -102,7 +102,22 @@ http://docs.groovy-lang.org/latest/html/api/groovy/util/Eval.html
 
 http://staging.terrencemiao.com/technology/how-to-validate-email-address-with-regular-expression-in-groovy/
 emailPattern = /[_A-Za-z0-9-]+(.[_A-Za-z0-9-]+)*@[A-Za-z0-9]+(.[A-Za-z0-9]+)*(.[A-Za-z]{2,})/
-email = 'god@heaven.org'
+email = 'person@reality.org'
  
 return email ==~ emailPattern
+
+https://www.owasp.org/index.php/Java_Security_Frameworks
+
+http://shiro.apache.org/static/1.2.3/apidocs/
+
+org.apache.shiro.crypto.hash.Sha384Hash
+byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}".getBytes()
+
+http://www.jasypt.org/
+http://www.bouncycastle.org/java.html
+http://www.cryptoworkshop.com/guide/
+
+http://www.mindrot.org/projects/jBCrypt/
+https://github.com/wg/scrypt
+
 

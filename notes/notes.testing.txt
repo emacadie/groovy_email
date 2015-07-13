@@ -6,6 +6,8 @@ gradle test --tests info.shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.ModularSMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.SMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.command.EHLOCommandSpec -info
+gradle test --tests info.shelfunit.socket.command.MAILCommandSpec -info
+gradle test --tests info.shelfunit.socket.command.RCPTCommandSpec -info
 
 gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info
@@ -22,4 +24,6 @@ Here is prevCommandList: [EHLO, DATA, THE MESSAGE]
 
 https://github.com/jamescarr/h2-gradle-plugin
 
+I got this message when I imported the wrong package in the test:
+No tests found for given includes: [info.shelfunit.socket.command.RCPTCommandSpec]
 

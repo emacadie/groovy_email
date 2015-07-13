@@ -8,10 +8,16 @@ class MailRunner {
     
     static runMetaProgramming() {
         ExpandoMetaClass.enableGlobally()
-        java.util.List.metaClass.lastItem = {
+        java.util.List.metaClass.lastItem = { ->
             if ( delegate.size() != 0 ) {
                 delegate.last()
             }
+        }
+        java.util.List.metaClass.lastCommandPrecedesMail = { ->
+            delegate.last().matches( 'EHLO|HELO|RSET' )
+        }
+        java.util.List.metaClass.lastCommandPrecedesRCPT = { ->
+            delegate.last().matches( 'MAIL|RCPT' ) 
         }
         StringBuffer.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {

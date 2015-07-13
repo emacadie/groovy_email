@@ -56,5 +56,27 @@ EMAIL_PATTERN =~ /^[A-Z0-9+_.-]+@[A-Z0-9.-]+$/
     println "; done with ${it}"
 } 
 compile 'commons-validator:commons-validator:1.4.1'
+
+
+regexClosure = {
+    println "looking at ${it}"
+    q = it =~ regex
+    print it ==~ regex
+    print "; " + ( it?: q[0][2] )
+    println "; done with ${it}"
+} 
+mkyongGood.each{regexClosure(it)}
+
+q.eachWithIndex { match, i ->
+    print "match ${i}: "
+    match.each { group ->
+        println "$group"
+    }
+}
+
+regex = '''^(RCPT TO):<(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
+*+/=?`{|}~^-]+)*@)((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>$(?x)'''
+regex = '''^(RCPT TO):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
+*+/=?`{|}~^-]+)*@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>$(?x)'''
 */
 
