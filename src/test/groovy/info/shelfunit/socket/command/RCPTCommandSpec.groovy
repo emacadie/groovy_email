@@ -7,7 +7,6 @@ import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.MailRunner
-import info.shelfunit.socket.command.RCPTCommand
 
 import groovy.sql.Sql
 
@@ -45,16 +44,16 @@ class RCPTCommandSpec extends Specification {
     def addUsers() {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'mountVernon', salt, 1000000 )
+        def atx512 = new Sha512Hash( 'somePassword', salt, 1000000 )
         def params = [ 'george.washington', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
-        atx512 = new Sha512Hash( 'BawstonMaas', salt, 1000000 )
         params = [ 'john.adams', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
+        params = [ 'oneill', atx512.toBase64(), 'SHA-512', numIterations, 'Jack', "O'Neill", 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
-
     }
     
 	def "test handling wrong command"() {
@@ -67,7 +66,7 @@ class RCPTCommandSpec extends Specification {
 	        mailResponse == "501 Command not in proper form\r\n"
 	        resultMap.prevCommandList == [ "RCPT" ]
 	}
-	
+	/*
 	@Unroll( "#command should result in #mailResponse" )
 	def "#command results in #mailResponse"() {
 	    def resultMap
@@ -86,7 +85,8 @@ class RCPTCommandSpec extends Specification {
             'HELO'  | "250 OK"
             'RSET'  | "250 OK"
 	}
-	
+	*/
+	/*
 	@Unroll( "#command gives #value with address #resultAddress" )
 	def "#command gives #value with address #resultAddress"() {
 	    def resultMap
@@ -110,7 +110,9 @@ class RCPTCommandSpec extends Specification {
             'NOOP'  | "503 Bad sequence of commands" | null
             'RCPT'  | "503 Bad sequence of commands" | null
 	}
+	*/
 	
+	/*
 	@Unroll( "#inputAddress gives #value with result Address the same" )
 	def "#inputAddress gives #value with result Address the same"() {
 	    def resultMap
@@ -153,7 +155,9 @@ class RCPTCommandSpec extends Specification {
             'user_name@domain.com'      | "250 OK" 
             'username@yahoo.corporate.in'   | "250 OK"
 	}
+	*/
 	
+	/*
 	@Unroll( "invalid address #inputAddress gives #value" )
 	def "invalid address #inputAddress gives #value"() {
 	    def resultMap
@@ -191,17 +195,18 @@ class RCPTCommandSpec extends Specification {
             'username@yahoo.c'          | "501 Command not in proper form"  | null 
             'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
 	}
+	*/
 	
 	def "test happy path"() {
 	    // def rcptCommand = new RCPTCommand( sql, domainList )
 	    when:
-	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'EHLO' ], [:] )
+	        def resultMap = rcptCommand.process( "RCPT TO:<oneill@shelfunit.info>", [ 'EHLO', 'MAIL' ], [:] )
 	        def mailResponse = resultMap.resultString + crlf 
 	        def bMap = resultMap.bufferMap
 	    then:
 	        mailResponse == "250 OK\r\n"
-	        resultMap.prevCommandList == [ "EHLO", "MAIL" ]
-	        bMap.reversePath == 'oneill@stargate.mil'
+	        resultMap.prevCommandList == [ "EHLO", "MAIL", "RCPT" ]
+	        bMap.forwardPath == 'oneill@shelfunit.info'
 	}
 
 }

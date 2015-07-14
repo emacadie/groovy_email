@@ -1,4 +1,4 @@
-package info.shelfunit.socket
+package info.shelfunit.socket.command
 
 import spock.lang.Specification
 import spock.lang.Unroll
@@ -7,11 +7,6 @@ import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.MailRunner
-import info.shelfunit.socket.command.MAILCommand
-
-// import org.xbill.DNS.Address
-
-// import groovy.mock.interceptor.StubFor
 
 class MAILCommandSpec extends Specification {
     
