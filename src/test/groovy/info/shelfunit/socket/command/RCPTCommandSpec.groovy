@@ -157,7 +157,7 @@ class RCPTCommandSpec extends Specification {
 	}
 	*/
 	
-	/*
+	
 	@Unroll( "invalid address #inputAddress gives #value" )
 	def "invalid address #inputAddress gives #value"() {
 	    def resultMap
@@ -165,12 +165,12 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
             when:
-                resultMap = rcptCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ], [:] )
+                resultMap = rcptCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
             then:
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value
                 resultMap.bufferMap?.reversePath == resultAddress
-                resultMap.prevCommandList == [ 'EHLO' ]
+                resultMap.prevCommandList == [ 'EHLO', 'MAIL' ]
             where:
             inputAddress                | value                             | resultAddress
             'mkyong'                    | "501 Command not in proper form"  | null 
@@ -195,7 +195,7 @@ class RCPTCommandSpec extends Specification {
             'username@yahoo.c'          | "501 Command not in proper form"  | null 
             'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
 	}
-	*/
+	
 	
 	def "test happy path"() {
 	    // def rcptCommand = new RCPTCommand( sql, domainList )
