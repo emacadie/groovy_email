@@ -45,18 +45,16 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             prevCommandList << 'RCPT'
             resultMap.resultString = '250 OK'
             def q = theMessage =~ pattern
-            // log.info "Here is q: ${q}"
+            log.info "q is a ${q.class.name}"
             log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}"
             log.info "Here is q[ 0 ][ 3 ]: ${q[0][3]}"
-            def userName = q[ 0 ][ 2 ].substring( 0, ( q[ 0 ][ 2 ].length() - ( q[ 0 ][ 3 ].length() + 1 ) ) )
+            def userName = q.extractUserName() // q[ 0 ][ 2 ].substring( 0, ( q[ 0 ][ 2 ].length() - ( q[ 0 ][ 3 ].length() + 1 ) ) )
             log.info "here is userName: ${userName}"
             def row = sql.firstRow( 'select * from email_user where username=?', userName )
             log.info "here is row.size() : ${row.size()}"
             if ( row.size() != 0 ) {
                 bufferMap.forwardPath = q[ 0 ][ 2 ]
             }
-            // Here is q[ 0 ][ 2 ]: oneill@stargate.mil 
-            // Here is q[ 0 ][ 3 ]: stargate.mil
             
             // bufferMap.clear()
             // bufferMap.reversePath =  q[ 0 ][ 2 ]

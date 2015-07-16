@@ -19,6 +19,9 @@ class MailRunner {
         java.util.List.metaClass.lastCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
         }
+        java.util.regex.Matcher.metaClass.extractUserName = { ->
+            delegate[ 0 ][ 2 ].substring( 0, ( delegate[ 0 ][ 2 ].length() - ( delegate[ 0 ][ 3 ].length() + 1 ) ) )
+        }
         StringBuffer.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {
                 return false
