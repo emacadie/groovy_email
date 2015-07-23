@@ -109,49 +109,49 @@ class RCPTCommandSpec extends Specification {
 	}
 	*/
 	
-	/*
+	
 	@Unroll( "#inputAddress gives #value with result Address the same" )
 	def "#inputAddress gives #value with result Address the same"() {
 	    def resultMap
 	    def resultString
 
             when:
-                resultMap = rcptCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ], [:] )
+                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
             then:
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value
-                resultMap.bufferMap?.reversePath == inputAddress
-                resultMap.prevCommandList == [ 'EHLO', 'MAIL' ]
+                // resultMap.bufferMap?.reversePath == inputAddress
+                resultMap.prevCommandList == [ 'EHLO', 'MAIL', 'RCPT' ]
             where:
             inputAddress                | value    
-            'mkyong@yahoo.com'          | "250 OK" 
-            'mkyong-100@yahoo.com'      | "250 OK" 
-            'mkyong.100@yahoo.com'      | "250 OK" 
-            'mkyong111@mkyong.com'      | "250 OK" 
-            'mkyong-100@mkyong.net'     | "250 OK" 
-            'mkyong.100@mkyong.com.au'  | "250 OK" 
-            'mkyong@1.com'              | "250 OK" 
-            'mkyong@gmail.com.com'      | "250 OK" 
-            'mkyong+100@gmail.com'      | "250 OK" 
-            'mkyong-100@yahoo-test.com' | "250 OK"
-            'howTuser@domain.com'       | "250 OK" 
-            'user@domain.co.in'         | "250 OK" 
-            'user1@domain.com'          | "250 OK" 
-            'user.name@domain.com'      | "250 OK" 
-            'user_name@domain.co.in'    | "250 OK" 
-            'user-name@domain.co.in'    | "250 OK" 
-            // 'user@domaincom'            | "250 OK" 
-            'user@domain.com'           | "250 OK" 
-            'user@domain.co.in'         | "250 OK" 
-            'user.name@domain.com'      | "250 OK"
-            // "user'name@domain.co.in"    | "250 OK"
-            'user@domain.com'           | "250 OK" 
-            'user@domain.co.in'         | "250 OK" 
-            'user.name@domain.com'      | "250 OK" 
-            'user_name@domain.com'      | "250 OK" 
-            'username@yahoo.corporate.in'   | "250 OK"
+            'mkyong@yahoo.com'          | "550 No such user" 
+            'mkyong-100@yahoo.com'      | "550 No such user" 
+            'mkyong.100@yahoo.com'      | "550 No such user" 
+            'mkyong111@mkyong.com'      | "550 No such user" 
+            'mkyong-100@mkyong.net'     | "550 No such user" 
+            'mkyong.100@mkyong.com.au'  | "550 No such user" 
+            'mkyong@1.com'              | "550 No such user" 
+            'mkyong@gmail.com.com'      | "550 No such user" 
+            'mkyong+100@gmail.com'      | "550 No such user" 
+            'mkyong-100@yahoo-test.com' | "550 No such user"
+            'howTuser@domain.com'       | "550 No such user" 
+            'user@domain.co.in'         | "550 No such user" 
+            'user1@domain.com'          | "550 No such user" 
+            'user.name@domain.com'      | "550 No such user" 
+            'user_name@domain.co.in'    | "550 No such user" 
+            'user-name@domain.co.in'    | "550 No such user" 
+            // 'user@domaincom'            | "550 No such user" 
+            'user@domain.com'           | "550 No such user" 
+            'user@domain.co.in'         | "550 No such user" 
+            'user.name@domain.com'      | "550 No such user"
+            // "user'name@domain.co.in"    | "550 No such user"
+            'user@domain.com'           | "550 No such user" 
+            'user@domain.co.in'         | "550 No such user" 
+            'user.name@domain.com'      | "550 No such user" 
+            'user_name@domain.com'      | "550 No such user" 
+            'username@yahoo.corporate.in'   | "550 No such user"
 	}
-	*/
+	
 	
 	
 	@Unroll( "invalid address #inputAddress gives #value" )
