@@ -47,37 +47,16 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             log.info "q is a ${q.class.name}"
             log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}"
             log.info "Here is q[ 0 ][ 3 ]: ${q[0][3]}"
-            def userName = q.extractUserName() // q[ 0 ][ 2 ].substring( 0, ( q[ 0 ][ 2 ].length() - ( q[ 0 ][ 3 ].length() + 1 ) ) )
+            def userName = q.extractUserName() 
             log.info "here is userName: ${userName}"
             def rows = sql.rows( 'select * from email_user where username=?', userName )
             log.info "here is rows?.size() : ${rows?.size()} "
             if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
-                bufferMap.forwardPath = q[ 0 ][ 2 ]
+                bufferMap.forwardPath = q.getEmailAddress() // q[ 0 ][ 2 ]
                 resultMap.resultString = '250 OK'
             } else {
                 resultMap.resultString = "550 No such user"
             }
-            /*
-            def row = sql.firstRow( 'select * from email_user where username=?', userName )
-            log.info "row is a ${row.getClass().getName()}"
-            log.info "here is row?.size() : ${row?.size()} here is row?.isEmpty(): ${row?.isEmpty()} "
-            */
-            /*
-            if ( row ) { // row?.size() != null ) { //  != 0 ) {
-                bufferMap.forwardPath = q[ 0 ][ 2 ]
-                resultMap.resultString = '250 OK'
-            } else {
-                resultMap.resultString = "550 No such user"
-            }
-            */
-            /*
-            if ( !row ) { // row?.size() != null ) { //  != 0 ) {
-                resultMap.resultString = "550 No such user"
-            } else {
-                bufferMap.forwardPath = q[ 0 ][ 2 ]
-                resultMap.resultString = '250 OK'
-            }
-            */
             
             // bufferMap.clear()
             // bufferMap.reversePath =  q[ 0 ][ 2 ]
