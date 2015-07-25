@@ -109,9 +109,8 @@ class RCPTCommandSpec extends Specification {
 	}
 	*/
 	
-	
-	@Unroll( "#inputAddress gives #value with result Address the same" )
-	def "#inputAddress gives #value with result Address the same"() {
+	@Unroll( "#inputAddress gives #value" )
+	def "valid #inputAddress gives #value"() {
 	    def resultMap
 	    def resultString
 
@@ -122,6 +121,25 @@ class RCPTCommandSpec extends Specification {
                 resultMap.resultString == value
                 // resultMap.bufferMap?.reversePath == inputAddress
                 resultMap.prevCommandList == [ 'EHLO', 'MAIL', 'RCPT' ]
+            where:
+            inputAddress                | value    
+            'george.washington@shelfunit.info'  | "250 OK"
+            'john.adams@shelfunit.info' | '250 OK'
+            'oneill@shelfunit.info'     | '250 OK'
+	}
+	
+	@Unroll( "#inputAddress with wrong domain gives #value" )
+	def "#inputAddress with wrong domain gives #value"() {
+	    def resultMap
+	    def resultString
+
+            when:
+                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
+            then:
+                println "command was EHLO, resultString is ${resultMap.resultString}"
+                resultMap.resultString == value
+                // resultMap.bufferMap?.reversePath == inputAddress
+                resultMap.prevCommandList == [ 'EHLO', 'MAIL' ]
             where:
             inputAddress                | value    
             'mkyong@yahoo.com'          | "550 No such user" 
@@ -149,7 +167,10 @@ class RCPTCommandSpec extends Specification {
             'user@domain.co.in'         | "550 No such user" 
             'user.name@domain.com'      | "550 No such user" 
             'user_name@domain.com'      | "550 No such user" 
-            'username@yahoo.corporate.in'   | "550 No such user"
+            'username@yahoo.corporate.in'       | "550 No such user"
+            'george.washington@mtvernon.co'  | "550 No such user"
+            'john.adams@his-rotundity.org' | "550 No such user"
+            'oneill@stargate.mil'       | "550 No such user"
 	}
 	
 	
@@ -160,7 +181,7 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
             when:
-                resultMap = rcptCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
+                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
             then:
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value

@@ -19,11 +19,16 @@ class MailRunner {
         java.util.List.metaClass.lastCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
         }
+        java.util.ArrayList.metaClass.includes = { i -> i in delegate 
+        }
         java.util.regex.Matcher.metaClass.extractUserName = { ->
             delegate[ 0 ][ 2 ].substring( 0, ( delegate[ 0 ][ 2 ].length() - ( delegate[ 0 ][ 3 ].length() + 1 ) ) )
         }
         java.util.regex.Matcher.metaClass.getEmailAddress = { ->
             delegate[ 0 ][ 2 ]
+        }
+        java.util.regex.Matcher.metaClass.extractDomain = { ->
+            delegate[ 0 ][ 3 ]
         }
         StringBuffer.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {

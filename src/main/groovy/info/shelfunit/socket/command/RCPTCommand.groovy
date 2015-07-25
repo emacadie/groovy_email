@@ -33,6 +33,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
         resultMap.clear()
         
         def regexResult = ( theMessage ==~ pattern )
+        def q = theMessage =~ pattern
         if ( !prevCommandList.lastCommandPrecedesRCPT() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else if ( !theMessage.startsWith( 'RCPT TO:' ) ) {
@@ -41,9 +42,12 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "501 Command not in proper form"
+        } else if ( !domainList.includes( q.extractDomain() ) ) {
+            resultMap.resultString = "550 No such user"
         } else {
             prevCommandList << 'RCPT'
-            def q = theMessage =~ pattern
+            
+            
             log.info "q is a ${q.class.name}"
             log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}"
             log.info "Here is q[ 0 ][ 3 ]: ${q[0][3]}"
