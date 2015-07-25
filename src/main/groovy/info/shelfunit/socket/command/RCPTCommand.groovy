@@ -28,13 +28,13 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
     
     def resultMap = [:]
     
-    def process( theMessage, prevCommandList, bufferMap ) {
+    def process( theMessage, prevCommandSet, bufferMap ) {
         def resultString
         resultMap.clear()
         
         def regexResult = ( theMessage ==~ pattern )
         def q = theMessage =~ pattern
-        if ( !prevCommandList.lastCommandPrecedesRCPT() ) {
+        if ( !prevCommandSet.lastCommandPrecedesRCPT() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else if ( !theMessage.startsWith( 'RCPT TO:' ) ) {
             resultMap.resultString = "501 Command not in proper form"
@@ -45,7 +45,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
         } else if ( !domainList.includes( q.extractDomain() ) ) {
             resultMap.resultString = "550 No such user"
         } else {
-            prevCommandList << 'RCPT'
+            
             
             
             log.info "q is a ${q.class.name}"
@@ -58,6 +58,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
                 bufferMap.forwardPath = q.getEmailAddress() // q[ 0 ][ 2 ]
                 resultMap.resultString = '250 OK'
+                prevCommandSet << 'RCPT'
             } else {
                 resultMap.resultString = "550 No such user"
             }
@@ -67,7 +68,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             
         }
         resultMap.bufferMap = bufferMap
-        resultMap.prevCommandList = prevCommandList
+        resultMap.prevCommandSet = prevCommandSet
 
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap

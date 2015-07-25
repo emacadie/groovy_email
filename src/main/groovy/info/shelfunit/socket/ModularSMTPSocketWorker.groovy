@@ -16,7 +16,7 @@ class ModularSMTPSocketWorker {
 	private String domain
     private String theResponse
     private String serverName
-	private prevCommandList 
+	private prevCommandSet 
 	private bufferMap
 	private mailCommand
 	private ehloCommand
@@ -27,7 +27,7 @@ class ModularSMTPSocketWorker {
         output = argOut
         serverName = argServerName
         log.info "server name is ${serverName}"
-        prevCommandList = []
+        prevCommandSet = [] as Set
         commandResultMap = [:]
         bufferMap = [:]
         mailCommand = new MAILCommand()
@@ -39,7 +39,7 @@ class ModularSMTPSocketWorker {
 	def setOutput( arg ) {}
 	def setDomain( arg ) {}
 	def setTheResponse( arg ) {}
-	def setPrevCommandList( arg ) {}
+	def setPrevCommandSet( arg ) {}
 
 	def doWork() {
         String sCurrentLine
@@ -60,7 +60,7 @@ class ModularSMTPSocketWorker {
 	        log.info "Here is newString: ${newString}"
 	        
 	        if ( newString.startsWith( 'QUIT' ) ) {
-		        log.info "got QUIT, here is prevCommandList: ${prevCommandList}, here is newString: ${newString}"
+		        log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
 		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
@@ -68,8 +68,8 @@ class ModularSMTPSocketWorker {
 		        responseString = this.handleMessage( newString )
 		    } else if ( newString.startsWith( 'DATA' ) ) {
 		        responseString = this.handleMessage( newString )
-		        prevCommandList << 'DATA'
-	        } else if ( prevCommandList.lastItem() == 'DATA' ) {
+		        prevCommandSet << 'DATA'
+	        } else if ( prevCommandSet.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        while ( !newString.equals( "." ) ) {
 		            sBuffer << newString << '\n'
@@ -83,14 +83,14 @@ class ModularSMTPSocketWorker {
 		        }
 		        log.info( "broke out of while loop for DATA" )
 		        responseString = this.handleMessage( sBuffer.toString() )
-		        prevCommandList << 'THE MESSAGE'
+		        prevCommandSet << 'THE MESSAGE'
 	        } else {
 		        responseString = this.handleMessage( newString )
 	        }
 	        log.info "responseString: ${responseString}"
 	        output << responseString
         }
-        log.info "Here is prevCommandList: ${prevCommandList}"
+        log.info "Here is prevCommandSet: ${prevCommandSet}"
         log.info "ending doWork"
 	} 
 
@@ -99,26 +99,26 @@ class ModularSMTPSocketWorker {
 		log.info "Incoming message: ${theMessage}"
 		if ( theMessage.isHelloCommand() ) {
 		    commandResultMap.clear()
-		    commandResultMap = ehloCommand.process( theMessage, prevCommandList, bufferMap ) 
-		    prevCommandList = commandResultMap.prevCommandList.clone()
+		    commandResultMap = ehloCommand.process( theMessage, prevCommandSet, bufferMap ) 
+		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
 			// temporary
-			// commandResultMap = mailCommand.process( theMessage, prevCommandList )
+			// commandResultMap = mailCommand.process( theMessage, prevCommandSet )
 			theResponse = "250 OK"
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
 			// temporary
 			theResponse = "250 OK"
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
-		} else if ( prevCommandList.lastItem() == 'DATA' ) {
+		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
-		    prevCommandList.clear()
+		    prevCommandSet.clear()
 			theResponse = "250 OK"
-		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandList.lastItem() == 'THE MESSAGE' && 
+		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandSet.lastItem() == 'THE MESSAGE' && 
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.isObsoleteCommand() ) { 
 		    theResponse = '502 Command not implemented'

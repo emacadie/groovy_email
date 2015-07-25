@@ -45,7 +45,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    then:
 	        ehloResponse == "250-Hello ${domain}\n" +
 	        "250 HELP\r\n"
-	        resultMap.prevCommandList == ["EHLO"]
+	        resultMap.prevCommandSet == ["EHLO"]
 	}
 	
 	def "test handling HELO"() {
@@ -62,7 +62,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
-	        println "Here is the map: ${resultMap.prevCommandList}"
+	        println "Here is the map: ${resultMap.prevCommandSet}"
 	}
 	
 	def "test handling old commands"() {

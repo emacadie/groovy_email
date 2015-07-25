@@ -13,14 +13,29 @@ class MailRunner {
                 delegate.last()
             }
         }
+        java.util.Set.metaClass.lastItem = { ->
+            if ( delegate.size() != 0 ) {
+                delegate.last()
+            }
+        }
         java.util.List.metaClass.lastCommandPrecedesMail = { ->
             delegate.last().matches( 'EHLO|HELO|RSET' )
         }
         java.util.List.metaClass.lastCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
         }
-        java.util.ArrayList.metaClass.includes = { i -> i in delegate 
+        java.util.List.metaClass.includes = { i -> i in delegate 
         }
+        
+        java.util.Set.metaClass.lastCommandPrecedesMail = { ->
+            delegate.last().matches( 'EHLO|HELO|RSET' )
+        }
+        java.util.Set.metaClass.lastCommandPrecedesRCPT = { ->
+            delegate.last().matches( 'MAIL|RCPT' ) 
+        }
+        java.util.Set.metaClass.includes = { i -> i in delegate 
+        }
+        
         java.util.regex.Matcher.metaClass.extractUserName = { ->
             delegate[ 0 ][ 2 ].substring( 0, ( delegate[ 0 ][ 2 ].length() - ( delegate[ 0 ][ 3 ].length() + 1 ) ) )
         }

@@ -13,14 +13,14 @@ class SMTPSocketWorker {
 	private String domain
     private String theResponse
     private String serverName
-	private prevCommandList 
+	private prevCommandSet 
 
 	SMTPSocketWorker( argIn, argOut, argServerName ) {
         input = argIn
         output = argOut
         serverName = argServerName
         log.info "server name is ${serverName}"
-        prevCommandList = []
+        prevCommandSet = []
 	}
     
 	// make sure private fields are truly private
@@ -28,7 +28,7 @@ class SMTPSocketWorker {
 	def setOutput( arg ) {}
 	def setDomain( arg ) {}
 	def setTheResponse( arg ) {}
-	def setPrevCommandList( arg ) {}
+	def setPrevCommandSet( arg ) {}
 
 	def doWork() {
         String sCurrentLine
@@ -49,7 +49,7 @@ class SMTPSocketWorker {
 	        log.info "Here is newString: ${newString}"
 	        
 	        if ( newString.startsWith( 'QUIT' ) ) {
-		        log.info "got QUIT, here is prevCommandList: ${prevCommandList}, here is newString: ${newString}"
+		        log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
 		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
@@ -57,8 +57,8 @@ class SMTPSocketWorker {
 		        responseString = this.handleMessage( newString )
 		    } else if ( newString.startsWith( 'DATA' ) ) {
 		        responseString = this.handleMessage( newString )
-		        prevCommandList << 'DATA'
-	        } else if ( prevCommandList.lastItem() == 'DATA' ) {
+		        prevCommandSet << 'DATA'
+	        } else if ( prevCommandSet.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        while ( !newString.equals( "." ) ) {
 		            sBuffer << newString << '\n'
@@ -72,7 +72,7 @@ class SMTPSocketWorker {
 		        }
 		        log.info( "broke out of while loop for DATA" )
 		        responseString = this.handleMessage( sBuffer.toString() )
-		        prevCommandList << 'THE MESSAGE'
+		        prevCommandSet << 'THE MESSAGE'
 	        } else {
 		        responseString = this.handleMessage( newString )
 	        }
@@ -86,14 +86,14 @@ class SMTPSocketWorker {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
 		if ( theMessage.startsWith( 'EHLO' ) ) {
-		    prevCommandList << 'EHLO'
+		    prevCommandSet << 'EHLO'
 			domain = theMessage.replaceFirst( 'EHLO ', '' )
 			log.info "Here is the domain: ${domain}"
 			theResponse = "250-Hello ${domain}\n"
 			theResponse += "250 HELP"
 			// log.info "Here is the response:\n${theResponse}"
 		} else if ( theMessage.startsWith( 'HELO' ) ) {
-		    prevCommandList << 'HELO'
+		    prevCommandSet << 'HELO'
 			domain = theMessage.replaceFirst( 'HELO ', '' )
 			log.info "Here is the domain: ${domain}"
 			theResponse = "250 Hello ${domain}"
@@ -105,13 +105,13 @@ class SMTPSocketWorker {
 			theResponse = "250 OK"
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
-		} else if ( prevCommandList.lastItem() == 'DATA' ) {
+		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
-		    prevCommandList.clear()
+		    prevCommandSet.clear()
 			theResponse = "250 OK"
-		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandList.lastItem() == 'THE MESSAGE' && 
+		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandSet.lastItem() == 'THE MESSAGE' && 
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.substring( 0, 4 ).matches( "SAML|SEND|SOML|TURN" ) ) {
 		    theResponse = '502 Command not implemented'

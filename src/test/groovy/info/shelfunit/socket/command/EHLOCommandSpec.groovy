@@ -33,12 +33,13 @@ class EHLOCommandSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${domain}", [], [:] )
+	        def resultMap = ehloCommand.process( "EHLO ${domain}", [] as Set, [:] )
 	        def ehloResponse = resultMap.resultString + crlf 
 	    then:
 	        ehloResponse == "250-Hello ${domain}\n" +
 	        "250 HELP\r\n"
-	        resultMap.prevCommandList == ["EHLO"]
+	        println "here is resultMap.prevCommandSet[0]: ${resultMap.prevCommandSet[0]} and it's a ${resultMap.prevCommandSet[0].class.name}"
+	        resultMap.prevCommandSet == ["EHLO"] as Set
 	}
 	
 	def "test handling HELO"() {
@@ -46,7 +47,7 @@ class EHLOCommandSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "HELO ${domain}", [], [:] )
+	        def resultMap = ehloCommand.process( "HELO ${domain}", [] as Set, [:] )
 	        def ehloResponse = resultMap.resultString + crlf
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
@@ -57,7 +58,7 @@ class EHLOCommandSpec extends Specification {
 	    
 	    def longString = ( "f" * 252 ) + '.com'
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${longString}", [], [:] )
+	        def resultMap = ehloCommand.process( "EHLO ${longString}", [] as Set, [:] )
 	        def ehloResponse = resultMap.resultString + crlf 
 	    then:
 	        ehloResponse == "501 Domain name length beyond 255 char limit per RFC 3696\r\n"
@@ -68,15 +69,15 @@ class EHLOCommandSpec extends Specification {
 	    def ehloCommand = new EHLOCommand()
 	    
 	    when:
-	        def prevCommandList = [ 'Get the hell off my ship', 'keep us under the radar, Wash' ]
+	        def prevCommandSet = [ 'Get the hell off my ship', 'keep us under the radar, Wash' ] as Set
 	        def bufferMap = [ name:'Jayne', location: 'bunk' ]
 	    then:
-	        prevCommandList.size() == 2
+	        prevCommandSet.size() == 2
 	        bufferMap.size() == 2
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${domain}", prevCommandList, bufferMap )
+	        def resultMap = ehloCommand.process( "EHLO ${domain}", prevCommandSet, bufferMap )
 	        def ehloResponse = resultMap.resultString + crlf 
-	        def newList = resultMap.prevCommandList
+	        def newList = resultMap.prevCommandSet
 	        def newMap = resultMap.bufferMap
 	    then:
 	        ehloResponse == "250-Hello ${domain}\n" +

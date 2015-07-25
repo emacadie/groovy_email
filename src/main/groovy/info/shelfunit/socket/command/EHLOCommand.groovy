@@ -13,7 +13,7 @@ class EHLOCommand {
     // https://tools.ietf.org/html/rfc3696#section-3  Domain cannot be more than 255 chars
     // RFC 5321, 3.2.  Client Initiation: You must return simple HELO 
     // theMessage is a String
-    def process( theMessage, prevCommandList, bufferMap ) {
+    def process( theMessage, prevCommandSet, bufferMap ) {
         def resultString
         resultMap.clear()
         bufferMap.clear()
@@ -22,17 +22,17 @@ class EHLOCommand {
         log.info "Here is the domain: ${domain} and it is a ${domain.class.name}"
         if ( domain.isMoreThan255Char() ) {
             resultMap.resultString = "501 Domain name length beyond 255 char limit per RFC 3696"
-            resultMap.prevCommandList = prevCommandList
+            resultMap.prevCommandSet = prevCommandSet
         } else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithEHLO() ) ) {
-            prevCommandList.clear()
-            prevCommandList << 'EHLO'
+            prevCommandSet.clear()
+            prevCommandSet << "EHLO"
             resultMap.resultString = "250-Hello ${domain}\n250 HELP"
 		} else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithHELO() ) ) {
-		    prevCommandList.clear()
-		    prevCommandList << 'HELO'
+		    prevCommandSet.clear()
+		    prevCommandSet << "HELO"
 		    resultMap.resultString = "250 Hello ${domain}"
 		}
-		resultMap.prevCommandList = prevCommandList
+		resultMap.prevCommandSet = prevCommandSet
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap
     }

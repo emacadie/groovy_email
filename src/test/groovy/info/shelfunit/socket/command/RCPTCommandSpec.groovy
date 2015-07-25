@@ -59,11 +59,11 @@ class RCPTCommandSpec extends Specification {
 	def "test handling wrong command"() {
 	    
 	    when:
-	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ], [:] )
+	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [:] )
 	        def mailResponse = resultMap.resultString + crlf 
 	    then:
 	        mailResponse == "501 Command not in proper form\r\n"
-	        resultMap.prevCommandList == [ "RCPT" ]
+	        resultMap.prevCommandSet == [ "RCPT" ] as Set
 	}
 	/*
 	@Unroll( "#command should result in #mailResponse" )
@@ -110,22 +110,45 @@ class RCPTCommandSpec extends Specification {
 	*/
 	
 	@Unroll( "#inputAddress gives #value" )
-	def "valid #inputAddress gives #value"() {
+	def "#inputAddress gives #value"() {
 	    def resultMap
 	    def resultString
 
             when:
-                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
+                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
             then:
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value
-                // resultMap.bufferMap?.reversePath == inputAddress
-                resultMap.prevCommandList == [ 'EHLO', 'MAIL', 'RCPT' ]
+                resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
             where:
             inputAddress                | value    
             'george.washington@shelfunit.info'  | "250 OK"
             'john.adams@shelfunit.info' | '250 OK'
             'oneill@shelfunit.info'     | '250 OK'
+            'george.washington@groovy-is-groovy.org'  | "250 OK"
+            'john.adams@groovy-is-groovy.org' | '250 OK'
+            'oneill@groovy-is-groovy.org'     | '250 OK'
+	}
+	
+	@Unroll( "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value" )
+	def "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value"() {
+	    def resultMap
+	    def resultString
+
+            when:
+                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL', 'RCPT' ] as Set, [:] )
+            then:
+                println "command was EHLO, resultString is ${resultMap.resultString}"
+                resultMap.resultString == value
+                resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+            where:
+            inputAddress                | value    
+            'george.washington@shelfunit.info'  | "250 OK"
+            'john.adams@shelfunit.info' | '250 OK'
+            'oneill@shelfunit.info'     | '250 OK'
+            'george.washington@groovy-is-groovy.org'  | "250 OK"
+            'john.adams@groovy-is-groovy.org' | '250 OK'
+            'oneill@groovy-is-groovy.org'     | '250 OK'
 	}
 	
 	@Unroll( "#inputAddress with wrong domain gives #value" )
@@ -134,12 +157,11 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
             when:
-                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
+                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
             then:
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value
-                // resultMap.bufferMap?.reversePath == inputAddress
-                resultMap.prevCommandList == [ 'EHLO', 'MAIL' ]
+                resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
             where:
             inputAddress                | value    
             'mkyong@yahoo.com'          | "550 No such user" 
@@ -181,12 +203,12 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
             when:
-                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ], [:] )
+                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
             then:
                 println "command was EHLO, resultString is ${resultMap.resultString}"
                 resultMap.resultString == value
                 resultMap.bufferMap?.reversePath == resultAddress
-                resultMap.prevCommandList == [ 'EHLO', 'MAIL' ]
+                resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
             where:
             inputAddress                | value                             | resultAddress
             'mkyong'                    | "501 Command not in proper form"  | null 
@@ -215,12 +237,12 @@ class RCPTCommandSpec extends Specification {
 	
 	def "test happy path"() {
 	    when:
-	        def resultMap = rcptCommand.process( "RCPT TO:<oneill@shelfunit.info>", [ 'EHLO', 'MAIL' ], [:] )
+	        def resultMap = rcptCommand.process( "RCPT TO:<oneill@shelfunit.info>", [ 'EHLO', 'MAIL' ] as Set, [:] )
 	        def mailResponse = resultMap.resultString + crlf 
 	        def bMap = resultMap.bufferMap
 	    then:
 	        mailResponse == "250 OK\r\n"
-	        resultMap.prevCommandList == [ "EHLO", "MAIL", "RCPT" ]
+	        resultMap.prevCommandSet == [ "EHLO", "MAIL", "RCPT" ] as Set
 	        bMap.forwardPath == 'oneill@shelfunit.info'
 	}
 
