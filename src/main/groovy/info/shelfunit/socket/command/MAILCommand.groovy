@@ -20,10 +20,9 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
 */
     static pattern = ~regex
     
-    def resultMap = [:]
-    
     def process( theMessage, prevCommandSet, bufferMap ) {
         def resultString
+        def resultMap = [:]
         resultMap.clear()
         // bufferMap.reversePath = '' 
         // bufferMap.forwardPath = ''

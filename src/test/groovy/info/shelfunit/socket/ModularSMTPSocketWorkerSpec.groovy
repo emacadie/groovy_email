@@ -5,6 +5,8 @@ import spock.lang.Specification
 import java.io.InputStream
 import java.io.OutputStream
 
+import groovy.sql.Sql
+
 import org.junit.Rule
 import org.junit.rules.TestName
 
@@ -16,27 +18,28 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     TestName name = new TestName()
     
     def crlf = "\r\n"
-    
+    static sql
+    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     def setup() {
         println "\n--- Starting test ${name.methodName}"
     }          // run before every feature method
     def cleanup() {}        // run after every feature method
     def setupSpec() {
         MailRunner.runMetaProgramming()
-        // ExpandoMetaClass.enableGlobally()
+        def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
+        user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
+        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
     }     // run before the first feature method
     def cleanupSpec() {}   // run after the last feature method
-    
-    
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    def serverName = "www.groovymail.org"
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    // def serverName = "www.groovymail.org"
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "www.groovymail.org"
+	        ssWorker.serverName == "shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:
@@ -49,12 +52,12 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    def serverName = "www.groovymail.org"
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    // def serverName = "www.groovymail.org"
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "www.groovymail.org"
+	        ssWorker.serverName == "shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:
@@ -66,11 +69,11 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling old commands"() {
-	    def serverName = "www.groovymail.org"
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), serverName )
+	    // def serverName = "www.groovymail.org"
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
 	    
 	    expect:
-	        ssWorker.serverName == "www.groovymail.org"
+	        ssWorker.serverName == "shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when: "Sending SAML"
@@ -93,7 +96,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	
 	def "test with a line containing two periods"() {
 	    when:
-            def serverName = "www.groovymail.org"
+            // def serverName = "www.groovymail.org"
             def domain = "hot-groovy.com"
             def bString = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}" +
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
@@ -102,85 +105,84 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new ModularSMTPSocketWorker( input, output, serverName )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, sql )
             ssWorker.doWork()
             
 	    then:
-	        output.toString() == "220 www.groovymail.org Simple Mail Transfer Service Ready\r\n" +
+	        output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\n" +
                 "250 HELP\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
                 "250 OK\r\n" +
-                "221 www.groovymail.org Service closing transmission channel\r\n"
+                "221 shelfunit.info Service closing transmission channel\r\n"
 	    
 	}
 	
 	def "test obsolete commands"() {
 	    when:
-            def serverName = "www.groovymail.org"
+            // def serverName = "www.groovymail.org"
             def mIs = Mock( InputStream )
             def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new ModularSMTPSocketWorker( input, output, serverName ).doWork()
+            new ModularSMTPSocketWorker( input, output, domainList, sql ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
-            output.toString() == "220 www.groovymail.org Simple Mail Transfer Service Ready\r\n" + // opening
+            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" + // opening
                 "250-Hello hot-groovy.com\n" +
                 "250 HELP\r\n" + // DATA
                 "502 Command not implemented\r\n" + // SAML
                 "502 Command not implemented\r\n" + // SEND
                 "502 Command not implemented\r\n" + // SOML
                 "502 Command not implemented\r\n" + // TURN
-                "221 www.groovymail.org Service closing transmission channel\r\n" // QUIT
+                "221 shelfunit.info Service closing transmission channel\r\n" // QUIT
 	}
 	
 	def "test common streams"() {
 	    when:
-            def serverName = "www.groovymail.org"
+            // def serverName = "www.groovymail.org"
             def mIs = Mock( InputStream )
             def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}.${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new ModularSMTPSocketWorker( input, output, serverName ).doWork()
+            new ModularSMTPSocketWorker( input, output, domainList, sql ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
-            output.toString() == "220 www.groovymail.org Simple Mail Transfer Service Ready\r\n" +
+            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\n" +
                 "250 HELP\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
                 "250 OK\r\n" +
-                "221 www.groovymail.org Service closing transmission channel\r\n"
+                "221 shelfunit.info Service closing transmission channel\r\n"
 	}
 	
 	def "test common streams with reader mocking"() {
 	    when:
-            def serverName = "www.groovymail.org"
+            // def serverName = "www.groovymail.org"
             def domain = "hot-groovy.com"
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def ssWorker = new ModularSMTPSocketWorker( input, output, serverName )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, sql )
             ssWorker.doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
-            output.toString() == "220 www.groovymail.org Simple Mail Transfer Service Ready\r\n" +
+            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\n" +
                 "250 HELP\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
                 "250 OK\r\n" +
-                "221 www.groovymail.org Service closing transmission channel\r\n"
-	    
+                "221 shelfunit.info Service closing transmission channel\r\n"
 	}
 }
 

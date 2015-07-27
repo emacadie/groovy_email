@@ -6,7 +6,6 @@ import groovy.util.logging.Slf4j
 
 @Slf4j
 class EHLOCommand {
-    def resultMap = [:]
     
     // RFC 5321 Sec.4.1.4: If the EHLO command is not acceptable to the SMTP server, 501, 500,
     //    502, or 550 failure replies MUST be returned as appropriate. 
@@ -15,6 +14,7 @@ class EHLOCommand {
     // theMessage is a String
     def process( theMessage, prevCommandSet, bufferMap ) {
         def resultString
+        def resultMap = [:]
         resultMap.clear()
         bufferMap.clear()
         resultMap.bufferMap = bufferMap

@@ -7,39 +7,44 @@ import groovy.util.logging.Slf4j
 
 import info.shelfunit.socket.command.EHLOCommand
 import info.shelfunit.socket.command.MAILCommand
+import info.shelfunit.socket.command.RCPTCommand
+import info.shelfunit.socket.command.RSETCommand
+
+import visibility.Hidden
 
 @Slf4j
 class ModularSMTPSocketWorker {
 
-    private InputStream input
-    private OutputStream output
-	private String domain
-    private String theResponse
-    private String serverName
-	private prevCommandSet 
-	private bufferMap
+    @Hidden InputStream input
+    @Hidden OutputStream output
+	@Hidden String domain
+    @Hidden String theResponse
+    @Hidden String serverName
+	@Hidden prevCommandSet 
+	@Hidden def bufferMap
+	@Hidden def sql
+	@Hidden def serverList
 	private mailCommand
 	private ehloCommand
+	private rcptCommand
+	private rsetCommand
 	private commandResultMap
 
-	ModularSMTPSocketWorker( argIn, argOut, argServerName ) {
+	ModularSMTPSocketWorker( argIn, argOut, argServerList, argSql ) {
         input = argIn
         output = argOut
-        serverName = argServerName
+        sql = argSql
+        serverList = argServerList
+        serverName = serverList[ 0 ]
         log.info "server name is ${serverName}"
         prevCommandSet = [] as Set
         commandResultMap = [:]
         bufferMap = [:]
         mailCommand = new MAILCommand()
         ehloCommand = new EHLOCommand()
+        rcptCommand = new RCPTCommand( sql, serverList )
+        rsetCommand = new RSETCommand()
 	}
-    
-	// make sure private fields are truly private
-	def setInput( arg ) {}
-	def setOutput( arg ) {}
-	def setDomain( arg ) {}
-	def setTheResponse( arg ) {}
-	def setPrevCommandSet( arg ) {}
 
 	def doWork() {
         String sCurrentLine
@@ -116,8 +121,11 @@ class ModularSMTPSocketWorker {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
-		    prevCommandSet.clear()
-			theResponse = "250 OK"
+		    commandResultMap.clear()
+		    commandResultMap = ehloCommand.process( theMessage, prevCommandSet, bufferMap ) 
+		    prevCommandSet = commandResultMap.prevCommandSet.clone()
+		    bufferMap = commandResultMap.bufferMap.clone() 
+			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandSet.lastItem() == 'THE MESSAGE' && 
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.isObsoleteCommand() ) { 

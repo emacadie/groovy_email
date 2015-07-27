@@ -8,7 +8,8 @@ class RCPTCommand {
     
     Sql sql
     List domainList
-    RCPTCommand( def argSql, def argDomainList  ) {
+    RCPTCommand( def argSql, def argDomainList ) {
+        println "Here is argDomainList: ${argDomainList}"
         this.sql = argSql
         this.domainList = argDomainList
     }
@@ -26,10 +27,9 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
 */
     static pattern = ~regex
     
-    def resultMap = [:]
-    
     def process( theMessage, prevCommandSet, bufferMap ) {
         def resultString
+        def resultMap = [:]
         resultMap.clear()
         
         def regexResult = ( theMessage ==~ pattern )
@@ -46,13 +46,13 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             resultMap.resultString = "550 No such user"
         } else {
             
-            log.info "q is a ${q.class.name}"
-            log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}"
-            log.info "Here is q[ 0 ][ 3 ]: ${q[0][3]}"
+            // log.info "q is a ${q.class.name}"
+            // log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}"
+            // log.info "Here is q[ 0 ][ 3 ]: ${q[0][3]}"
             def userName = q.extractUserName() 
-            log.info "here is userName: ${userName}"
+            // log.info "here is userName: ${userName}"
             def rows = sql.rows( 'select * from email_user where username=?', userName )
-            log.info "here is rows?.size() : ${rows?.size()} "
+            // log.info "here is rows?.size() : ${rows?.size()} "
             if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
                 bufferMap.forwardPath = q.getEmailAddress() // q[ 0 ][ 2 ]
                 resultMap.resultString = '250 OK'
