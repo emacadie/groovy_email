@@ -46,8 +46,6 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             resultMap.resultString = "550 No such user"
         } else {
             
-            
-            
             log.info "q is a ${q.class.name}"
             log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}"
             log.info "Here is q[ 0 ][ 3 ]: ${q[0][3]}"
@@ -62,9 +60,6 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             } else {
                 resultMap.resultString = "550 No such user"
             }
-            
-            // bufferMap.clear()
-            // bufferMap.reversePath =  q[ 0 ][ 2 ]
             
         }
         resultMap.bufferMap = bufferMap

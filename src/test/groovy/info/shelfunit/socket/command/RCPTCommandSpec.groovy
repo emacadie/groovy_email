@@ -65,62 +65,19 @@ class RCPTCommandSpec extends Specification {
 	        mailResponse == "501 Command not in proper form\r\n"
 	        resultMap.prevCommandSet == [ "RCPT" ] as Set
 	}
-	/*
-	@Unroll( "#command should result in #mailResponse" )
-	def "#command results in #mailResponse"() {
-	    def resultMap
-	    expect:
-	        mailResponse == rcptCommand.process( "RCPT TO:<oneill@stargate.mil>", [ command ], [:] ).resultString
-	    
-	    where:
-            command | mailResponse
-            'MAIL'  | "503 Bad sequence of commands"
-            'EXPN'  | "503 Bad sequence of commands"
-            'VRFY'  | "503 Bad sequence of commands"
-            'NOOP'  | "503 Bad sequence of commands"
-            'RCPT'  | "503 Bad sequence of commands"
-            'EHLO'  | "250 OK"
-            'HELO'  | "250 OK"
-            'RSET'  | "250 OK"
-	}
-	*/
-	/*
-	@Unroll( "#command gives #value with address #resultAddress" )
-	def "#command gives #value with address #resultAddress"() {
-	    def resultMap
-	    def resultString
 
-            when:
-                resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ], [:] )
-            then:
-                println "command was ${command}, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.bufferMap?.reversePath == resultAddress
-            where:
-            command | value                          | resultAddress
-            'EHLO'  | "250 OK"                       | 'oneill@stargate.mil'
-            'HELO'  | "250 OK"                       | 'oneill@stargate.mil'
-            'RSET'  | "250 OK"                       | 'oneill@stargate.mil'
-            'MAIL'  | "503 Bad sequence of commands" | null
-            'EXPN'  | "503 Bad sequence of commands" | null
-            'VRFY'  | "503 Bad sequence of commands" | null
-            'NOOP'  | "503 Bad sequence of commands" | null
-            'RCPT'  | "503 Bad sequence of commands" | null
-	}
-	*/
-	
 	@Unroll( "#inputAddress gives #value" )
 	def "#inputAddress gives #value"() {
 	    def resultMap
 	    def resultString
 
-            when:
-                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
-            then:
-                println "command was EHLO, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-            where:
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+        where:
             inputAddress                | value    
             'george.washington@shelfunit.info'  | "250 OK"
             'john.adams@shelfunit.info' | '250 OK'
@@ -135,13 +92,13 @@ class RCPTCommandSpec extends Specification {
 	    def resultMap
 	    def resultString
 
-            when:
-                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL', 'RCPT' ] as Set, [:] )
-            then:
-                println "command was EHLO, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-            where:
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL', 'RCPT' ] as Set, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+        where:
             inputAddress                | value    
             'george.washington@shelfunit.info'  | "250 OK"
             'john.adams@shelfunit.info' | '250 OK'
@@ -151,18 +108,63 @@ class RCPTCommandSpec extends Specification {
             'oneill@groovy-is-groovy.org'     | '250 OK'
 	}
 	
+	@Unroll( "#inputAddress with prev command sequence gives #value" )
+	def "#inputAddress with prev command sequence gives #value"() {
+	    def resultMap
+	    def resultString
+
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+        where:
+            inputAddress                | prevCommandSet | value    
+            'george.washington@shelfunit.info'  | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK"
+            'john.adams@shelfunit.info' | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK"
+            'oneill@shelfunit.info'     | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK"
+            'george.washington@groovy-is-groovy.org'  | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK"
+            'john.adams@groovy-is-groovy.org' | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK"
+            'oneill@groovy-is-groovy.org'     | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK"
+            'george.washington@shelfunit.info'  | [ 'EHLO', 'MAIL' ] as Set | "250 OK"
+            'john.adams@shelfunit.info' | [ 'EHLO', 'MAIL' ] as Set | "250 OK"
+            'oneill@shelfunit.info'     | [ 'EHLO', 'MAIL' ] as Set | "250 OK"
+            'george.washington@groovy-is-groovy.org'  | [ 'EHLO', 'MAIL' ] as Set | "250 OK"
+            'john.adams@groovy-is-groovy.org' | [ 'EHLO', 'MAIL' ] as Set | "250 OK"
+            'oneill@groovy-is-groovy.org'     | [ 'EHLO', 'MAIL' ] as Set | "250 OK"
+	}
+	
+	@Unroll( "#inputAddress with wrong prev command sequence gives #value" )
+	def "#inputAddress with wrong prev command sequence gives #value"() {
+	    def resultMap
+	    def resultString
+
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.prevCommandSet == prevCommandSet
+        where:
+            inputAddress                | prevCommandSet | value    
+            'george.washington@shelfunit.info'  | [ 'EHLO' ] as Set | "503 Bad sequence of commands"
+            'john.adams@shelfunit.info' | [ 'RSET' ] as Set | "503 Bad sequence of commands"
+
+	}
+
 	@Unroll( "#inputAddress with wrong domain gives #value" )
 	def "#inputAddress with wrong domain gives #value"() {
 	    def resultMap
 	    def resultString
 
-            when:
-                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
-            then:
-                println "command was EHLO, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
-            where:
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
+        where:
             inputAddress                | value    
             'mkyong@yahoo.com'          | "550 No such user" 
             'mkyong-100@yahoo.com'      | "550 No such user" 
@@ -195,21 +197,19 @@ class RCPTCommandSpec extends Specification {
             'oneill@stargate.mil'       | "550 No such user"
 	}
 	
-	
-	
 	@Unroll( "invalid address #inputAddress gives #value" )
 	def "invalid address #inputAddress gives #value"() {
 	    def resultMap
 	    def resultString
 
-            when:
-                resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
-            then:
-                println "command was EHLO, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.bufferMap?.reversePath == resultAddress
-                resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
-            where:
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.bufferMap?.reversePath == resultAddress
+            resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
+        where:
             inputAddress                | value                             | resultAddress
             'mkyong'                    | "501 Command not in proper form"  | null 
             'mkyong@.com.my'            | "501 Command not in proper form"  | null 
@@ -233,7 +233,6 @@ class RCPTCommandSpec extends Specification {
             'username@yahoo.c'          | "501 Command not in proper form"  | null 
             'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
 	}
-	
 	
 	def "test happy path"() {
 	    when:

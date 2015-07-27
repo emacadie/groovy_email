@@ -61,13 +61,13 @@ class MAILCommandSpec extends Specification {
 	    def mailCommand = new MAILCommand()
 	    def resultString
 
-            when:
-                resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ] as Set, [:] )
-            then:
-                println "command was ${command}, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.bufferMap?.reversePath == resultAddress
-            where:
+        when:
+            resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ command ] as Set, [:] )
+        then:
+            println "command was ${command}, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.bufferMap?.reversePath == resultAddress
+        where:
             command | value                          | resultAddress
             'EHLO'  | "250 OK"                       | 'oneill@stargate.mil'
             'HELO'  | "250 OK"                       | 'oneill@stargate.mil'
@@ -85,14 +85,14 @@ class MAILCommandSpec extends Specification {
 	    def mailCommand = new MAILCommand()
 	    def resultString
 
-            when:
-                resultMap = mailCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ] as Set, [:] )
-            then:
-                println "command was EHLO, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.bufferMap?.reversePath == inputAddress
-                resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
-            where:
+        when:
+            resultMap = mailCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ] as Set, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.bufferMap?.reversePath == inputAddress
+            resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
+        where:
             inputAddress                | value    
             'mkyong@yahoo.com'          | "250 OK" 
             'mkyong-100@yahoo.com'      | "250 OK" 
@@ -128,14 +128,14 @@ class MAILCommandSpec extends Specification {
 	    def mailCommand = new MAILCommand()
 	    def resultString
 
-            when:
-                resultMap = mailCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ] as Set, [:] )
-            then:
-                println "command was EHLO, resultString is ${resultMap.resultString}"
-                resultMap.resultString == value
-                resultMap.bufferMap?.reversePath == resultAddress
-                resultMap.prevCommandSet == [ 'EHLO' ] as Set
-            where:
+        when:
+            resultMap = mailCommand.process( "MAIL FROM:<${inputAddress}>", [ 'EHLO' ] as Set, [:] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.bufferMap?.reversePath == resultAddress
+            resultMap.prevCommandSet == [ 'EHLO' ] as Set
+        where:
             inputAddress                | value                             | resultAddress
             'mkyong'                    | "501 Command not in proper form"  | null 
             'mkyong@.com.my'            | "501 Command not in proper form"  | null 
