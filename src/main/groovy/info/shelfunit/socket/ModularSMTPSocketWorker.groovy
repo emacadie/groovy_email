@@ -109,12 +109,17 @@ class ModularSMTPSocketWorker {
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
-			// temporary
-			// commandResultMap = mailCommand.process( theMessage, prevCommandSet )
-			theResponse = "250 OK"
+			commandResultMap.clear()
+		    commandResultMap = mailCommand.process( theMessage, prevCommandSet, bufferMap ) 
+		    prevCommandSet = commandResultMap.prevCommandSet.clone()
+		    bufferMap = commandResultMap.bufferMap.clone() 
+			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
-			// temporary
-			theResponse = "250 OK"
+			commandResultMap.clear()
+		    commandResultMap = rcptCommand.process( theMessage, prevCommandSet, bufferMap ) 
+		    prevCommandSet = commandResultMap.prevCommandSet.clone()
+		    bufferMap = commandResultMap.bufferMap.clone() 
+			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
@@ -122,7 +127,7 @@ class ModularSMTPSocketWorker {
 			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    commandResultMap.clear()
-		    commandResultMap = ehloCommand.process( theMessage, prevCommandSet, bufferMap ) 
+		    commandResultMap = rsetCommand.process( theMessage, prevCommandSet, bufferMap ) 
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString

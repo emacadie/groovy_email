@@ -59,8 +59,8 @@ http://www.docjar.com/docs/api/java/net/SocketInputStream.html
 5321 minimum implementation:
 x EHLO
 x HELO
-MAIL
-RCPT
+x MAIL
+x RCPT
 DATA
 RSET
 NOOP

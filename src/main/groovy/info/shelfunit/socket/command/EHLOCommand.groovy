@@ -17,6 +17,7 @@ class EHLOCommand {
         def resultMap = [:]
         resultMap.clear()
         bufferMap.clear()
+        prevCommandSet.clear()
         resultMap.bufferMap = bufferMap
         def domain = theMessage.getDomain()
         log.info "Here is the domain: ${domain} and it is a ${domain.class.name}"

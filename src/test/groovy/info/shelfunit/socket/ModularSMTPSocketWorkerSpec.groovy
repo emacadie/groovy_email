@@ -34,7 +34,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    // def serverName = "www.groovymail.org"
 	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
 	    def ehloCommand = new EHLOCommand()
 	    
@@ -52,7 +51,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    // def serverName = "www.groovymail.org"
 	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
 	    def ehloCommand = new EHLOCommand()
 	    
@@ -69,7 +67,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling old commands"() {
-	    // def serverName = "www.groovymail.org"
 	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
 	    
 	    expect:
@@ -96,7 +93,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	
 	def "test with a line containing two periods"() {
 	    when:
-            // def serverName = "www.groovymail.org"
             def domain = "hot-groovy.com"
             def bString = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}" +
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
@@ -120,7 +116,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	
 	def "test obsolete commands"() {
 	    when:
-            // def serverName = "www.groovymail.org"
             def mIs = Mock( InputStream )
             def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
@@ -144,7 +139,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	
 	def "test common streams"() {
 	    when:
-            // def serverName = "www.groovymail.org"
             def mIs = Mock( InputStream )
             def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
@@ -166,7 +160,6 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	
 	def "test common streams with reader mocking"() {
 	    when:
-            // def serverName = "www.groovymail.org"
             def domain = "hot-groovy.com"
             byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )

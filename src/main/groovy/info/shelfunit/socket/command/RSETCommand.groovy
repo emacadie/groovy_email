@@ -1,14 +1,13 @@
 package info.shelfunit.socket.command
 
-
 import groovy.util.logging.Slf4j 
 
 @Slf4j
 class RSETCommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
+        def resultMap = [:]
         def resultString
-        resultMap.clear()
         bufferMap.clear()
         prevCommandSet.clear()
         resultMap.bufferMap = bufferMap
