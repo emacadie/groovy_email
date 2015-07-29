@@ -3,11 +3,13 @@ package info.shelfunit.socket.command
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
+import visibility.Hidden
+
 @Slf4j
 class RCPTCommand {
     
-    Sql sql
-    List domainList
+    @Hidden Sql sql
+    @Hidden List domainList
     RCPTCommand( def argSql, def argDomainList ) {
         println "Here is argDomainList: ${argDomainList}"
         this.sql = argSql

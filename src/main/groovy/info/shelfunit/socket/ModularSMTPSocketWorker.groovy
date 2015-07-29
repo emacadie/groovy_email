@@ -120,17 +120,17 @@ class ModularSMTPSocketWorker {
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
-		} else if ( theMessage.startsWith( 'DATA' ) ) {
-			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
-		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
-			log.info "prevCommand is DATA, here is the message: ${theMessage}"
-			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    commandResultMap.clear()
 		    commandResultMap = rsetCommand.process( theMessage, prevCommandSet, bufferMap ) 
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
+		} else if ( theMessage.startsWith( 'DATA' ) ) {
+			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
+		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
+			log.info "prevCommand is DATA, here is the message: ${theMessage}"
+			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandSet.lastItem() == 'THE MESSAGE' && 
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.isObsoleteCommand() ) { 
