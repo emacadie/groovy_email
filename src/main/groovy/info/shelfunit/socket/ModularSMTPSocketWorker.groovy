@@ -24,6 +24,7 @@ class ModularSMTPSocketWorker {
 	@Hidden def bufferMap
 	@Hidden def sql
 	@Hidden def serverList
+	@Hidden def commandObject
 	private mailCommand
 	private ehloCommand
 	private rcptCommand
@@ -69,8 +70,6 @@ class ModularSMTPSocketWorker {
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
 		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
-	        } else if ( newString.startsWith( 'RSET' ) ) {
-		        responseString = this.handleMessage( newString )
 		    } else if ( newString.startsWith( 'DATA' ) ) {
 		        responseString = this.handleMessage( newString )
 		        prevCommandSet << 'DATA'
@@ -102,6 +101,7 @@ class ModularSMTPSocketWorker {
 	def handleMessage( theMessage ) {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
+		/*
 		if ( theMessage.isHelloCommand() ) {
 		    commandResultMap.clear()
 		    commandResultMap = ehloCommand.process( theMessage, prevCommandSet, bufferMap ) 
@@ -126,6 +126,14 @@ class ModularSMTPSocketWorker {
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
+		*/	
+		if ( theMessage.isEncapsulated() ) {
+		    commandObject = this.returnCurrentCommand( theMessage )
+		    commandResultMap.clear()
+		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
+		    prevCommandSet = commandResultMap.prevCommandSet.clone()
+		    bufferMap = commandResultMap.bufferMap.clone() 
+			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
@@ -145,6 +153,18 @@ class ModularSMTPSocketWorker {
 			theResponse = '250 OK'
 		}
 		theResponse + "\r\n"
+	}
+	
+	def returnCurrentCommand( theMessage ) {
+		if ( theMessage.isHelloCommand() ) {
+		    return ehloCommand
+		} else if ( theMessage.startsWith( 'MAIL' ) ) {
+			return mailCommand
+		} else if ( theMessage.startsWith( 'RCPT' ) ) {
+			return rcptCommand
+		} else if ( theMessage.startsWith( 'RSET' ) ) {
+		    return rsetCommand
+		}
 	}
 }
 

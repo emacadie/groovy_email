@@ -56,7 +56,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             def rows = sql.rows( 'select * from email_user where username=?', userName )
             // log.info "here is rows?.size() : ${rows?.size()} "
             if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
-                bufferMap.forwardPath = q.getEmailAddress() // q[ 0 ][ 2 ]
+                bufferMap.forwardPath << q.getEmailAddress() // q[ 0 ][ 2 ]
                 resultMap.resultString = '250 OK'
                 prevCommandSet << 'RCPT'
             } else {

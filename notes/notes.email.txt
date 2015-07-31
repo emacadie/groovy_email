@@ -71,7 +71,7 @@ Others:
 x SEND obsolete: 502	Command not implemented
 x SOML obsolete: 502	Command not implemented
 x SAML obsolete: 502	Command not implemented
-EXPN
+x EXPN
 HELP
 x TURN Deprecated	502	Command not implemented
 

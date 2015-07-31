@@ -70,6 +70,9 @@ class MailRunner {
         String.metaClass.firstFour = { ->
             return delegate.substring( 0, 4 )
         }
+        String.metaClass.allButFirstFour = { ->
+            return delegate.substring( 4, delegate.length() )
+        }
         String.metaClass.startsWithEHLO = { ->
             return delegate.startsWith( 'EHLO' )
         }
@@ -86,7 +89,20 @@ class MailRunner {
                 return null
             }
         }
-        
+        // I REALLY need to come up with a better name than this
+        String.metaClass.isEncapsulated = {
+            def returnValue = false
+            if ( delegate.isHelloCommand() ) { 
+                returnValue = true
+            } else if ( delegate.startsWith( 'MAIL' ) ) {
+                returnValue = true
+            } else if ( delegate.startsWith( 'RCPT' ) ) {
+                returnValue = true
+            } else if ( delegate.startsWith( 'RSET' ) ) {
+                returnValue = true
+            }
+            returnValue
+        }
         // for domain in EHLOCommand
         String.metaClass.isMoreThan255Char = { ->
             delegate.length() > 255
