@@ -18,6 +18,15 @@ class RCPTCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
     static rcptCommand
+    static hamilton = 'alexander@shelfunit.info'
+    static gwShelf  = 'george.washington@shelfunit.info'
+    static jAdamsShelf = 'john.adams@shelfunit.info'
+    static jackShell = 'oneill@shelfunit.info'
+    static gwGroovy  = 'george.washington@groovy-is-groovy.org'
+    static jaGroovy  = 'john.adams@groovy-is-groovy.org'
+    static jackGroovy = 'oneill@groovy-is-groovy.org'
+    static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+    static resultSetEM = [ 'EHLO', 'MAIL' ] as Set 
 
     @Rule 
     TestName name = new TestName()
@@ -59,7 +68,7 @@ class RCPTCommandSpec extends Specification {
 	def "test handling wrong command"() {
 	    
 	    when:
-	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  'alexander@shelfunit.info' ] )
+	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  [ hamilton ] ] )
 	        def mailResponse = resultMap.resultString + crlf 
 	    then:
 	        mailResponse == "501 Command not in proper form\r\n"
@@ -72,19 +81,19 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [ forwardPath:  'alexander@shelfunit.info' ] )
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+            resultMap.prevCommandSet == resultSetEMR
         where:
-            inputAddress                | value    
-            'george.washington@shelfunit.info'  | "250 OK"
-            'john.adams@shelfunit.info' | '250 OK'
-            'oneill@shelfunit.info'     | '250 OK'
-            'george.washington@groovy-is-groovy.org'  | "250 OK"
-            'john.adams@groovy-is-groovy.org' | '250 OK'
-            'oneill@groovy-is-groovy.org'     | '250 OK'
+            inputAddress    | value    
+            gwShelf         | "250 OK"
+            jAdamsShelf     | '250 OK'
+            jackShell       | '250 OK'
+            gwGroovy        | "250 OK"
+            jaGroovy        | '250 OK'
+            jackGroovy      | '250 OK'
 	}
 	
 	@Unroll( "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value" )
@@ -93,47 +102,47 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL', 'RCPT' ] as Set, [ forwardPath:  'alexander@shelfunit.info' ] )
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEMR, [ forwardPath:  hamilton ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+            resultMap.prevCommandSet == resultSetEMR
         where:
-            inputAddress                | value    
-            'george.washington@shelfunit.info'  | "250 OK"
-            'john.adams@shelfunit.info' | '250 OK'
-            'oneill@shelfunit.info'     | '250 OK'
-            'george.washington@groovy-is-groovy.org'  | "250 OK"
-            'john.adams@groovy-is-groovy.org' | '250 OK'
-            'oneill@groovy-is-groovy.org'     | '250 OK'
+            inputAddress    | value    
+            gwShelf         | "250 OK"
+            jAdamsShelf     | '250 OK'
+            jackShell       | '250 OK'
+            gwGroovy        | "250 OK"
+            jaGroovy        | '250 OK'
+            jackGroovy      | '250 OK'
 	}
 	
 	@Unroll( "#inputAddress with prev command sequence gives #value" )
 	def "#inputAddress with prev command sequence gives #value"() {
 	    def resultMap
 	    def resultString
-
+	    
         when:
-            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [ forwardPath:  ['alexander@shelfunit.info'] ] )
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [ forwardPath: [ hamilton ] ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+            resultMap.prevCommandSet == resultSetEMR
             resultMap.bufferMap.forwardPath == forwardList
         where:
-            inputAddress                | prevCommandSet | value | forwardList    
-            'george.washington@shelfunit.info'  | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'george.washington@shelfunit.info' ]
-            'john.adams@shelfunit.info' | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'john.adams@shelfunit.info' ]
-            'oneill@shelfunit.info'     | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'oneill@shelfunit.info' ]
-            'george.washington@groovy-is-groovy.org'  | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'george.washington@groovy-is-groovy.org' ]
-            'john.adams@groovy-is-groovy.org' | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'john.adams@groovy-is-groovy.org' ]
-            'oneill@groovy-is-groovy.org'     | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'oneill@groovy-is-groovy.org' ]
-            'george.washington@shelfunit.info'  | [ 'EHLO', 'MAIL' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'george.washington@shelfunit.info' ]
-            'john.adams@shelfunit.info' | [ 'EHLO', 'MAIL' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'john.adams@shelfunit.info' ]
-            'oneill@shelfunit.info'     | [ 'EHLO', 'MAIL' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'oneill@shelfunit.info' ]
-            'george.washington@groovy-is-groovy.org'  | [ 'EHLO', 'MAIL' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'george.washington@groovy-is-groovy.org' ]
-            'john.adams@groovy-is-groovy.org' | [ 'EHLO', 'MAIL' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'john.adams@groovy-is-groovy.org' ]
-            'oneill@groovy-is-groovy.org'     | [ 'EHLO', 'MAIL' ] as Set | "250 OK" | ['alexander@shelfunit.info', 'oneill@groovy-is-groovy.org' ]
+            inputAddress    | prevCommandSet    | value     | forwardList    
+            gwShelf         | resultSetEMR      | "250 OK"  | [ hamilton, gwShelf ]
+            jAdamsShelf     | resultSetEMR      | "250 OK"  | [ hamilton, jAdamsShelf ]
+            jackShell       | resultSetEMR      | "250 OK"  | [ hamilton, jackShell ]
+            gwGroovy        | resultSetEMR      | "250 OK"  | [ hamilton, gwGroovy ]
+            jaGroovy        | resultSetEMR      | "250 OK"  | [ hamilton, jaGroovy ]
+            jackGroovy      | resultSetEMR      | "250 OK"  | [ hamilton, jackGroovy ]
+            gwShelf         | resultSetEM       | "250 OK"  | [ hamilton, gwShelf ]
+            jAdamsShelf     | resultSetEM       | "250 OK"  | [ hamilton, jAdamsShelf ]
+            jackShell       | resultSetEM       | "250 OK"  | [ hamilton, jackShell ]
+            gwGroovy        | resultSetEM       | "250 OK"  | [ hamilton, gwGroovy ]
+            jaGroovy        | resultSetEM       | "250 OK"  | [ hamilton, jaGroovy ]
+            jackGroovy      | resultSetEM       | "250 OK"  | [ hamilton, jackGroovy ]
 	}
 	
 	@Unroll( "#inputAddress with wrong prev command sequence gives #value" )
@@ -148,9 +157,9 @@ class RCPTCommandSpec extends Specification {
             resultMap.resultString == value
             resultMap.prevCommandSet == prevCommandSet
         where:
-            inputAddress                | prevCommandSet | value    
-            'george.washington@shelfunit.info'  | [ 'EHLO' ] as Set | "503 Bad sequence of commands"
-            'john.adams@shelfunit.info' | [ 'RSET' ] as Set | "503 Bad sequence of commands"
+            inputAddress    | prevCommandSet | value    
+            gwShelf         | [ 'EHLO' ] as Set | "503 Bad sequence of commands"
+            jAdamsShelf     | [ 'RSET' ] as Set | "503 Bad sequence of commands"
 
 	}
 
@@ -160,43 +169,43 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [ forwardPath:  ['alexander@shelfunit.info'] ] )
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
+            resultMap.prevCommandSet == resultSetEM
             resultMap.bufferMap.forwardPath == forwardList
         where:
             inputAddress                | value                 | forwardList
-            'mkyong@yahoo.com'          | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong-100@yahoo.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ] 
-            'mkyong.100@yahoo.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong111@mkyong.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong-100@mkyong.net'     | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong.100@mkyong.com.au'  | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong@1.com'              | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong@gmail.com.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong+100@gmail.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'mkyong-100@yahoo-test.com' | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'howTuser@domain.com'       | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user@domain.co.in'         | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user1@domain.com'          | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user.name@domain.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user_name@domain.co.in'    | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user-name@domain.co.in'    | "550 No such user"    | [ 'alexander@shelfunit.info' ]
+            'mkyong@yahoo.com'          | "550 No such user"    | [ hamilton ]
+            'mkyong-100@yahoo.com'      | "550 No such user"    | [ hamilton ] 
+            'mkyong.100@yahoo.com'      | "550 No such user"    | [ hamilton ]
+            'mkyong111@mkyong.com'      | "550 No such user"    | [ hamilton ]
+            'mkyong-100@mkyong.net'     | "550 No such user"    | [ hamilton ]
+            'mkyong.100@mkyong.com.au'  | "550 No such user"    | [ hamilton ]
+            'mkyong@1.com'              | "550 No such user"    | [ hamilton ]
+            'mkyong@gmail.com.com'      | "550 No such user"    | [ hamilton ]
+            'mkyong+100@gmail.com'      | "550 No such user"    | [ hamilton ]
+            'mkyong-100@yahoo-test.com' | "550 No such user"    | [ hamilton ]
+            'howTuser@domain.com'       | "550 No such user"    | [ hamilton ]
+            'user@domain.co.in'         | "550 No such user"    | [ hamilton ]
+            'user1@domain.com'          | "550 No such user"    | [ hamilton ]
+            'user.name@domain.com'      | "550 No such user"    | [ hamilton ]
+            'user_name@domain.co.in'    | "550 No such user"    | [ hamilton ]
+            'user-name@domain.co.in'    | "550 No such user"    | [ hamilton ]
+            'user@domain.com'           | "550 No such user"    | [ hamilton ]
+            'user@domain.co.in'         | "550 No such user"    | [ hamilton ]
+            'user.name@domain.com'      | "550 No such user"    | [ hamilton ]
+            'user@domain.com'           | "550 No such user"    | [ hamilton ]
+            'user@domain.co.in'         | "550 No such user"    | [ hamilton ]
+            'user.name@domain.com'      | "550 No such user"    | [ hamilton ]
+            'user_name@domain.com'      | "550 No such user"    | [ hamilton ]
+            'username@yahoo.corporate.in'       | "550 No such user" | [ hamilton ]    
+            'george.washington@mtvernon.co'  | "550 No such user"  | [ hamilton ] 
+            'john.adams@his-rotundity.org' | "550 No such user" | [ hamilton ]
+            'oneill@stargate.mil'       | "550 No such user"    | [ hamilton ]
             // 'user@domaincom'            | "550 No such user" 
-            'user@domain.com'           | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user@domain.co.in'         | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user.name@domain.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
             // "user'name@domain.co.in"    | "550 No such user"
-            'user@domain.com'           | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user@domain.co.in'         | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user.name@domain.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'user_name@domain.com'      | "550 No such user"    | [ 'alexander@shelfunit.info' ]
-            'username@yahoo.corporate.in'       | "550 No such user" | [ 'alexander@shelfunit.info' ]    
-            'george.washington@mtvernon.co'  | "550 No such user"  | [ 'alexander@shelfunit.info' ] 
-            'john.adams@his-rotundity.org' | "550 No such user" | [ 'alexander@shelfunit.info' ]
-            'oneill@stargate.mil'       | "550 No such user"    | [ 'alexander@shelfunit.info' ]
 	}
 	
 	@Unroll( "invalid address #inputAddress gives #value" )
@@ -205,12 +214,12 @@ class RCPTCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", [ 'EHLO', 'MAIL' ] as Set, [ forwardPath:  'alexander@shelfunit.info' ] )
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  hamilton ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
             resultMap.bufferMap?.reversePath == resultAddress
-            resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
+            resultMap.prevCommandSet == resultSetEM
         where:
             inputAddress                | value                             | resultAddress
             'mkyong'                    | "501 Command not in proper form"  | null 
@@ -238,13 +247,13 @@ class RCPTCommandSpec extends Specification {
 	
 	def "test happy path"() {
 	    when:
-	        def resultMap = rcptCommand.process( "RCPT TO:<oneill@shelfunit.info>", [ 'EHLO', 'MAIL' ] as Set, [ forwardPath:  ['alexander@shelfunit.info'] ] )
+	        def resultMap = rcptCommand.process( "RCPT TO:<${jackShell}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
 	        def mailResponse = resultMap.resultString + crlf 
 	        def bMap = resultMap.bufferMap
 	    then:
 	        mailResponse == "250 OK\r\n"
-	        resultMap.prevCommandSet == [ "EHLO", "MAIL", "RCPT" ] as Set
-	        bMap.forwardPath == [ 'alexander@shelfunit.info', 'oneill@shelfunit.info' ]
+	        resultMap.prevCommandSet == resultSetEMR
+	        bMap.forwardPath == [ hamilton, jackShell ]
 	}
 
 }
