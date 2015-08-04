@@ -8,7 +8,7 @@ import spock.lang.Unroll
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import info.shelfunit.mail.MailRunner
+import info.shelfunit.mail.MetaProgrammer
 
 class RSETCommandSpec extends Specification {
     
@@ -26,7 +26,7 @@ class RSETCommandSpec extends Specification {
     def cleanup() {}        // run after every feature method
     
     def setupSpec() {
-        MailRunner.runMetaProgramming()
+        MetaProgrammer.runMetaProgramming()
                 
         rsetCommand = new RSETCommand( )
     }     // run before the first feature method

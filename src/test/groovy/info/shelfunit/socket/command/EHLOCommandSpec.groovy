@@ -5,7 +5,7 @@ import spock.lang.Specification
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import info.shelfunit.mail.MailRunner
+import info.shelfunit.mail.MetaProgrammer
 
 import org.xbill.DNS.Address
 
@@ -23,7 +23,7 @@ class EHLOCommandSpec extends Specification {
     }          // run before every feature method
     def cleanup() {}        // run after every feature method
     def setupSpec() {
-        MailRunner.runMetaProgramming()
+        MetaProgrammer.runMetaProgramming()
     }     // run before the first feature method
     
     def cleanupSpec() {}   // run after the last feature method

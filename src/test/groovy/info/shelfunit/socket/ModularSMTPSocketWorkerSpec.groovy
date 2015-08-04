@@ -10,8 +10,9 @@ import groovy.sql.Sql
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import info.shelfunit.mail.MailRunner
+import info.shelfunit.mail.MetaProgrammer
 import info.shelfunit.socket.command.EHLOCommand
+import org.apache.shiro.crypto.hash.Sha512Hash
 
 class ModularSMTPSocketWorkerSpec extends Specification {
     @Rule 
@@ -25,12 +26,31 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     }          // run before every feature method
     def cleanup() {}        // run after every feature method
     def setupSpec() {
-        MailRunner.runMetaProgramming()
+        MetaProgrammer.runMetaProgramming()
         def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
         user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        this.addUsers()
     }     // run before the first feature method
-    def cleanupSpec() {}   // run after the last feature method
+    def cleanupSpec() {
+        sql.execute "DELETE FROM email_user"
+        sql.close()
+    }   // run after the last feature method
+    
+    def addUsers() {
+        def numIterations = 10000
+        def salt = 'you say your password tastes like chicken? Add salt!'
+        def atx512 = new Sha512Hash( 'somePassword', salt, 1000000 )
+        def params = [ 'gwash', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        
+        params = [ 'jadams', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        
+        params = [ 'tee-jay', atx512.toBase64(), 'SHA-512', numIterations, 'Thomas', "Jefferson", 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        // sql.commit()
+    }
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"

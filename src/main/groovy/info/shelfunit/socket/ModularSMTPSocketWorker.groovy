@@ -70,9 +70,7 @@ class ModularSMTPSocketWorker {
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
 		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
-		    } else if ( newString.startsWith( 'DATA' ) ) {
-		        responseString = this.handleMessage( newString )
-		        prevCommandSet << 'DATA'
+
 	        } else if ( prevCommandSet.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        while ( !newString.equals( "." ) ) {
@@ -136,6 +134,7 @@ class ModularSMTPSocketWorker {
 			theResponse = commandResultMap.resultString
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
+			prevCommandSet << 'DATA'
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
@@ -147,6 +146,8 @@ class ModularSMTPSocketWorker {
 		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'NOOP' ) ) {
 		    theReponse = '250 OK'
+		} else if ( theMessage.startsWith( 'VRFY' ) ) {
+		    "252 VRFY Disabled, returning argument ${theMesssage.allButFirstFour()}"
 		} else {
 			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			// this should probably not stay 250

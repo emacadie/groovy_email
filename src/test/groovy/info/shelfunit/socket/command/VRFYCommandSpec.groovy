@@ -6,7 +6,7 @@ import spock.lang.Unroll
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import info.shelfunit.mail.MailRunner
+import info.shelfunit.mail.MetaProgrammer
 
 import groovy.sql.Sql
 
@@ -28,7 +28,7 @@ class VRFYCommandSpec extends Specification {
     def cleanup() {}        // run after every feature method
     
     def setupSpec() {
-        MailRunner.runMetaProgramming()
+        MetaProgrammer.runMetaProgramming()
         def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
         user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
@@ -38,7 +38,7 @@ class VRFYCommandSpec extends Specification {
     
     def cleanupSpec() {
         // sql.execute "DELETE FROM email_user"
-        sql.close()
+        // sql.close()
     }   // run after the last feature method
    
     /*
