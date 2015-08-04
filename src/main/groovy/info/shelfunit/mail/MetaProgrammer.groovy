@@ -7,16 +7,20 @@ class MetaProgrammer {
     
     static runMetaProgramming() {
         ExpandoMetaClass.enableGlobally()
+        runListMetaProgramming()
+        runSetMetaProgramming()
+        runMatcherMetaProgramming() 
+        runStringBufferMetaProgramming()
+        runStringMetaProgramming()
+    }
+    
+    static runListMetaProgramming() {
         java.util.List.metaClass.lastItem = { ->
             if ( delegate.size() != 0 ) {
                 delegate.last()
             }
         }
-        java.util.Set.metaClass.lastItem = { ->
-            if ( delegate.size() != 0 ) {
-                delegate.last()
-            }
-        }
+        
         java.util.List.metaClass.lastCommandPrecedesMail = { ->
             delegate.last().matches( 'EHLO|HELO|RSET' )
         }
@@ -25,7 +29,14 @@ class MetaProgrammer {
         }
         java.util.List.metaClass.includes = { i -> i in delegate 
         }
-        
+    }
+    
+    static runSetMetaProgramming() {
+        java.util.Set.metaClass.lastItem = { ->
+            if ( delegate.size() != 0 ) {
+                delegate.last()
+            }
+        }
         java.util.Set.metaClass.lastCommandPrecedesMail = { ->
             delegate.last().matches( 'EHLO|HELO|RSET' )
         }
@@ -34,7 +45,9 @@ class MetaProgrammer {
         }
         java.util.Set.metaClass.includes = { i -> i in delegate 
         }
-        
+    }
+    
+    static runMatcherMetaProgramming() {
         java.util.regex.Matcher.metaClass.extractUserName = { ->
             delegate[ 0 ][ 2 ].substring( 0, ( delegate[ 0 ][ 2 ].length() - ( delegate[ 0 ][ 3 ].length() + 1 ) ) )
         }
@@ -44,6 +57,9 @@ class MetaProgrammer {
         java.util.regex.Matcher.metaClass.extractDomain = { ->
             delegate[ 0 ][ 3 ]
         }
+    }
+    
+    static runStringBufferMetaProgramming() {
         StringBuffer.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {
                 return false
@@ -65,6 +81,9 @@ class MetaProgrammer {
         StringBuffer.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
         }
+    }
+    
+    static runStringMetaProgramming() {
         String.metaClass.firstFour = { ->
             return delegate.substring( 0, 4 )
         }
@@ -112,6 +131,5 @@ class MetaProgrammer {
             delegate.firstFour().matches( "SAML|SEND|SOML|TURN" )
         }
     }
-    
 }
 

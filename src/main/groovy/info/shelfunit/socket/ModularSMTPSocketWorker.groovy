@@ -99,32 +99,6 @@ class ModularSMTPSocketWorker {
 	def handleMessage( theMessage ) {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
-		/*
-		if ( theMessage.isHelloCommand() ) {
-		    commandResultMap.clear()
-		    commandResultMap = ehloCommand.process( theMessage, prevCommandSet, bufferMap ) 
-		    prevCommandSet = commandResultMap.prevCommandSet.clone()
-		    bufferMap = commandResultMap.bufferMap.clone() 
-			theResponse = commandResultMap.resultString
-		} else if ( theMessage.startsWith( 'MAIL' ) ) {
-			commandResultMap.clear()
-		    commandResultMap = mailCommand.process( theMessage, prevCommandSet, bufferMap ) 
-		    prevCommandSet = commandResultMap.prevCommandSet.clone()
-		    bufferMap = commandResultMap.bufferMap.clone() 
-			theResponse = commandResultMap.resultString
-		} else if ( theMessage.startsWith( 'RCPT' ) ) {
-			commandResultMap.clear()
-		    commandResultMap = rcptCommand.process( theMessage, prevCommandSet, bufferMap ) 
-		    prevCommandSet = commandResultMap.prevCommandSet.clone()
-		    bufferMap = commandResultMap.bufferMap.clone() 
-			theResponse = commandResultMap.resultString
-		} else if ( theMessage.startsWith( 'RSET' ) ) {
-		    commandResultMap.clear()
-		    commandResultMap = rsetCommand.process( theMessage, prevCommandSet, bufferMap ) 
-		    prevCommandSet = commandResultMap.prevCommandSet.clone()
-		    bufferMap = commandResultMap.bufferMap.clone() 
-			theResponse = commandResultMap.resultString
-		*/	
 		if ( theMessage.isEncapsulated() ) {
 		    commandObject = this.returnCurrentCommand( theMessage )
 		    commandResultMap.clear()

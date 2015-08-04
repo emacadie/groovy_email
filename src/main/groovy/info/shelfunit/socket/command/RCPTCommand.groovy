@@ -48,9 +48,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             resultMap.resultString = "550 No such user"
         } else {
             
-            // log.info "q is a ${q.class.name}"
-            // log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}"
-            // log.info "Here is q[ 0 ][ 3 ]: ${q[0][3]}"
+            // log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}, Here is q[ 0 ][ 3 ]: ${q[0][3]}"
             def userName = q.extractUserName() 
             // log.info "here is userName: ${userName}"
             def rows = sql.rows( 'select * from email_user where username=?', userName )
