@@ -20,7 +20,6 @@ class MetaProgrammer {
                 delegate.last()
             }
         }
-        
         java.util.List.metaClass.lastCommandPrecedesMail = { ->
             delegate.last().matches( 'EHLO|HELO|RSET' )
         }
@@ -42,6 +41,9 @@ class MetaProgrammer {
         }
         java.util.Set.metaClass.lastCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
+        }
+        java.util.Set.metaClass.lastCommandPrecedesDATA = { ->
+            delegate.last().matches( 'RCPT' ) 
         }
         java.util.Set.metaClass.includes = { i -> i in delegate 
         }
@@ -128,7 +130,11 @@ class MetaProgrammer {
             delegate.length() <= 255
         }
         String.metaClass.isObsoleteCommand = { ->
-            delegate.firstFour().matches( "SAML|SEND|SOML|TURN" )
+            if ( delegate.length() >= 4 ) {
+                return delegate.firstFour().matches( "SAML|SEND|SOML|TURN" )
+            } else {
+                false
+            }
         }
     }
 }

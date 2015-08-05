@@ -1,7 +1,7 @@
 package info.shelfunit.socket
 
 import spock.lang.Specification
-// import spock.lang.Ignore
+import spock.lang.Ignore
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -111,6 +111,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	        ehloResponse == "502 Command not implemented\r\n"
 	}
 	
+	@Ignore
 	def "test with a line containing two periods"() {
 	    when:
             def domain = "hot-groovy.com"
@@ -157,6 +158,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
                 "221 shelfunit.info Service closing transmission channel\r\n" // QUIT
 	}
 	
+	@Ignore
 	def "test common streams"() {
 	    when:
             def mIs = Mock( InputStream )
@@ -178,6 +180,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
                 "221 shelfunit.info Service closing transmission channel\r\n"
 	}
 	
+	@Ignore
 	def "test common streams with reader mocking"() {
 	    when:
             def domain = "hot-groovy.com"

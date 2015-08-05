@@ -5,6 +5,7 @@ import java.io.OutputStream
 
 import groovy.util.logging.Slf4j 
 
+import info.shelfunit.socket.command.DATACommand
 import info.shelfunit.socket.command.EHLOCommand
 import info.shelfunit.socket.command.MAILCommand
 import info.shelfunit.socket.command.RCPTCommand
@@ -29,6 +30,7 @@ class ModularSMTPSocketWorker {
 	private ehloCommand
 	private rcptCommand
 	private rsetCommand
+	@Hidden dataCommand
 	private commandResultMap
 
 	ModularSMTPSocketWorker( argIn, argOut, argServerList, argSql ) {
@@ -45,6 +47,7 @@ class ModularSMTPSocketWorker {
         ehloCommand = new EHLOCommand()
         rcptCommand = new RCPTCommand( sql, serverList )
         rsetCommand = new RSETCommand()
+        dataCommand = new DATACommand()
 	}
 
 	def doWork() {
@@ -106,22 +109,24 @@ class ModularSMTPSocketWorker {
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
+		/*
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
 			prevCommandSet << 'DATA'
+			*/
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandSet.lastItem() == 'THE MESSAGE' && 
 			theResponse = "221 ${serverName} Service closing transmission channel"
-		} else if ( theMessage.isObsoleteCommand() ) { 
-		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'EXPN' ) ) {
 		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'NOOP' ) ) {
 		    theReponse = '250 OK'
 		} else if ( theMessage.startsWith( 'VRFY' ) ) {
 		    "252 VRFY Disabled, returning argument ${theMesssage.allButFirstFour()}"
+		} else if ( theMessage.isObsoleteCommand() ) { 
+		    theResponse = '502 Command not implemented'
 		} else {
 			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			// this should probably not stay 250
@@ -139,6 +144,8 @@ class ModularSMTPSocketWorker {
 			return rcptCommand
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    return rsetCommand
+		} else if ( theMessage.startsWith( 'DATA' ) ) {
+		    return dataCommand
 		}
 	}
 }

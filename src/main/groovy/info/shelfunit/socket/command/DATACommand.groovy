@@ -9,24 +9,19 @@ class DATACommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         def resultString
-        resultMap.clear()
-        bufferMap.clear()
         resultMap.bufferMap = bufferMap
-        def domain = theMessage.getDomain()
-        log.info "Here is the domain: ${domain} and it is a ${domain.class.name}"
-        if ( domain.isMoreThan255Char() ) {
-            resultMap.resultString = "501 Domain name length beyond 255 char limit per RFC 3696"
+        if ( theMessage.length() > 4 ) {
+            resultMap.resultString = "501 Command not in proper form"
             resultMap.prevCommandSet = prevCommandSet
-        } else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithEHLO() ) ) {
-            prevCommandSet.clear()
-            prevCommandSet << "EHLO"
-            resultMap.resultString = "250-Hello ${domain}\n250 HELP"
-		} else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithHELO() ) ) {
+        } else if ( !prevCommandSet.lastCommandPrecedesDATA() ) {
+            resultMap.resultString = "503 Bad sequence of commands"
+        } else {
 		    prevCommandSet.clear()
-		    prevCommandSet << "HELO"
-		    resultMap.resultString = "250 Hello ${domain}"
+		    prevCommandSet << "DATA"
+		    resultMap.resultString = "354 Start mail input; end with <CRLF>.<CRLF>"
 		}
 		resultMap.prevCommandSet = prevCommandSet
+		resultMap.bufferMap = bufferMap
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap
     }
