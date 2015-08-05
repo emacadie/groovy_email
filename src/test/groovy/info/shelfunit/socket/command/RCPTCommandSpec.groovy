@@ -46,7 +46,7 @@ class RCPTCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user"
+        sql.execute "DELETE FROM email_user where username in ('george.washington', 'john.adams', 'oneill')"
         sql.close()
     }   // run after the last feature method
    

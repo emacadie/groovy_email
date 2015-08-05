@@ -33,7 +33,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
         this.addUsers()
     }     // run before the first feature method
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user"
+        sql.execute "DELETE FROM email_user where username in ('gwash', 'jadams', 'tee-jay')"
         sql.close()
     }   // run after the last feature method
     
