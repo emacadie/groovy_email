@@ -109,6 +109,5 @@ class DATACommandSpec extends Specification {
             resultMap.resultString == "354 Start mail input; end with <CRLF>.<CRLF>"
 	}
 
-
 }
 

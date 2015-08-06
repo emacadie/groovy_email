@@ -11,6 +11,7 @@ class RCPTCommand {
     @Hidden Sql sql
     @Hidden List domainList
     RCPTCommand( def argSql, def argDomainList ) {
+        log.info "Starting new RCPTCommand"
         println "Here is argDomainList: ${argDomainList}"
         this.sql = argSql
         this.domainList = argDomainList
@@ -30,6 +31,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
+        log.info "In RCPTCommand"
         def resultString
         def resultMap = [:]
         resultMap.clear()

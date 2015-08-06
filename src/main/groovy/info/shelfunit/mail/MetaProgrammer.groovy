@@ -119,6 +119,8 @@ class MetaProgrammer {
                 returnValue = true
             } else if ( delegate.startsWith( 'RSET' ) ) {
                 returnValue = true
+            } else if ( delegate.startsWith( 'DATA' ) ) {
+                returnValue = true
             }
             returnValue
         }

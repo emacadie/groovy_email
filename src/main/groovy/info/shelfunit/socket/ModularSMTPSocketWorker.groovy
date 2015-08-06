@@ -30,7 +30,7 @@ class ModularSMTPSocketWorker {
 	private ehloCommand
 	private rcptCommand
 	private rsetCommand
-	@Hidden dataCommand
+	private dataCommand
 	private commandResultMap
 
 	ModularSMTPSocketWorker( argIn, argOut, argServerList, argSql ) {
