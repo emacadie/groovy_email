@@ -195,7 +195,11 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	def "test common streams with reader mocking"() {
 	    when:
             def domain = "hot-groovy.com"
-            byte[] data = "EHLO ${domain}${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}".getBytes()
+            def dataString = "EHLO ${domain}" + 
+            "MAIL FROM:<aaa@showboat.com>${crlf}" +
+            "RCPT TO:<gwash@shelfunit.info>${crlf}" +
+            "${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}"
+            byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, sql )
@@ -207,6 +211,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\n" +
                 "250 HELP\r\n" +
+                "250 OK\r\n" +
+                "250 OK\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
                 "250 OK\r\n" +
                 "221 shelfunit.info Service closing transmission channel\r\n"

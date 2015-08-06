@@ -26,12 +26,12 @@ class ModularSMTPSocketWorker {
 	@Hidden def sql
 	@Hidden def serverList
 	@Hidden def commandObject
-	private mailCommand
-	private ehloCommand
-	private rcptCommand
-	private rsetCommand
-	private dataCommand
-	private commandResultMap
+	@Hidden def mailCommand
+	@Hidden def ehloCommand
+	@Hidden def rcptCommand
+	@Hidden def rsetCommand
+	@Hidden def dataCommand
+	@Hidden def commandResultMap
 
 	ModularSMTPSocketWorker( argIn, argOut, argServerList, argSql ) {
         input = argIn
@@ -109,11 +109,6 @@ class ModularSMTPSocketWorker {
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
-		/*
-		} else if ( theMessage.startsWith( 'DATA' ) ) {
-			theResponse = "354 Start mail input; end with <CRLF>.<CRLF>"
-			prevCommandSet << 'DATA'
-			*/
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
@@ -128,8 +123,6 @@ class ModularSMTPSocketWorker {
 		} else if ( theMessage.isObsoleteCommand() ) { 
 		    theResponse = '502 Command not implemented'
 		} else {
-			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
-			// this should probably not stay 250
 			theResponse = '250 OK'
 		}
 		theResponse + "\r\n"
