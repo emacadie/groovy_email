@@ -1,7 +1,7 @@
 package info.shelfunit.socket
 
 import spock.lang.Specification
-import spock.lang.Ignore
+// import spock.lang.Ignore
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -111,11 +111,13 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	        ehloResponse == "502 Command not implemented\r\n"
 	}
 	
-	@Ignore
 	def "test with a line containing two periods"() {
 	    when:
             def domain = "hot-groovy.com"
-            def bString = "EHLO ${domain}${crlf}DATA${crlf}JJJ${crlf}" +
+            def bString = "EHLO ${domain}${crlf}" + 
+            "MAIL FROM:<aaa@showboat.com>${crlf}" +
+            "RCPT TO:<gwash@shelfunit.info>${crlf}" +
+            "DATA${crlf}JJJ${crlf}" +
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
             byte[] data = bString.getBytes()
     
@@ -129,6 +131,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	        output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\n" +
                 "250 HELP\r\n" +
+                "250 OK\r\n" +
+                "250 OK\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
                 "250 OK\r\n" +
                 "221 shelfunit.info Service closing transmission channel\r\n"
@@ -157,8 +161,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
                 "502 Command not implemented\r\n" + // TURN
                 "221 shelfunit.info Service closing transmission channel\r\n" // QUIT
 	}
-	
-	// @Ignore
+
 	def "test common streams"() {
 	    when:
             def mIs = Mock( InputStream )
@@ -191,14 +194,13 @@ class ModularSMTPSocketWorkerSpec extends Specification {
                 
 	}
 	
-	@Ignore
 	def "test common streams with reader mocking"() {
 	    when:
             def domain = "hot-groovy.com"
-            def dataString = "EHLO ${domain}" + 
+            def dataString = "EHLO ${domain}${crlf}" + 
             "MAIL FROM:<aaa@showboat.com>${crlf}" +
             "RCPT TO:<gwash@shelfunit.info>${crlf}" +
-            "${crlf}DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}"
+            "DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}"
             byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
