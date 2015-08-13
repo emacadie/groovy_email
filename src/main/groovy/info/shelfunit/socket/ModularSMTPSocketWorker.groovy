@@ -8,6 +8,7 @@ import groovy.util.logging.Slf4j
 import info.shelfunit.socket.command.DATACommand
 import info.shelfunit.socket.command.EHLOCommand
 import info.shelfunit.socket.command.MAILCommand
+import info.shelfunit.socket.command.MSSGCommand
 import info.shelfunit.socket.command.RCPTCommand
 import info.shelfunit.socket.command.RSETCommand
 
@@ -31,6 +32,7 @@ class ModularSMTPSocketWorker {
 	@Hidden def rcptCommand
 	@Hidden def rsetCommand
 	@Hidden def dataCommand
+	@Hidden def mssgCommand
 	@Hidden def commandResultMap
 
 	ModularSMTPSocketWorker( argIn, argOut, argServerList, argSql ) {
@@ -48,6 +50,7 @@ class ModularSMTPSocketWorker {
         rcptCommand = new RCPTCommand( sql, serverList )
         rsetCommand = new RSETCommand()
         dataCommand = new DATACommand()
+        mssgCommand = new MSSGCommand( sql, serverList )
 	}
 
 	def doWork() {
@@ -87,7 +90,7 @@ class ModularSMTPSocketWorker {
 			        }
 		        }
 		        log.info( "broke out of while loop for DATA" )
-		        responseString = this.handleMessage( sBuffer.toString() )
+		        responseString = this.handleMessage( sBuffer.toString(), true )
 		        prevCommandSet << 'THE MESSAGE'
 	        } else {
 		        responseString = this.handleMessage( newString )
@@ -99,11 +102,11 @@ class ModularSMTPSocketWorker {
         log.info "ending doWork"
 	} 
 
-	def handleMessage( theMessage ) {
+	def handleMessage( theMessage, def isActualMessage = false ) {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
 		if ( theMessage.isEncapsulated() ) {
-		    commandObject = this.returnCurrentCommand( theMessage )
+		    commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
 		    commandResultMap.clear()
 		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
@@ -128,8 +131,10 @@ class ModularSMTPSocketWorker {
 		theResponse + "\r\n"
 	}
 	
-	def returnCurrentCommand( theMessage ) {
-		if ( theMessage.isHelloCommand() ) {
+	def returnCurrentCommand( theMessage, isActualMessage ) {
+		if ( isActualMessage ) {
+		    return mssgCommand
+		} else if ( theMessage.isHelloCommand() ) {
 		    return ehloCommand
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
 			return mailCommand

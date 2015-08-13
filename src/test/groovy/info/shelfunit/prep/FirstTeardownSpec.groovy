@@ -76,7 +76,8 @@ class FirstTeardownSpec extends Specification {
     @Requires({ properties[ 'database.teardown' ] == 'true' })
     def "drop user table"() {
         
-        sql.execute "DROP TABLE IF EXISTS  email_user CASCADE"
+        sql.execute "DROP TABLE IF EXISTS email_user CASCADE"
+        sql.execute "DROP TABLE IF EXISTS mail_store CASCADE"
          expect:
             5 == 5
     }

@@ -87,6 +87,17 @@ class FirstPrepSpec extends Specification {
                 last_name character varying(30) not null,
                 version bigint NOT NULL
             )'''
+            
+         sql.execute '''
+             create table mail_store (
+                id UUID PRIMARY KEY  NOT NULL,
+                username character varying( 64 ) not null,
+                from_address character varying( 255 ) not null,
+                to_address character varying( 255 ) not null,
+                message bytea not null,
+                msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
+            )
+         '''
          expect:
             5 == 5
     }

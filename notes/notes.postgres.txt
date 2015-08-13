@@ -69,3 +69,47 @@ def db = [url: "jdbc:postgresql://localhost:5432/shro_grls_dev_002",
           user: props.dbuser, password: props.dbpassword, driver: 'org.postgresql.Driver']
 def sql = Sql.newInstance(db.url, db.user, db.password, db.driver)
 println "DB connection ready"
+----
+2015-08-07: installing postgresql-contrib to get pgcrypto extension
+CREATE EXTENSION pgcrypto;
+ERROR:  permission denied to create extension "pgcrypto"
+HINT:  Must be superuser to create this extension.
+Installing modules: http://stackoverflow.com/questions/1564056/how-do-i-import-modules-or-install-extensions-in-postgres-8-4
+https://blog.starkandwayne.com/2015/05/23/uuid-primary-keys-in-postgresql/
+http://www.postgresql.org/docs/current/static/uuid-ossp.html
+sudo -u postgres psql gemail_dev_db
+CREATE EXTENSION pgcrypto;
+No good.
+Try:
+CREATE EXTENSION "uuid-ossp"; -> do this as root. I do not know if you need the contrib package to do this.
+
+"id UUID PRIMARY KEY DEFAULT uuid_generate_v4()" might be the winner
+
+CREATE SCHEMA IF NOT EXISTS snw;  
+CREATE TABLE contactsB(  
+   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+   name TEXT,
+   email TEXT
+);
+
+INSERT INTO contactsB (name,email) VALUES  
+('Dr Nic Williams','drnic'),
+('Brian Mattal','brian'),
+('Wayne E. Seguin','wayneeseguin'),
+('Long Nguyen','long'),
+('Bill Chapman','bill'),
+('Chris Weibel','chris'),
+('Jeremey Budnack','jrbudnack'),
+('Ruben Koster','rkoster'),
+('Jamie Van Dyke','jamie'),
+('Quintessence Anx','qanx'),
+('McGowan','mcg'),
+('高，秀娇 (XJ)','xj'),
+('Geoff Franks','geoff'),
+('Van Nguyen','vnguyen'),
+('John Longanecker','jlonganecker')
+;
+
+https://jdbc.postgresql.org/documentation/80/binary-data.html
+UUID.randomUUID().toString()
+
