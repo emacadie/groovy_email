@@ -67,38 +67,18 @@ for ( item in myList ) {
         bufferMap.forwardPath.size().times() {
             uuidSet << UUID.randomUUID().toString()
         }
-        def resultStringList = []
-        bufferMap.forwardPath.each { user ->
-        }
-        def regexResult = ( theMessage ==~ pattern )
-        def q = theMessage =~ pattern
-        if ( !prevCommandSet.lastCommandPrecedesRCPT() ) {
+        // def resultStringList = []
+
+        // def regexResult = ( theMessage ==~ pattern )
+        // def q = theMessage =~ pattern
+        if ( !prevCommandSet.lastCommandPrecedesMSSG() ) {
             resultMap.resultString = "503 Bad sequence of commands"
-        } else if ( !theMessage.startsWith( 'RCPT TO:' ) ) {
-            resultMap.resultString = "501 Command not in proper form"
-        } else if ( !regexResult ) {
-            resultMap.resultString = "501 Command not in proper form"
-        } else if ( !( theMessage ==~ pattern ) ) {
-            resultMap.resultString = "501 Command not in proper form"
-        } else if ( !domainList.includes( q.extractDomain() ) ) {
-            resultMap.resultString = "550 No such user"
         } else {
-            
-            // log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}, Here is q[ 0 ][ 3 ]: ${q[0][3]}"
-            def userName = q.extractUserName() 
-            // log.info "here is userName: ${userName}"
-            def rows = sql.rows( 'select * from email_user where username=?', userName )
-            // log.info "here is rows?.size() : ${rows?.size()} "
-            if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
-                bufferMap.forwardPath << q.getEmailAddress() // q[ 0 ][ 2 ]
-                resultMap.resultString = '250 OK'
-                prevCommandSet << 'RCPT'
-            } else {
-                resultMap.resultString = "550 No such user"
-            }
-            
+            resultMap.resultString =  this.addMessageToDatabase( theMessage, bufferMap, uuidSet )
         }
-        resultMap.bufferMap = bufferMap
+        if ( resultMap.resultString == '250 OK' ) {
+            resultMap.bufferMap = [:]
+        }
         resultMap.prevCommandSet = prevCommandSet
 
 		log.info "here is resultMap: ${resultMap.toString()}"

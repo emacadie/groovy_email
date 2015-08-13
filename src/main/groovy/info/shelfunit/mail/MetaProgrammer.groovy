@@ -45,6 +45,9 @@ class MetaProgrammer {
         java.util.Set.metaClass.lastCommandPrecedesDATA = { ->
             delegate.last().matches( 'RCPT' ) 
         }
+        java.util.Set.metaClass.lastCommandPrecedesMSSG = { ->
+            delegate.last().matches( 'DATA' ) 
+        }
         java.util.Set.metaClass.includes = { i -> i in delegate 
         }
     }
