@@ -113,3 +113,12 @@ INSERT INTO contactsB (name,email) VALUES
 https://jdbc.postgresql.org/documentation/80/binary-data.html
 UUID.randomUUID().toString()
 
+gemail_test_db=> insert into mail_store(id, username, from_address, to_address, text_body) values ('c315a08c-1a04-4f2d-9dac-223a237f4e95', 'alexander', 'oneill@stargate.mil', 'alexander@shelfunit.info', 'The next meeting of the board of directors will be on Tuesday.
+John.');
+in shell:
+import groovy.sql.*
+db = [ url: "jdbc:postgresql://localhost:5432/gemail_test_db", user: 'gemail_test', password: 'dev-word-to-pass002', driver: 'org.postgresql.Driver' ]
+sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+ff= sql.
+
+

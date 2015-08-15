@@ -1,0 +1,44 @@
+in shell:
+import groovy.sql.*
+import java.sql.*
+db = [ url: "jdbc:postgresql://localhost:5432/gemail_test_db", user: 'gemail_test', password: 'dev-word-to-pass002', driver: 'org.postgresql.Driver' ]
+sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+
+// gives a list of groovy.sql.GroovyRowResult objects
+rows = sql.rows( 'select id from mail_store' )
+rows.class.name
+first = rows[0]
+first.getClass().name
+first.keys()
+No such property: keys for class: groovy.sql.GroovyRowResult
+groovy:000> first.keySet().each { it -> println "it is a ${it.getClass().getName()}"}
+first.values().each { it -> println "it is a ${it.getClass().getName()}"}
+it is a java.util.UUID
+rows.size()
+jj = UUID.fromString('c315a08c-1a04-4f2d-9dac-223a237f4e95')
+jj.class.name
+qq = sql.rows('select * from mail_store where id = ?', jj)
+qq[0]
+
+[[id:c315a08c-1a04-4f2d-9dac-223a237f4e95], [id:98db4258-0b7a-4b5c-8865-493417012677], [id:84418594-f3d9-4751-9da1-da9cac3c1a02], [id:49b2b384-4183-4ccd-bc69-9138856441d3], [id:9ddfffbe-2ab5-4f2c-bc19-b17347000e8d], [id:9fdd5de5-371f-49dd-965b-2871a7e0bf71], [id:03558ee5-9b92-4ca4-9211-5347f9ae7ab3], [id:ef743ba6-d62d-4305-a142-2ad7d0e78891], [id:2e0501cd-9f6b-43d6-a527-6c80ebeaca3c], [id:dc6f619e-4856-45bb-87a8-188dcbe0be7f], [id:94add1ab-c314-43ff-ba51-20174799cfe9]]
+uuidStrings = ['c315a08c-1a04-4f2d-9dac-223a237f4e95', '98db4258-0b7a-4b5c-8865-493417012677', '84418594-f3d9-4751-9da1-da9cac3c1a02']
+uuidList = []
+uuidStrings.each { uuidS ->
+    uuidList << UUID.fromString( uuidS )
+}
+delResult = sql.execute( 'delete from mail_store where id in ?', uuidList )
+try {
+    delResult = sql.withBatch( "delete from mail_store where id = ?" ) { ps ->   
+        uuidList.each { ul ->
+            ps.setObject( 1, ul )
+            ps.addBatch( ul )
+        }
+    }
+} catch ( Exception e ) {
+    println "${e.getMessage()}"
+    SQLException ex = e.getNextException()
+    println "Next exception message: ${ex.getMessage()}"
+    // ex.printStrackTrace()
+}
+
+

@@ -14,7 +14,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.5'
+        classpath 'com.tkruse.gradle:gradle-groovysh-plugin:1.0.6'
     }
 }
 
@@ -158,10 +158,21 @@ task( console, dependsOn: 'classes', type: JavaExec ) {
     classpath = sourceSets.main.runtimeClasspath
 }
 
-/*
 groovysh {
     // groovyVersion determines the features of the shell and buildShell tasks.
-    groovyVersion = '2.4.0'
+    // groovyVersion = '2.4.0'
+        // false to disable the shell task
+    enableAppShell = true
+    // false to disable the shell task
+    enableBuildShell = true
+    // false to disable the buildDevShell task
+    enableBuildDevShell = true
+    shell{ 
+        System.properties[ 'dbname' ]        = 'gemail_test_db'
+        System.properties['host_and_port' ] = 'localhost:5432'
+        System.properties[ 'dbuser' ]        = 'gemail_test'
+        System.properties[ 'dbpassword' ]    = 'dev-word-to-pass002'
+    }
 }
-*/
+
 // 

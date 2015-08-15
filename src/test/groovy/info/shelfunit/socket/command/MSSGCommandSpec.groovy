@@ -75,6 +75,39 @@ class MSSGCommandSpec extends Specification {
 	        mailResponse == "503 Bad sequence of commands\r\n"
 	        resultMap.prevCommandSet == prevCommandSetArg
 	}
+	
+	def "test handling a message"() {
+	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
+	    def uuidSet = [] as Set
+	    bufferMapArg.forwardPath.size().times() {
+            uuidSet << UUID.randomUUID() // .toString()
+        }
+        def theMessage = "The next meeting of the board of directors will be on Tuesday.\nJohn."
+        def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+	    when:
+	        // def resultMap = mssgCommand.process( , prevCommandSetArg, [ forwardPath:  [ hamilton ] ] )
+	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg, uuidSet ) 
+	        // def mailResponse = resultMap.resultString + crlf 
+	    then:
+	        mailResponse == "250 OK"
+	        // resultMap.prevCommandSet == prevCommandSetArg
+	}
+	
+	def "test getting the data"() {
+	    sql.eachRow( 'select * from mail_store' ) { mailItem ->
+	        println mailItem.id.toString()
+            println "mailItem.text_body is a ${mailItem.text_body.getClass().getName()}"
+            println "mailItem.text_body: ${mailItem.text_body}"
+	        /*
+	        println mailItem.message.characterStream.text
+            def recipeImage = new File("recipe-${recipe.id}.jpg")
+            recipeImage.delete()
+            recipeImage << recipe.image.binaryStream
+            */
+        }
+	    expect:
+	        5 ==5
+	}
 	/*
 	@Unroll( "#inputAddress gives #value" )
 	def "#inputAddress gives #value"() {

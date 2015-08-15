@@ -3,6 +3,8 @@ package info.shelfunit.socket.command
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
+import java.sql.SQLException
+
 import visibility.Hidden
 
 @Slf4j
@@ -67,10 +69,7 @@ for ( item in myList ) {
         bufferMap.forwardPath.size().times() {
             uuidSet << UUID.randomUUID().toString()
         }
-        // def resultStringList = []
 
-        // def regexResult = ( theMessage ==~ pattern )
-        // def q = theMessage =~ pattern
         if ( !prevCommandSet.lastCommandPrecedesMSSG() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
@@ -96,16 +95,23 @@ for ( item in myList ) {
                     def q = address =~ regex
                     def wholeAddress = q[ 0 ][ 1 ]
                     def userName = q[ 0 ][ 2 ]
-                    mail_store
-                    
-                    insertCounts = sql.withBatch( 'insert into mail_store(id, username, from_address, to_address, message) values (?, ?, ?, ?, ?)' ) { stmt ->
-                        ps.addBatch( [ uuidSet[ i ], userName, reversePath, wholeAddress, theMessage ] )
+                    log.info "here are the args: [ uuidSet[ i ]: ${uuidSet[ i ]}, userName: ${userName}, fromAddress: ${fromAddress}, wholeAddress: ${wholeAddress}, theMessage: ${theMessage}"
+                    insertCounts = sql.withBatch( 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)' ) { stmt ->
+                        log.info "uuidSet[ i ] is a ${uuidSet[ i ].class.name}"
+                        log.info "stmt is a ${stmt.class.name}"
+                        // stmt.setObject( 1, uuidSet[ i ] )
+                        // stmt.setBlob( 5, theMessage )
+                        stmt.addBatch( [ uuidSet[ i ], userName, fromAddress, wholeAddress, theMessage ] )
                     }
                 }
             }
         } catch ( Exception e ) {
             result = '500 Something went wrong'
+            SQLException ex = e.getNextException()
+            log.info "Next exception message: ${ex.getMessage()}"
+            ex.printStrackTrace()
         }
+        println "here is insertCounts: ${insertCounts}"
         result
     } // addMessageToDatabase
 }

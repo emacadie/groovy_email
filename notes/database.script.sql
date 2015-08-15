@@ -10,11 +10,12 @@ CREATE TABLE email_user (
 );
 
 create table mail_store (
-    id UUID PRIMARY KEY  NOT NULL,
+    id UUID PRIMARY KEY  NOT NULL unique,
     username character varying( 64 ) not null,
     from_address character varying( 255 ) not null,
     to_address character varying( 255 ) not null,
-    message bytea not null,
+    message bytea,
+    text_body text not null,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
 );
 
