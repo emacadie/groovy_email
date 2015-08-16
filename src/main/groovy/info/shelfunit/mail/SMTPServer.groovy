@@ -14,7 +14,7 @@ class SMTPServer {
         log.info "the server is ${argServer}, now it's ${serverName}"
     }
     
-    def doStuff( port, sql ) {
+    def doStuff( port ) {
         def server = new ServerSocket( port )
  
         while ( true ) { 
@@ -22,7 +22,7 @@ class SMTPServer {
                 log.info "processing new connection..."
                 socket.withStreams { input, output ->
                     log.info "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverName}"
-                    ModularSMTPSocketWorker sSockW = new ModularSMTPSocketWorker( input, output, serverList, sql )
+                    ModularSMTPSocketWorker sSockW = new ModularSMTPSocketWorker( input, output, serverList )
                     sSockW.doWork(  )
                 }
                 log.info "processing/thread complete......................"

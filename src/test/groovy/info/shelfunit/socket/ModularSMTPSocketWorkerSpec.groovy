@@ -56,7 +56,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) // , Mock( Sql ) )
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
@@ -73,7 +73,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) //, Mock( Sql ) )
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
@@ -89,7 +89,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling old commands"() {
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, Mock( Sql ) )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) // , Mock( Sql ) )
 	    
 	    expect:
 	        ssWorker.serverName == "shelfunit.info"
@@ -126,7 +126,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, sql )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList ) // , sql )
             ssWorker.doWork()
             
 	    then:
@@ -149,7 +149,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new ModularSMTPSocketWorker( input, output, domainList, sql ).doWork()
+            new ModularSMTPSocketWorker( input, output, domainList ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -180,7 +180,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new ModularSMTPSocketWorker( input, output, domainList, sql ).doWork()
+            new ModularSMTPSocketWorker( input, output, domainList ).doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -206,7 +206,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, sql )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList )
             ssWorker.doWork()
             
 	    then:

@@ -3,8 +3,10 @@ package info.shelfunit.socket
 import java.io.InputStream
 import java.io.OutputStream
 
+import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
+import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.socket.command.DATACommand
 import info.shelfunit.socket.command.EHLOCommand
 import info.shelfunit.socket.command.MAILCommand
@@ -35,10 +37,13 @@ class ModularSMTPSocketWorker {
 	@Hidden def mssgCommand
 	@Hidden def commandResultMap
 
-	ModularSMTPSocketWorker( argIn, argOut, argServerList, argSql ) {
+	ModularSMTPSocketWorker( argIn, argOut, argServerList ) {
         input = argIn
         output = argOut
-        sql = argSql
+        
+        def db = ConfigHolder.instance.returnDbMap()         
+        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        
         serverList = argServerList
         serverName = serverList[ 0 ]
         log.info "server name is ${serverName}"
