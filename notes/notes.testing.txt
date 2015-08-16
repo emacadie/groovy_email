@@ -7,6 +7,7 @@ gradle test --tests info.shelfunit.socket.ModularSMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.SMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.command.EHLOCommandSpec -info
 gradle test --tests info.shelfunit.socket.command.MAILCommandSpec -info
+gradle test --tests info.shelfunit.socket.command.MSSGCommandSpec -info
 gradle test --tests info.shelfunit.socket.command.RCPTCommandSpec -info
 
 gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info

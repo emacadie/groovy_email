@@ -85,6 +85,7 @@ for ( item in myList ) {
     } // process
     
     def addMessageToDatabase( theMessage, bufferMap, uuidSet ) {
+        log.info "log is a ${log.class.name}"
         def result = '250 OK'
         def toAddresses = bufferMap.forwardPath
         def fromAddress = bufferMap.reversePath
@@ -109,7 +110,9 @@ for ( item in myList ) {
             result = '500 Something went wrong'
             SQLException ex = e.getNextException()
             log.info "Next exception message: ${ex.getMessage()}"
-            ex.printStrackTrace()
+            // ex.printStrackTrace()
+            log.error "something went wrong", ex 
+            // log.error "Failed to format {}", result, ex
         }
         println "here is insertCounts: ${insertCounts}"
         result
