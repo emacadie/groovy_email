@@ -22,6 +22,7 @@ class ConfigHolder {
     def returnDbMap() {
         def db = [ url: "jdbc:postgresql://${confObject.database.host_and_port}/${confObject.database.dbname}",
         user: confObject.database.dbuser, password: confObject.database.dbpassword, driver: confObject.database.driver ]
+        return db
     }
     
 }

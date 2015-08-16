@@ -6,12 +6,15 @@ import spock.lang.Specification
 import org.junit.Rule
 import org.junit.rules.TestName
 
+import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.MetaProgrammer
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j 
 
 import org.apache.shiro.crypto.hash.Sha512Hash
 
+@Slf4j
 class MSSGCommandSpec extends Specification {
     
     def crlf = "\r\n"
@@ -30,8 +33,11 @@ class MSSGCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
-        user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
+        
+        ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
+        def conf = ConfigHolder.instance.getConfObject()
+        def db = ConfigHolder.instance.returnDbMap()         
+        
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
         this.addUsers()
         mssgCommand = new MSSGCommand( sql, domainList )
