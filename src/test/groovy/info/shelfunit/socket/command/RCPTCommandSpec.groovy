@@ -45,7 +45,7 @@ class RCPTCommandSpec extends Specification {
         def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
         user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
         */
-        ConfigHolder.instance.setConfObject( "src/main/resources/application.test.conf" )
+        ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
         log.info "conf is a ${conf.class.name}"
         def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
