@@ -77,20 +77,29 @@ class MSSGCommandSpec extends Specification {
 	}
 	
 	def "test handling a message"() {
-	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
+	    def bufferMapArg = [ forwardPath:[ 'john.adams@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() // .toString()
         }
+        def countResult
+        def qList = []
+        ( 1..uuidSet.size() ).each { qList << '?' }
+        def qCString = qList.join( ',' )
+        def sqlString = 'select count(*) from mail_store where id in (' + qCString + ')'
+        when:
+            countResult = sql.firstRow( sqlString, uuidSet as List )
+        then:
+            countResult.count == 0
+            
         def theMessage = "The next meeting of the board of directors will be on Tuesday.\nJohn."
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
-	        // def resultMap = mssgCommand.process( , prevCommandSetArg, [ forwardPath:  [ hamilton ] ] )
 	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg, uuidSet ) 
-	        // def mailResponse = resultMap.resultString + crlf 
+	        countResult = sql.firstRow( sqlString, uuidSet as List )
 	    then:
 	        mailResponse == "250 OK"
-	        // resultMap.prevCommandSet == prevCommandSetArg
+	        countResult.count == uuidSet.size()
 	}
 	
 	def "test getting the data"() {
@@ -98,16 +107,12 @@ class MSSGCommandSpec extends Specification {
 	        println mailItem.id.toString()
             println "mailItem.text_body is a ${mailItem.text_body.getClass().getName()}"
             println "mailItem.text_body: ${mailItem.text_body}"
-	        /*
-	        println mailItem.message.characterStream.text
-            def recipeImage = new File("recipe-${recipe.id}.jpg")
-            recipeImage.delete()
-            recipeImage << recipe.image.binaryStream
-            */
+            println "mailItem.username: ${mailItem.username}\n-------------------------------------------------"
         }
 	    expect:
 	        5 ==5
 	}
+	
 	/*
 	@Unroll( "#inputAddress gives #value" )
 	def "#inputAddress gives #value"() {

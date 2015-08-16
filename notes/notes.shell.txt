@@ -40,5 +40,37 @@ try {
     println "Next exception message: ${ex.getMessage()}"
     // ex.printStrackTrace()
 }
+--------
+doing arrays in param
+secondUUList = []
+['49b2b384-4183-4ccd-bc69-9138856441d3', '9ddfffbe-2ab5-4f2c-bc19-b17347000e8d'].each {
+    secondUUList << UUID.fromString( it )
+}
+sql.setObject( 1, UUID )
+countResult = sql.rows( 'SELECT count(*) FROM mail_store WHERE id in ?', [secondUUList])
+countResult = sql.rows( 'SELECT count(*) FROM mail_store WHERE id in ?', ${secondUUList.join(',')})
+secondStringList = ['49b2b384-4183-4ccd-bc69-9138856441d3', '9ddfffbe-2ab5-4f2c-bc19-b17347000e8d']
+countResult = sql.rows( "SELECT count(*) FROM mail_store WHERE id in ?", ${secondStringList.join(',')})
+countResult = sql.rows( 'SELECT count(*) FROM mail_store WHERE id in ${secondUUList}')
+userList = ['alexander', 'george.washington']
+countResult = sql.rows( "SELECT count(*) FROM mail_store WHERE username in ('${userList.join("','")}')" )
+This works:
+countResult = sql.rows( 'SELECT count(*) FROM mail_store WHERE username in (?,?)', userList)
+countResult = sql.rows( 'SELECT count(*) FROM mail_store WHERE id in (?,?)', secondUUList)
 
+qList = []
+(1..4).each {qList << '?'}
+qCString = qList.join(',')
+sqlString = 'select count(*) from mail_store where id in (' + qCString + ')'
+
+fourUUIDList = []
+['ef743ba6-d62d-4305-a142-2ad7d0e78891', '2e0501cd-9f6b-43d6-a527-6c80ebeaca3c', 'dc6f619e-4856-45bb-87a8-188dcbe0be7f', '94add1ab-c314-43ff-ba51-20174799cfe9'].each {
+    fourUUIDList << UUID.fromString(it)
+}
+countResult = sql.rows( sqlString, fourUUIDList )
+OR
+countResult = sql.firstRow( sqlString, fourUUIDList )
+countResult.count
+
+countResult = sql.firstRow( "select count(*) from mail_store where id in ( ${qCString} )", fourUUIDList )
 

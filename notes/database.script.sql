@@ -16,7 +16,8 @@ create table mail_store (
     to_address character varying( 255 ) not null,
     message bytea,
     text_body text not null,
-    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
+    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null,
+    FOREIGN KEY ( username ) REFERENCES email_user ( username ) on delete cascade
 );
 
 
