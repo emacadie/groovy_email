@@ -15,19 +15,11 @@ import org.apache.shiro.crypto.hash.Sha512Hash
 class MSSGCommandSpec extends Specification {
     
     def crlf = "\r\n"
-    static domainList = [ 'shelfunit2.info', 'groovy-is-groovy2.org' ]
     static sql
     static mssgCommand
+    static domainList = [ 'shelfunit2.info', 'groovy-is-groovy2.org' ]
     static hamilton = 'alexander2@shelfunit2.info'
-    static gwShelf  = 'george.columbia2@shelfunit2.info'
-    static jAdamsShelf = 'john.quincy2@shelfunit2.info'
-    static jackShell = 'oneillMSSG2@shelfunit2.info'
-    static gwGroovy  = 'george.columbia2@groovy-is-groovy2.org'
-    static jaGroovy  = 'john.quincy2@groovy-is-groovy2.org'
-    static jackGroovy = 'oneillMSSG2@groovy-is-groovy2.org'
-    static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-    static resultSetEM = [ 'EHLO', 'MAIL' ] as Set 
-
+    
     @Rule 
     TestName name = new TestName()
     
@@ -132,7 +124,6 @@ class MSSGCommandSpec extends Specification {
 	        countResult.count == 0
 	}
 	
-	
 	def "test getting the data"() {
 	    sql.eachRow( 'select * from mail_store' ) { mailItem ->
 	        println mailItem.id.toString()
@@ -141,7 +132,7 @@ class MSSGCommandSpec extends Specification {
             println "mailItem.username: ${mailItem.username}\n-------------------------------------------------"
         }
 	    expect:
-	        5 ==5
+	        5 == 5
 	}
 
 }
