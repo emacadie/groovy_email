@@ -10,8 +10,8 @@ class MailRunner {
     static main( args ) {
         MetaProgrammer.runMetaProgramming()
         log.info "in MailRunner"
-        URL theURL = getClass().getResource( "/log4j.properties" );
-        log.info "theURL is a ${theURL.class.name}"
+        // URL theURL = getClass().getResource( "/log4j.properties" );
+        // log.info "theURL is a ${theURL.class.name}"
         def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
         user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
         def sql = Sql.newInstance( db.url, db.user, db.password, db.driver )

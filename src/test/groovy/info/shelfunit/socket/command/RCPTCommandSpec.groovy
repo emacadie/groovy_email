@@ -7,11 +7,14 @@ import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.MetaProgrammer
+import info.shelfunit.mail.ConfigHolder
 
 import groovy.sql.Sql
+import groovy.util.logging.Slf4j 
 
 import org.apache.shiro.crypto.hash.Sha512Hash
 
+@Slf4j
 class RCPTCommandSpec extends Specification {
     
     def crlf = "\r\n"
@@ -38,8 +41,16 @@ class RCPTCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
+        /*
         def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
         user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
+        */
+        ConfigHolder.instance.setConfObject( "src/main/resources/application.test.conf" )
+        def conf = ConfigHolder.instance.getConfObject()
+        log.info "conf is a ${conf.class.name}"
+        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
+        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
+        log.info "db is a ${db.getClass().name}"
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
         this.addUsers()
         rcptCommand = new RCPTCommand( sql, domainList )
