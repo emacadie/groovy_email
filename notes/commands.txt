@@ -19,7 +19,24 @@ gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=25
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner -PmainArgs="src/main/resources/application.conf"
 gradle runGroovy -PmainClass=info.shelfunit.mail.BinaryMailRunner -PmainArgs="src/main/resources/application.conf"
+gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath=/src/test/resources/application.test.conf -user=lionel.richie -fName=Lionel -lName=Richie -pass='Hello, is it me you're looking for' -iterations=10"
 
+gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user lionel.richie -fName Lionel -lName Richie -pass 'Hello, is it me you're looking for' -iterations 10"
+no space in password
+gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user lionel.richie -fName Lionel -lName Richie -pass \"Hello, is it me you're looking for\" -iterations 10"
+gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user lionel.richie -fName Lionel -lName Richie -pass This-is-a-P455word -iterations 10"
+              iterations
+.
+
+    UserInserter( def args ) {
+        
+        def cli = new CliBuilder( usage:'UserInserter' )
+        cli.configPath( 'path to application.conf file' )
+        cli.user( 'user name (part of email address before "@" symbol)' )
+        cli.fName( "user's first name" )
+        cli.lName( "user's last name" )
+        cli.pass( "password" )
+        cli.iterations( "number of thousands of iterations to hash password" )
 
 
 To use shell:

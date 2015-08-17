@@ -48,6 +48,7 @@ allprojects {
         compile 'dnsjava:dnsjava:2.1.7'
         compile 'org.postgresql:postgresql:9.3-1101-jdbc41'
         compile 'org.apache.shiro:shiro-core:1.2.3'
+        compile 'commons-cli:commons-cli:1.2'
     }
     
     tasks.withType( GroovyCompile ) { GroovyCompile compile ->
