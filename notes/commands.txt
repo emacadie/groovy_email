@@ -25,7 +25,9 @@ gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-confi
 no space in password
 gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user lionel.richie -fName Lionel -lName Richie -pass \"Hello, is it me you're looking for\" -iterations 10"
 gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user lionel.richie -fName Lionel -lName Richie -pass This-is-a-P455word -iterations 10"
-              iterations
+gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user major.carter -fName Samantha -lName Carter -pass G4teTravel-fun -iterations 10"
+gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user maildude -fName Dude -lName Abiding -pass L3bowsk_ii -iterations 10"
+
 .
 
     UserInserter( def args ) {
