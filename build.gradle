@@ -177,20 +177,23 @@ groovysh {
     }
 }
 
-task createStartScripts( type: CreateStartScripts ) {
-  outputDir = file( 'build/sample' )
-  mainClassName = 'info.shelfunit.mail.MailRunner'
-  applicationName = 'MailRunner'
-  classpath = sourceSets.main.runtimeClasspath
-  // classpath = files('path/to/some.jar')
+task createMailRunnerStartScript( type: CreateStartScripts ) {
+    println "In MailRunnerStartScript"
+    println "Here is sourceSets.main.runtimeClasspath: ${sourceSets.main.runtimeClasspath}"
+    println "Here is sourceSets.main: ${sourceSets.main}"
+    outputDir = file( 'build/scripts' )
+    mainClassName = 'info.shelfunit.mail.MailRunner'
+    applicationName = 'MailRunner'
+    classpath = sourceSets.main.runtimeClasspath
+    // classpath = files('path/to/some.jar')
 }
 
-task createUserInserterStartScripts( type: CreateStartScripts ) {
-  outputDir = file( 'build/sample' )
-  mainClassName = 'info.shelfunit.mail.UserInserter'
-  applicationName = 'UserInserter'
-  classpath = sourceSets.main.runtimeClasspath
-  // classpath = files('path/to/some.jar')
+task createUserInserterStartScript( type: CreateStartScripts ) {
+    outputDir = file( 'build/scripts' )
+    mainClassName = 'info.shelfunit.mail.UserInserter'
+    applicationName = 'UserInserter'
+    classpath = sourceSets.main.runtimeClasspath
+    // classpath = files('path/to/some.jar')
 }
 
 mainClassName = "info.shelfunit.mail.MailRunner"
