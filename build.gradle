@@ -3,6 +3,7 @@ apply plugin: 'maven'
 apply plugin: 'groovy'
 apply plugin: 'codenarc'
 apply plugin: 'com.github.tkruse.groovysh'
+apply plugin: 'application'
 
 repositories {
   mavenCentral()
@@ -175,5 +176,23 @@ groovysh {
         System.properties[ 'dbpassword' ]    = 'dev-word-to-pass002'
     }
 }
+
+task createStartScripts( type: CreateStartScripts ) {
+  outputDir = file( 'build/sample' )
+  mainClassName = 'info.shelfunit.mail.MailRunner'
+  applicationName = 'MailRunner'
+  classpath = sourceSets.main.runtimeClasspath
+  // classpath = files('path/to/some.jar')
+}
+
+task createUserInserterStartScripts( type: CreateStartScripts ) {
+  outputDir = file( 'build/sample' )
+  mainClassName = 'info.shelfunit.mail.UserInserter'
+  applicationName = 'UserInserter'
+  classpath = sourceSets.main.runtimeClasspath
+  // classpath = files('path/to/some.jar')
+}
+
+mainClassName = "info.shelfunit.mail.MailRunner"
 
 // 

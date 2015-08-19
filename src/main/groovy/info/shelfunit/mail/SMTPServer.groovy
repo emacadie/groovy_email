@@ -11,7 +11,7 @@ class SMTPServer {
     
     def SMTPServer( def argServer ) {
         serverList = argServer
-        log.info "the server is ${argServer}, now it's ${serverName}"
+        log.info "the server is ${argServer}"
     }
     
     def doStuff( port ) {
