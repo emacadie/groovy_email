@@ -180,7 +180,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new ModularSMTPSocketWorker( input, output, domainList ).doWork()
+            def msmtpw = new ModularSMTPSocketWorker( input, output, domainList )
+            msmtpw.doWork()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"

@@ -112,9 +112,15 @@ class MetaProgrammer {
             }
         }
         // I REALLY need to come up with a better name than this
-        String.metaClass.isEncapsulated = {
+        String.metaClass.isEncapsulated = { -> 
             def returnValue = false
-            if ( delegate.isHelloCommand() ) { 
+            /* isMessage ->
+            
+            if ( isMessage ) {
+                returnValue = true
+            } else 
+            */
+            if( delegate.isHelloCommand() ) { 
                 returnValue = true
             } else if ( delegate.startsWith( 'MAIL' ) ) {
                 returnValue = true

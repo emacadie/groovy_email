@@ -67,7 +67,7 @@ for ( item in myList ) {
         resultMap.clear()
         
         bufferMap.forwardPath.size().times() {
-            uuidSet << UUID.randomUUID().toString()
+            uuidSet << UUID.randomUUID() // .toString()
         }
 
         if ( !prevCommandSet.lastCommandPrecedesMSSG() ) {

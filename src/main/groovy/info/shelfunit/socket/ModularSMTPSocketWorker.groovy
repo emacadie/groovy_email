@@ -88,7 +88,7 @@ class ModularSMTPSocketWorker {
 		            sBuffer << newString << '\n'
 			        try {
 				        newString = reader?.readLine()
-				        log.info "Here is sBuffer in while loop: ${sBuffer}"
+				        // log.info "Here is sBuffer in while loop: ${sBuffer}"
 			        } catch ( Exception ex ) {
 				        log.info "exception: ${ex.printMessage()}"
 				        ex.printStackTrace()
@@ -110,8 +110,9 @@ class ModularSMTPSocketWorker {
 	def handleMessage( theMessage, def isActualMessage = false ) {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
-		if ( theMessage.isEncapsulated() ) {
+		if ( theMessage.isEncapsulated( ) || isActualMessage ) {
 		    commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
+		    log.info "returned a command object that is a ${commandObject.class.name}"
 		    commandResultMap.clear()
 		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
@@ -137,6 +138,7 @@ class ModularSMTPSocketWorker {
 	}
 	
 	def returnCurrentCommand( theMessage, isActualMessage ) {
+	    log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
 		if ( isActualMessage ) {
 		    return mssgCommand
 		} else if ( theMessage.isHelloCommand() ) {

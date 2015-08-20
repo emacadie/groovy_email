@@ -21,7 +21,7 @@ class SMTPServer {
             server.accept {  socket ->
                 log.info "processing new connection..."
                 socket.withStreams { input, output ->
-                    log.info "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverName}"
+                    log.info "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverList}"
                     ModularSMTPSocketWorker sSockW = new ModularSMTPSocketWorker( input, output, serverList )
                     sSockW.doWork(  )
                 }
