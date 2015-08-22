@@ -1,0 +1,4 @@
+This has a nice XML file:
+http://stackoverflow.com/questions/10734025/logback-two-appenders-multiple-loggers-different-levels
+Perhaps I can use that to log different packages to different files?
+

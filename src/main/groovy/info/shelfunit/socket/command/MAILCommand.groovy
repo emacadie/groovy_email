@@ -24,11 +24,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
         def resultString
         def resultMap = [:]
         resultMap.clear()
-        // bufferMap.reversePath = '' 
-        // bufferMap.forwardPath = ''
-        // bufferMap.mailData = ''
         def regexResult = ( theMessage ==~ pattern )
-        // if ( !prevCommandSet.last().matches( 'EHLO|HELO|RSET' ) ) {
         if ( !prevCommandSet.lastCommandPrecedesMail() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else if ( !theMessage.startsWith( 'MAIL FROM:' ) ) {
@@ -41,8 +37,6 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             prevCommandSet << 'MAIL'
             resultMap.resultString = '250 OK'
             def q = theMessage =~ pattern
-            // log.info "Here is q: ${q}"
-            // log.info "Here is q[0][2]: ${q[0][2]}"
             bufferMap.clear()
             bufferMap.forwardPath = [] // for RCPT command
             bufferMap.reversePath =  q[ 0 ][ 2 ]
