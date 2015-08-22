@@ -1,4 +1,4 @@
-package info.shelfunit.socket.command
+package info.shelfunit.smtp.command
 
 import spock.lang.Specification
 import spock.lang.Unroll

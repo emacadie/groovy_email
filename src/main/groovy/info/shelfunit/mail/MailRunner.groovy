@@ -5,6 +5,7 @@ import groovy.util.logging.Slf4j
 // import groovy.sql.Sql
 
 // import info.shelfunit.mail.ConfigHolder
+import info.shelfunit.smtp.SMTPServer
 
 @Slf4j
 class MailRunner {

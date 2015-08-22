@@ -1,4 +1,4 @@
-package info.shelfunit.socket.command
+package info.shelfunit.smtp.command
 
 
 import groovy.util.logging.Slf4j 

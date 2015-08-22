@@ -1,4 +1,4 @@
-package info.shelfunit.socket
+package info.shelfunit.smtp
 
 import java.io.InputStream
 import java.io.OutputStream
@@ -7,12 +7,12 @@ import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import info.shelfunit.mail.ConfigHolder
-import info.shelfunit.socket.command.DATACommand
-import info.shelfunit.socket.command.EHLOCommand
-import info.shelfunit.socket.command.MAILCommand
-import info.shelfunit.socket.command.MSSGCommand
-import info.shelfunit.socket.command.RCPTCommand
-import info.shelfunit.socket.command.RSETCommand
+import info.shelfunit.smtp.command.DATACommand
+import info.shelfunit.smtp.command.EHLOCommand
+import info.shelfunit.smtp.command.MAILCommand
+import info.shelfunit.smtp.command.MSSGCommand
+import info.shelfunit.smtp.command.RCPTCommand
+import info.shelfunit.smtp.command.RSETCommand
 
 import visibility.Hidden
 

@@ -1,4 +1,4 @@
-package info.shelfunit.socket
+package info.shelfunit.smtp
 
 import java.io.InputStream
 import java.io.OutputStream

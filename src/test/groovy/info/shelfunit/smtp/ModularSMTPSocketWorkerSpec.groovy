@@ -1,4 +1,4 @@
-package info.shelfunit.socket
+package info.shelfunit.smtp
 
 import spock.lang.Specification
 // import spock.lang.Ignore
@@ -12,7 +12,7 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.MetaProgrammer
-import info.shelfunit.socket.command.EHLOCommand
+import info.shelfunit.smtp.command.EHLOCommand
 import org.apache.shiro.crypto.hash.Sha512Hash
 
 class ModularSMTPSocketWorkerSpec extends Specification {
@@ -22,10 +22,13 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     def crlf = "\r\n"
     static sql
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    
     def setup() {
         println "\n--- Starting test ${name.methodName}"
     }          // run before every feature method
+    
     def cleanup() {}        // run after every feature method
+    
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
@@ -34,6 +37,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
         this.addUsers()
     }     // run before the first feature method
+    
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ('gwash', 'jadams', 'tee-jay')"
         sql.close()
