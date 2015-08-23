@@ -71,7 +71,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	        def resultMap = ehloCommand.process( "EHLO ${domain}", [], [:] )
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
-	        ehloResponse == "250-Hello ${domain}\n" +
+	        ehloResponse == "250-Hello ${domain}\r\n" +
+	        "250-8BITMIME\r\n" + 
 	        "250 HELP\r\n"
 	        resultMap.prevCommandSet == ["EHLO"]
 	}
@@ -135,7 +136,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             
 	    then:
 	        output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
-                "250-Hello hot-groovy.com\n" +
+                "250-Hello hot-groovy.com\r\n" +
+                "250-8BITMIME\r\n" +
                 "250 HELP\r\n" +
                 "250 OK\r\n" +
                 "250 OK\r\n" +
@@ -159,7 +161,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
             output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" + // opening
-                "250-Hello hot-groovy.com\n" +
+                "250-Hello hot-groovy.com\r\n" +
+                "250-8BITMIME\r\n" +
                 "250 HELP\r\n" + // DATA
                 "502 Command not implemented\r\n" + // SAML
                 "502 Command not implemented\r\n" + // SEND
@@ -191,7 +194,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
             output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
-                "250-Hello hot-groovy.com\n" +
+                "250-Hello hot-groovy.com\r\n" +
+                "250-8BITMIME\r\n" + 
                 "250 HELP\r\n" +
                 "250 OK\r\n" +
                 "250 OK\r\n" +
@@ -218,7 +222,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
             output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
-                "250-Hello hot-groovy.com\n" +
+                "250-Hello hot-groovy.com\r\n" +
+                "250-8BITMIME\r\n" +
                 "250 HELP\r\n" +
                 "250 OK\r\n" +
                 "250 OK\r\n" +

@@ -36,7 +36,8 @@ class EHLOCommandSpec extends Specification {
 	        def resultMap = ehloCommand.process( "EHLO ${domain}", [] as Set, [:] )
 	        def ehloResponse = resultMap.resultString + crlf 
 	    then:
-	        ehloResponse == "250-Hello ${domain}\n" +
+	        ehloResponse == "250-Hello ${domain}\r\n" +
+	        "250-8BITMIME\r\n" +
 	        "250 HELP\r\n"
 	        println "here is resultMap.prevCommandSet[0]: ${resultMap.prevCommandSet[0]} and it's a ${resultMap.prevCommandSet[0].class.name}"
 	        resultMap.prevCommandSet == ["EHLO"] as Set
@@ -80,7 +81,8 @@ class EHLOCommandSpec extends Specification {
 	        def newList = resultMap.prevCommandSet
 	        def newMap = resultMap.bufferMap
 	    then:
-	        ehloResponse == "250-Hello ${domain}\n" +
+	        ehloResponse == "250-Hello ${domain}\r\n" +
+	        "250-8BITMIME\r\n" + 
 	        "250 HELP\r\n"
 	        newList.size() == 1
 	        newList[ 0 ] == "EHLO"

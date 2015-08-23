@@ -23,7 +23,11 @@ class DATACommand {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
 		    prevCommandSet << "DATA"
-		    resultMap.resultString = "354 Start mail input; end with <CRLF>.<CRLF>"
+		    if ( bufferMap.handles8bit == "true" ) {
+		        resultMap.resultString = "354 Send 8BITMIME message, ending in <CRLF>.<CRLF>"
+		    } else {
+		        resultMap.resultString = "354 Start mail input; end with <CRLF>.<CRLF>"
+		    }
 		}
 		resultMap.prevCommandSet = prevCommandSet
 		resultMap.bufferMap = bufferMap

@@ -59,6 +59,12 @@ class MetaProgrammer {
         java.util.regex.Matcher.metaClass.getEmailAddressInRCPT = { ->
             delegate[ 0 ][ 2 ]
         }
+        java.util.regex.Matcher.metaClass.getEmailAddressInMAIL = { ->
+            delegate[ 0 ][ 2 ]
+        }
+        java.util.regex.Matcher.metaClass.handles8BitInMAIL = { ->
+            delegate[ 0 ][ 3 ]
+        }
         java.util.regex.Matcher.metaClass.extractDomain = { ->
             delegate[ 0 ][ 3 ]
         }

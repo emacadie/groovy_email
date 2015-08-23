@@ -29,7 +29,7 @@ class RCPTCommandSpec extends Specification {
     static jaGroovy  = 'john.adams@groovy-is-groovy.org'
     static jackGroovy = 'oneill@groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-    static resultSetEM = [ 'EHLO', 'MAIL' ] as Set 
+    static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
     @Rule 
     TestName name = new TestName()

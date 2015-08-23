@@ -20,12 +20,12 @@ class DATACommandSpec extends Specification {
     static hamilton = 'alexander@shelfunit.info'
     static gwShelf  = 'george.washington@shelfunit.info'
     static jAdamsShelf = 'john.adams@shelfunit.info'
-    static jackShell = 'oneill@shelfunit.info'
-    static gwGroovy  = 'george.washington@groovy-is-groovy.org'
-    static jaGroovy  = 'john.adams@groovy-is-groovy.org'
-    static jackGroovy = 'oneill@groovy-is-groovy.org'
+    static jackShell   = 'oneill@shelfunit.info'
+    static gwGroovy    = 'george.washington@groovy-is-groovy.org'
+    static jaGroovy    = 'john.adams@groovy-is-groovy.org'
+    static jackGroovy  = 'oneill@groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-    static resultSetEM = [ 'EHLO', 'MAIL' ] as Set 
+    static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
     @Rule 
     TestName name = new TestName()

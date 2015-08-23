@@ -35,11 +35,17 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             resultMap.resultString = "501 Command not in proper form"
         } else {
             prevCommandSet << 'MAIL'
-            resultMap.resultString = '250 OK'
+            
             def q = theMessage =~ pattern
             bufferMap.clear()
             bufferMap.forwardPath = [] // for RCPT command
-            bufferMap.reversePath =  q[ 0 ][ 2 ]
+            bufferMap.reversePath =  q.getEmailAddressInMAIL()
+            if ( q.handles8BitInMAIL() ) {
+                bufferMap.handles8bit = "true"
+                resultMap.resultString = "250 <${bufferMap.reversePath}> Sender and 8BITMIME OK"
+            } else {
+                resultMap.resultString = '250 OK'
+            }
             log.info "here is reverse path: ${bufferMap.reversePath}"
             log.info "here is q: ${q}"
             resultMap.bufferMap = bufferMap

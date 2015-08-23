@@ -28,7 +28,7 @@ class EHLOCommand {
         } else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithEHLO() ) ) {
             prevCommandSet.clear()
             prevCommandSet << "EHLO"
-            resultMap.resultString = "250-Hello ${domain}\n250 HELP"
+            resultMap.resultString = "250-Hello ${domain}\r\n250-8BITMIME\r\n250 HELP"
 		} else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithHELO() ) ) {
 		    prevCommandSet.clear()
 		    prevCommandSet << "HELO"

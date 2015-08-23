@@ -10,6 +10,10 @@ import info.shelfunit.mail.MetaProgrammer
 
 class MAILCommandSpec extends Specification {
     
+    // if pre-defined, responses/inputs in unrolled tests must be defined here, not in method they are used
+    static response250With8Bit = "250 <oneill@stargate.mil> Sender and 8BITMIME OK"
+    static response503 = "503 Bad sequence of commands"
+    static response501 = "501 Command not in proper form"
     def crlf = "\r\n"
 
     @Rule 
@@ -45,11 +49,11 @@ class MAILCommandSpec extends Specification {
 	    
 	    where:
             command | mailResponse
-            'MAIL'  | "503 Bad sequence of commands"
-            'EXPN'  | "503 Bad sequence of commands"
-            'VRFY'  | "503 Bad sequence of commands"
-            'NOOP'  | "503 Bad sequence of commands"
-            'RCPT'  | "503 Bad sequence of commands"
+            'MAIL'  | response503
+            'EXPN'  | response503
+            'VRFY'  | response503
+            'NOOP'  | response503
+            'RCPT'  | response503
             'EHLO'  | "250 OK"
             'HELO'  | "250 OK"
             'RSET'  | "250 OK"
@@ -68,15 +72,15 @@ class MAILCommandSpec extends Specification {
             resultMap.resultString == value
             resultMap.bufferMap?.reversePath == resultAddress
         where:
-            command | value                          | resultAddress
-            'EHLO'  | "250 OK"                       | 'oneill@stargate.mil'
-            'HELO'  | "250 OK"                       | 'oneill@stargate.mil'
-            'RSET'  | "250 OK"                       | 'oneill@stargate.mil'
-            'MAIL'  | "503 Bad sequence of commands" | null
-            'EXPN'  | "503 Bad sequence of commands" | null
-            'VRFY'  | "503 Bad sequence of commands" | null
-            'NOOP'  | "503 Bad sequence of commands" | null
-            'RCPT'  | "503 Bad sequence of commands" | null
+            command | value         | resultAddress
+            'EHLO'  | "250 OK"      | 'oneill@stargate.mil'
+            'HELO'  | "250 OK"      | 'oneill@stargate.mil'
+            'RSET'  | "250 OK"      | 'oneill@stargate.mil'
+            'MAIL'  | response503   | null
+            'EXPN'  | response503   | null
+            'VRFY'  | response503   | null
+            'NOOP'  | response503   | null
+            'RCPT'  | response503   | null
 	}
 	
 	@Unroll( "#command gives #value with address #resultAddress with BODY=8BITMIME at the end" )
@@ -92,15 +96,15 @@ class MAILCommandSpec extends Specification {
             resultMap.resultString == value
             resultMap.bufferMap?.reversePath == resultAddress
         where:
-            command | value                          | resultAddress
-            'EHLO'  | "250 OK"                       | 'oneill@stargate.mil'
-            'HELO'  | "250 OK"                       | 'oneill@stargate.mil'
-            'RSET'  | "250 OK"                       | 'oneill@stargate.mil'
-            'MAIL'  | "503 Bad sequence of commands" | null
-            'EXPN'  | "503 Bad sequence of commands" | null
-            'VRFY'  | "503 Bad sequence of commands" | null
-            'NOOP'  | "503 Bad sequence of commands" | null
-            'RCPT'  | "503 Bad sequence of commands" | null
+            command | value                 | resultAddress
+            'EHLO'  | response250With8Bit   | 'oneill@stargate.mil'
+            'HELO'  | response250With8Bit   | 'oneill@stargate.mil'
+            'RSET'  | response250With8Bit   | 'oneill@stargate.mil'
+            'MAIL'  | response503           | null
+            'EXPN'  | response503           | null
+            'VRFY'  | response503           | null
+            'NOOP'  | response503           | null
+            'RCPT'  | response503           | null
 	}
 	
 	@Unroll( "#inputAddress gives #value with result Address the same" )
@@ -160,28 +164,28 @@ class MAILCommandSpec extends Specification {
             resultMap.bufferMap?.reversePath == resultAddress
             resultMap.prevCommandSet == [ 'EHLO' ] as Set
         where:
-            inputAddress                | value                             | resultAddress
-            'mkyong'                    | "501 Command not in proper form"  | null 
-            'mkyong@.com.my'            | "501 Command not in proper form"  | null 
-            'mkyong123@gmail.a'         | "501 Command not in proper form"  | null 
-            'mkyong123@.com'            | "501 Command not in proper form"  | null 
-            'mkyong123@.com.com'        | "501 Command not in proper form"  | null 
-            '.mkyong@mkyong.com'        | "501 Command not in proper form"  | null 
-            'mkyong()*@gmail.com'       | "501 Command not in proper form"  | null 
-            'mkyong@%*.com'             | "501 Command not in proper form"  | null 
-            'mkyong..2002@gmail.com'    | "501 Command not in proper form"  | null 
-            'mkyong.@gmail.com'         | "501 Command not in proper form"  | null 
-            'mkyong@mkyong@gmail.com'   | "501 Command not in proper form"  | null 
-            'mkyong@gmail.com.1a'       | "501 Command not in proper form"  | null 
-            '@yahoo.com'                | "501 Command not in proper form"  | null 
-            '.username@yahoo.com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.com.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            '.username@yahoo.com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.com.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.c'          | "501 Command not in proper form"  | null 
-            'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
+            inputAddress                | value         | resultAddress
+            'mkyong'                    | response501   | null 
+            'mkyong@.com.my'            | response501   | null 
+            'mkyong123@gmail.a'         | response501   | null 
+            'mkyong123@.com'            | response501   | null 
+            'mkyong123@.com.com'        | response501   | null 
+            '.mkyong@mkyong.com'        | response501   | null 
+            'mkyong()*@gmail.com'       | response501   | null 
+            'mkyong@%*.com'             | response501   | null 
+            'mkyong..2002@gmail.com'    | response501   | null 
+            'mkyong.@gmail.com'         | response501   | null 
+            'mkyong@mkyong@gmail.com'   | response501   | null 
+            'mkyong@gmail.com.1a'       | response501   | null 
+            '@yahoo.com'                | response501   | null 
+            '.username@yahoo.com'       | response501   | null 
+            'username@yahoo.com.'       | response501   | null 
+            'username@yahoo..com'       | response501   | null 
+            '.username@yahoo.com'       | response501   | null 
+            'username@yahoo.com.'       | response501   | null 
+            'username@yahoo..com'       | response501   | null 
+            'username@yahoo.c'          | response501   | null 
+            'username@yahoo.corporate'  | response501   | null 
 	}
 	
 	def "test happy path"() {
