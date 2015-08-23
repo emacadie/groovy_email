@@ -7,8 +7,7 @@
 // in general, please contact the logback user mailing list at
 //    http://qos.ch/mailman/listinfo/logback-user
 
-// For professional support please see
-//   http://www.qos.ch/shop/products/professionalSupport
+// For professional support please see http://www.qos.ch/shop/products/professionalSupport
 
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder
 import ch.qos.logback.core.ConsoleAppender

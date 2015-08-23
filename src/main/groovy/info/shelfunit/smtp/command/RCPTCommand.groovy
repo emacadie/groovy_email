@@ -51,12 +51,12 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
         } else {
             
             // log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}, Here is q[ 0 ][ 3 ]: ${q[0][3]}"
-            def userName = q.extractUserName() 
+            def userName = q.extractUserNameInRCPT() 
             // log.info "here is userName: ${userName}"
             def rows = sql.rows( 'select * from email_user where username=?', userName )
             // log.info "here is rows?.size() : ${rows?.size()} "
             if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
-                bufferMap.forwardPath << q.getEmailAddress() // q[ 0 ][ 2 ]
+                bufferMap.forwardPath << q.getEmailAddressInRCPT() 
                 resultMap.resultString = '250 OK'
                 prevCommandSet << 'RCPT'
             } else {

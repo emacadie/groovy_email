@@ -53,14 +53,20 @@ class MetaProgrammer {
     }
     
     static runMatcherMetaProgramming() {
-        java.util.regex.Matcher.metaClass.extractUserName = { ->
+        java.util.regex.Matcher.metaClass.extractUserNameInRCPT = { ->
             delegate[ 0 ][ 2 ].substring( 0, ( delegate[ 0 ][ 2 ].length() - ( delegate[ 0 ][ 3 ].length() + 1 ) ) )
         }
-        java.util.regex.Matcher.metaClass.getEmailAddress = { ->
+        java.util.regex.Matcher.metaClass.getEmailAddressInRCPT = { ->
             delegate[ 0 ][ 2 ]
         }
         java.util.regex.Matcher.metaClass.extractDomain = { ->
             delegate[ 0 ][ 3 ]
+        }
+        java.util.regex.Matcher.metaClass.getWholeAddressInMSSG = { ->
+            delegate[ 0 ][ 1 ]
+        }
+        java.util.regex.Matcher.metaClass.getUserNameInMSSG = { ->
+            delegate[ 0 ][ 2 ]
         }
     }
     

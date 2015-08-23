@@ -79,6 +79,30 @@ class MAILCommandSpec extends Specification {
             'RCPT'  | "503 Bad sequence of commands" | null
 	}
 	
+	@Unroll( "#command gives #value with address #resultAddress with BODY=8BITMIME at the end" )
+	def "#command gives #value with address #resultAddress with BODY=8BITMIME at the end"() {
+	    def resultMap
+	    def mailCommand = new MAILCommand()
+	    def resultString
+
+        when:
+            resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil> BODY=8BITMIME", [ command ] as Set, [:] )
+        then:
+            println "command was ${command}, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.bufferMap?.reversePath == resultAddress
+        where:
+            command | value                          | resultAddress
+            'EHLO'  | "250 OK"                       | 'oneill@stargate.mil'
+            'HELO'  | "250 OK"                       | 'oneill@stargate.mil'
+            'RSET'  | "250 OK"                       | 'oneill@stargate.mil'
+            'MAIL'  | "503 Bad sequence of commands" | null
+            'EXPN'  | "503 Bad sequence of commands" | null
+            'VRFY'  | "503 Bad sequence of commands" | null
+            'NOOP'  | "503 Bad sequence of commands" | null
+            'RCPT'  | "503 Bad sequence of commands" | null
+	}
+	
 	@Unroll( "#inputAddress gives #value with result Address the same" )
 	def "#inputAddress gives #value with result Address the same"() {
 	    def resultMap

@@ -67,7 +67,7 @@ for ( item in myList ) {
         resultMap.clear()
         
         bufferMap.forwardPath.size().times() {
-            uuidSet << UUID.randomUUID() // .toString()
+            uuidSet << UUID.randomUUID() 
         }
 
         if ( !prevCommandSet.lastCommandPrecedesMSSG() ) {
@@ -94,8 +94,8 @@ for ( item in myList ) {
             sql.withTransaction {
                 toAddresses.eachWithIndex { address, i ->
                     def q = address =~ regex
-                    def wholeAddress = q[ 0 ][ 1 ]
-                    def userName = q[ 0 ][ 2 ]
+                    def wholeAddress = q.getWholeAddressInMSSG()
+                    def userName = q.getUserNameInMSSG()
                     log.info "here are the args: [ uuidSet[ i ]: ${uuidSet[ i ]}, userName: ${userName}, fromAddress: ${fromAddress}, wholeAddress: ${wholeAddress}, theMessage: ${theMessage}"
                     insertCounts = sql.withBatch( 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)' ) { stmt ->
                         log.info "uuidSet[ i ] is a ${uuidSet[ i ].class.name}"

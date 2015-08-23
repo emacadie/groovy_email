@@ -12,7 +12,7 @@ class MAILCommand {
     
     // http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
     static regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6})>$(?x)'''
+*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6})>(\\s{0,}BODY=8BITMIME)?$(?x)'''
 /*
  regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
 *+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+([a-zA-Z]{2,6}))>$(?x)'''
@@ -40,6 +40,8 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             bufferMap.clear()
             bufferMap.forwardPath = [] // for RCPT command
             bufferMap.reversePath =  q[ 0 ][ 2 ]
+            log.info "here is reverse path: ${bufferMap.reversePath}"
+            log.info "here is q: ${q}"
             resultMap.bufferMap = bufferMap
         }
         resultMap.prevCommandSet = prevCommandSet

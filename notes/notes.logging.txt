@@ -1,4 +1,7 @@
 This has a nice XML file:
 http://stackoverflow.com/questions/10734025/logback-two-appenders-multiple-loggers-different-levels
 Perhaps I can use that to log different packages to different files?
+http://logback.qos.ch/translator/asGroovy.html
+Look at chapter 3 as well: http://logback.qos.ch/manual/configuration.html
+Look at http://logback.10977.n7.nabble.com/Log-only-one-java-package-td2858.html
 
