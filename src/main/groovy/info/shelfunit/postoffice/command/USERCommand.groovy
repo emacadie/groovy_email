@@ -42,8 +42,9 @@ class USERCommand {
             // log.info "here is userName: ${userName}"
             def rows = sql.rows( 'select * from email_user where username=?', userName )
             // log.info "here is rows?.size() : ${rows?.size()} "
+            log.info "Here is rows, it's a : ${rows.class.name}"
             if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
-                bufferMap.forwardPath << q.getEmailAddressInRCPT() 
+                bufferMap.userInfo << rows[ 0 ]
                 resultMap.resultString = "+OK ${userName} is a valid mailbox"
                 // prevCommandSet << 'RCPT'
             } else {

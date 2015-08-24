@@ -1,11 +1,9 @@
 //
 // Built on Thu Jun 11 10:36:44 CEST 2015 by logback-translator
-// For more information on configuration files in Groovy
-// please see http://logback.qos.ch/manual/groovy.html
+// For more information on configuration files in Groovy please see http://logback.qos.ch/manual/groovy.html
 
-// For assistance related to this tool or configuration files
-// in general, please contact the logback user mailing list at
-//    http://qos.ch/mailman/listinfo/logback-user
+// For assistance related to this tool or configuration files in general, 
+// please contact the logback user mailing list at http://qos.ch/mailman/listinfo/logback-user
 
 // For professional support please see http://www.qos.ch/shop/products/professionalSupport
 
@@ -32,15 +30,7 @@ appender( "FILE-smtp", RollingFileAppender ) {
 }
 root( DEBUG, [ "STDOUT" ] )
 logger( "info.shelfunit.smtp", INFO, [ "FILE-smtp" ] )
-////////////////////////////////////
-/*
-appender("CONSOLE-postoffice", ConsoleAppender) {
-  target = "System.out"
-  encoder(PatternLayoutEncoder) {
-    pattern = "%d %-5level [%thread] %logger{0}: %msg%n"
-  }
-}
-*/
+
 appender( "FILE-postoffice", RollingFileAppender ) {
   rollingPolicy( TimeBasedRollingPolicy ) {
     fileNamePattern = "log/post.office.%d{yyyy-MM-dd}.log"
@@ -50,6 +40,6 @@ appender( "FILE-postoffice", RollingFileAppender ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
-// root( DEBUG, [ "CONSOLE-stdout" ] )
+
 logger( "info.shelfunit.postoffice", INFO, [ "FILE-postoffice" ] )
 
