@@ -9,7 +9,7 @@ class PostOfficeServer {
     
     def serverList = []
     
-    def SMTPServer( def argServer ) {
+    PostOfficeServer( def argServer ) {
         serverList = argServer
         log.info "the server is ${argServer}"
     }
@@ -22,7 +22,7 @@ class PostOfficeServer {
                 log.info "processing new connection..."
                 socket.withStreams { input, output ->
                     log.info "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverList}"
-                    ModularPostOfficeSocketWorker sSockW = new ModularOfficeSocketWorker( input, output, serverList )
+                    ModularPostOfficeSocketWorker sSockW = new ModularPostOfficeSocketWorker( input, output, serverList )
                     sSockW.doWork(  )
                 }
                 log.info "processing/thread complete......................"

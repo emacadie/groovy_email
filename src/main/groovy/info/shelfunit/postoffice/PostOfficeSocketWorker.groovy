@@ -15,7 +15,7 @@ class PostOfficeSocketWorker {
     private String serverName
 	private prevCommandSet 
 
-	SMTPSocketWorker( argIn, argOut, argServerName ) {
+	PostOfficeSocketWorker( argIn, argOut, argServerName ) {
         input = argIn
         output = argOut
         serverName = argServerName

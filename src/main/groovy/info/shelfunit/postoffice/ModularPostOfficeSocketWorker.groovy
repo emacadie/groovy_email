@@ -1,4 +1,4 @@
-package info.shelfunit.smtp
+package info.shelfunit.postoffice
 
 import java.io.InputStream
 import java.io.OutputStream
@@ -7,7 +7,7 @@ import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import info.shelfunit.mail.ConfigHolder
-import info.shelfunit.smtp.command.DATACommand
+import info.shelfunit.postoffice.command.USERCommand
 import info.shelfunit.smtp.command.EHLOCommand
 import info.shelfunit.smtp.command.MAILCommand
 import info.shelfunit.smtp.command.MSSGCommand
@@ -17,7 +17,7 @@ import info.shelfunit.smtp.command.RSETCommand
 import visibility.Hidden
 
 @Slf4j
-class ModularSMTPSocketWorker {
+class ModularPostOfficeSocketWorker {
 
     @Hidden InputStream input
     @Hidden OutputStream output
@@ -37,7 +37,7 @@ class ModularSMTPSocketWorker {
 	@Hidden def mssgCommand
 	@Hidden def commandResultMap
 
-	ModularSMTPSocketWorker( argIn, argOut, argServerList ) {
+	ModularPostOfficeSocketWorker( argIn, argOut, argServerList ) {
         input = argIn
         output = argOut
         
@@ -50,11 +50,13 @@ class ModularSMTPSocketWorker {
         prevCommandSet = [] as Set
         commandResultMap = [:]
         bufferMap = [:]
+        userCommand = new USERCommand()
+        
         mailCommand = new MAILCommand()
         ehloCommand = new EHLOCommand()
         rcptCommand = new RCPTCommand( sql, serverList )
         rsetCommand = new RSETCommand()
-        dataCommand = new DATACommand()
+        
         mssgCommand = new MSSGCommand( sql, serverList )
 	}
 
@@ -66,8 +68,8 @@ class ModularSMTPSocketWorker {
         log.info "available: ${input.available()}"
         def reader = input.newReader()
         log.info "reader is a ${reader.class.name}"
-        output << "220 ${serverName} Simple Mail Transfer Service Ready\r\n"
-
+        output << "+OK POP3 server ready <${serverName}>\r\n"
+        bufferMap.state = 'AUTHORIZATION'
         def responseString
         while ( !gotQuitCommand ) {
 	        responseString = ''
@@ -143,8 +145,8 @@ class ModularSMTPSocketWorker {
 		    return mssgCommand
 		} else if ( theMessage.isHelloCommand() ) {
 		    return ehloCommand
-		} else if ( theMessage.startsWith( 'MAIL' ) ) {
-			return mailCommand
+		} else if ( theMessage.startsWith( 'USER' ) ) {
+			return userCommand
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
 			return rcptCommand
 		} else if ( theMessage.startsWith( 'RSET' ) ) {

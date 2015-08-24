@@ -142,6 +142,8 @@ class MetaProgrammer {
                 returnValue = true
             } else if ( delegate.startsWith( 'DATA' ) ) {
                 returnValue = true
+            } else if ( delegate.startsWith( 'USER' ) ) {
+                returnValue = true
             }
             returnValue
         }
