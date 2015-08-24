@@ -175,9 +175,28 @@ class USERCommandSpec extends Specification {
 
 	}
 	*/
+	
+	@Unroll( "#someState gives #value" )
+	def "#someState gives #value"() {
+	    def resultMap
+	    def resultString
 
-	@Unroll( "#inputAddress with wrong domain gives #value" )
-	def "#inputAddress with wrong domain gives #value"() {
+        when:
+            resultMap = userCommand.process( "USER some.user", resultSetEM, [ state: "${someState}" ] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.prevCommandSet == resultSetEM
+            resultMap.bufferMap.state == finalState
+        where:
+            someState       | value                             | finalState
+            'AUTHORIZATION' | "-ERR No such user some.user"     | 'AUTHORIZATION'
+            'TRANSACTION'   | "-ERR Not in AUTHORIZATION state" | 'TRANSACTION'
+            'UPDATE'        | "-ERR Not in AUTHORIZATION state" | 'UPDATE'
+	}
+
+	@Unroll( "non-existent user #inputAddress gives #value" )
+	def "non-existent user #inputAddress gives #value"() {
 	    def resultMap
 	    def resultString
 
@@ -187,25 +206,22 @@ class USERCommandSpec extends Specification {
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
             resultMap.prevCommandSet == resultSetEM
-            // resultMap.bufferMap.state == forwardList
         where:
-            inputAddress                | value                 | state
-            'mkyong'          | "-ERR No such user mkyong"    | 'AUTHORIZATION'
-            'mkyong-100'      | "-ERR No such user mkyong-100"    | 'AUTHORIZATION' 
-            'mkyong.100'      | "-ERR No such user mkyong.100"    | 'AUTHORIZATION'
-            'mkyong111'      | "-ERR No such user mkyong111"    | 'AUTHORIZATION'
-            'mkyong+100'      | "-ERR No such user mkyong+100"    | 'AUTHORIZATION'
-            'howTuser'       | "-ERR No such user howTuser"    | 'AUTHORIZATION'
-            'user'         | "-ERR No such user user"    | 'AUTHORIZATION'
-            'user1'          | "-ERR No such user user1"    | 'AUTHORIZATION'
-            'user.name'      | "-ERR No such user user.name"    | 'AUTHORIZATION'
-            'user_name'    | "-ERR No such user user_name"    | 'AUTHORIZATION'
-            'user-name'    | "-ERR No such user user-name"    | 'AUTHORIZATION'
+            inputAddress    | value                             | state
+            'mkyong'        | "-ERR No such user mkyong"        | 'AUTHORIZATION'
+            'mkyong-100'    | "-ERR No such user mkyong-100"    | 'AUTHORIZATION' 
+            'mkyong.100'    | "-ERR No such user mkyong.100"    | 'AUTHORIZATION'
+            'mkyong111'     | "-ERR No such user mkyong111"     | 'AUTHORIZATION'
+            'mkyong+100'    | "-ERR No such user mkyong+100"    | 'AUTHORIZATION'
+            'howTuser'      | "-ERR No such user howTuser"      | 'AUTHORIZATION'
+            'user'          | "-ERR No such user user"          | 'AUTHORIZATION'
+            'user1'         | "-ERR No such user user1"         | 'AUTHORIZATION'
+            'user.name'     | "-ERR No such user user.name"     | 'AUTHORIZATION'
+            'user_name'     | "-ERR No such user user_name"     | 'AUTHORIZATION'
+            'user-name'     | "-ERR No such user user-name"     | 'AUTHORIZATION'
+            'john.adams'    | "-ERR No such user john.adams"    | 'AUTHORIZATION'
+            'oneill'        | "-ERR No such user oneill"        | 'AUTHORIZATION'
             'george.washington'  | "-ERR No such user george.washington"  | 'AUTHORIZATION' 
-            'john.adams' | "-ERR No such user john.adams" | 'AUTHORIZATION'
-            'oneill'       | "-ERR No such user oneill"    | 'AUTHORIZATION'
-            // 'user@domaincom'            | "-ERR No such user" 
-            // "user'name@domain.co.in"    | "-ERR No such user"
 	}
 	
 	/*

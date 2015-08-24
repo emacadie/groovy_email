@@ -9,21 +9,14 @@ import visibility.Hidden
 class USERCommand {
     
     @Hidden Sql sql
-    // @Hidden List domainList
     USERCommand( def argSql ) {
         log.info "Starting new USERCommand"
-        // println "Here is argDomainList: ${argDomainList}"
         this.sql = argSql
-        // this.domainList = argDomainList
     }
 
     static regex = '''^(USER )([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
 *+/=?`{|}~^-]+)*)$(?x)'''
-/*
- regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+([a-zA-Z]{2,6}))>$(?x)'''
-regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}>$'''
-*/
+
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -34,7 +27,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
         
         def regexResult = ( theMessage ==~ pattern )
         def q = theMessage =~ pattern
-        if ( !bufferMap.state == 'AUTHORIZATION' ) {
+        if ( bufferMap.state != 'AUTHORIZATION' ) {
             resultMap.resultString = "-ERR Not in AUTHORIZATION state"
         } else if ( !theMessage.startsWith( 'USER ' ) ) {
             resultMap.resultString = "-ERR Command not in proper form A"
@@ -65,5 +58,4 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
 		resultMap
     }
 }
-
 
