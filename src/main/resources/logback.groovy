@@ -31,4 +31,24 @@ appender( "FILE", RollingFileAppender ) {
   }
 }
 root( DEBUG, [ "FILE", "STDOUT" ] )
+////////////////////////////////////
+/*
+appender("CONSOLE-postoffice", ConsoleAppender) {
+  target = "System.out"
+  encoder(PatternLayoutEncoder) {
+    pattern = "%d %-5level [%thread] %logger{0}: %msg%n"
+  }
+}
+*/
+appender( "FILE-postoffice", RollingFileAppender ) {
+  rollingPolicy( TimeBasedRollingPolicy ) {
+    fileNamePattern = "log/post.office.%d{yyyy-MM-dd}.log"
+    maxHistory = 7
+  }
+  encoder( PatternLayoutEncoder ) {
+    pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  }
+}
+// root( DEBUG, [ "CONSOLE-stdout" ] )
+logger( "info.shelfunit.postoffice", INFO, [ "FILE-postoffice" ] )
 
