@@ -21,16 +21,17 @@ appender( "STDOUT", ConsoleAppender ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
-appender( "FILE", RollingFileAppender ) {
+appender( "FILE-smtp", RollingFileAppender ) {
   rollingPolicy( TimeBasedRollingPolicy ) {
-    fileNamePattern = "log/MyExample.%d{yyyy-MM-dd}.log"
+    fileNamePattern = "log/smtp.%d{yyyy-MM-dd}.log"
     maxHistory = 7
   }
   encoder( PatternLayoutEncoder ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
-root( DEBUG, [ "FILE", "STDOUT" ] )
+root( DEBUG, [ "STDOUT" ] )
+logger( "info.shelfunit.smtp", INFO, [ "FILE-smtp" ] )
 ////////////////////////////////////
 /*
 appender("CONSOLE-postoffice", ConsoleAppender) {
