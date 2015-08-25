@@ -7,9 +7,10 @@ import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import info.shelfunit.mail.ConfigHolder
+import info.shelfunit.postoffice.command.PASSCommand
 import info.shelfunit.postoffice.command.USERCommand
+
 import info.shelfunit.smtp.command.EHLOCommand
-import info.shelfunit.smtp.command.MAILCommand
 import info.shelfunit.smtp.command.MSSGCommand
 import info.shelfunit.smtp.command.RCPTCommand
 import info.shelfunit.smtp.command.RSETCommand
@@ -29,12 +30,14 @@ class ModularPostOfficeSocketWorker {
 	@Hidden def sql
 	@Hidden def serverList
 	@Hidden def commandObject
-	@Hidden def mailCommand
-	@Hidden def ehloCommand
+	@Hidden def userCommand
+	@Hidden def passCommand
+	
 	@Hidden def rcptCommand
 	@Hidden def rsetCommand
 	@Hidden def dataCommand
 	@Hidden def mssgCommand
+	
 	@Hidden def commandResultMap
 
 	ModularPostOfficeSocketWorker( argIn, argOut, argServerList ) {
@@ -50,13 +53,13 @@ class ModularPostOfficeSocketWorker {
         prevCommandSet = [] as Set
         commandResultMap = [:]
         bufferMap = [:]
-        userCommand = new USERCommand()
         
-        mailCommand = new MAILCommand()
+        userCommand = new USERCommand( sql )
+        passCommand = new PASSCommand( sql )
+        
         ehloCommand = new EHLOCommand()
         rcptCommand = new RCPTCommand( sql, serverList )
         rsetCommand = new RSETCommand()
-        
         mssgCommand = new MSSGCommand( sql, serverList )
 	}
 
@@ -127,8 +130,8 @@ class ModularPostOfficeSocketWorker {
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.startsWith( 'EXPN' ) ) {
 		    theResponse = '502 Command not implemented'
-		} else if ( theMessage.startsWith( 'NOOP' ) ) {
-		    theReponse = '250 OK'
+		} else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
+		    theReponse = '+OK'
 		} else if ( theMessage.startsWith( 'VRFY' ) ) {
 		    "252 VRFY Disabled, returning argument ${theMesssage.allButFirstFour()}"
 		} else if ( theMessage.isObsoleteCommand() ) { 
@@ -147,8 +150,8 @@ class ModularPostOfficeSocketWorker {
 		    return ehloCommand
 		} else if ( theMessage.startsWith( 'USER' ) ) {
 			return userCommand
-		} else if ( theMessage.startsWith( 'RCPT' ) ) {
-			return rcptCommand
+		} else if ( theMessage.startsWith( 'PASS' ) ) {
+			return passCommand
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    return rsetCommand
 		} else if ( theMessage.startsWith( 'DATA' ) ) {

@@ -15,20 +15,20 @@ import groovy.util.logging.Slf4j
 import org.apache.shiro.crypto.hash.Sha512Hash
 
 @Slf4j
-class USERCommandSpec extends Specification {
+class PASSCommandSpec extends Specification {
     
     def crlf = "\r\n"
-    
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
-    static userCommand
+    static iterations = 10000
+    static passCommand
     static hamilton = 'alexander' // @shelfunit.info'
-    static gwShelf  = 'george.washingtonu' // @shelfunit.info'
-    static jAdamsShelf = 'john.adamsu' // @shelfunit.info'
-    static jackShelf = 'oneillu' // @shelfunit.info'
-    static gwGroovy  = 'george.washingtonu' // @groovy-is-groovy.org'
-    static jaGroovy  = 'john.adamsu' // @groovy-is-groovy.org'
-    static jackGroovy = 'oneillu' // @groovy-is-groovy.org'
+    static gwShelf  = 'george.washingtonp' // @shelfunit.info'
+    static jAdamsShelf = 'john.adamsp' // @shelfunit.info'
+    static jackShelf = 'oneillp' // @shelfunit.info'
+    static gwGroovy  = 'george.washingtonp' // @groovy-is-groovy.org'
+    static jaGroovy  = 'john.adamsp' // @groovy-is-groovy.org'
+    static jackGroovy = 'oneillp' // @groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
     static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
@@ -42,6 +42,7 @@ class USERCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
+        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
         log.info "conf is a ${conf.class.name}"
@@ -49,29 +50,27 @@ class USERCommandSpec extends Specification {
         user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
         log.info "db is a ${db.getClass().name}"
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
-        this.addUsers()
-        userCommand = new USERCommand( sql )
+        // this.addUsers()
+        passCommand = new PASSCommand( sql )
+        
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ('george.washingtonu', 'john.adamsu', 'oneillu')"
-        sql.close()
+        // sql.execute "DELETE FROM email_user where username in ('george.washingtonp', 'john.adamsp', 'oneillp')"
+        // sql.close()
     }   // run after the last feature method
    
     def addUsers() {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512
-        atx512 = new Sha512Hash( 'somePassword', 'george.washingtonu', numIterations )
-        def params = [ 'george.washingtonu', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
+        def atx512 = new Sha512Hash( 'somePassword', salt, 1000000 )
+        def params = [ 'george.washingtonp', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
-        atx512 = new Sha512Hash( 'somePassword', 'john.adamsu', numIterations )
-        params = [ 'john.adamsu', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
+        params = [ 'john.adamsp', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
-        atx512 = new Sha512Hash( 'somePassword', 'oneillu', numIterations )
-        params = [ 'oneillu', atx512.toBase64(), 'SHA-512', numIterations, 'Jack', "O'Neill", 0 ]
+        params = [ 'oneillp', atx512.toBase64(), 'SHA-512', numIterations, 'Jack', "O'Neill", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
@@ -79,7 +78,7 @@ class USERCommandSpec extends Specification {
 	def "test handling wrong command"() {
 	    
 	    when:
-	        def resultMap = userCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  [ hamilton ] ] )
+	        def resultMap = passCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  [ hamilton ] ] )
 	        def mailResponse = resultMap.resultString + crlf 
 	    then:
 	        mailResponse == "501 Command not in proper form\r\n"
@@ -87,16 +86,48 @@ class USERCommandSpec extends Specification {
 	}
 	*/
 
-	/*00:44:46.135 [Test worker] INFO  i.s.postoffice.command.USERCommand - here is resultMap: [resultString:+OK george.washingtonu is a valid mailbox, bufferMap:[state:AUTHORIZATION, userInfo:[userid:199, username:george.washingtonu, password_hash:q84tQlFbTCkx/l5xyD4cvM81kCIRe33kt1ilPdT5E81k0WUVy73a5v2tQeuGGGDjfpEdBQj2Fuq+McYHE8+1Ig==, password_algo:SHA-512, iterations:10000, first_name:George, last_name:Washington, version:0]], prevCommandSet:[EHLO, MAIL]]
+	/*00:44:46.135 [Test worker] INFO  i.s.postoffice.command.USERCommand - here is resultMap: [resultString:+OK george.washingtonp is a valid mailbox, bufferMap:[state:AUTHORIZATION, userInfo:[userid:199, username:george.washingtonp, password_hash:q84tQlFbTCkx/l5xyD4cvM81kCIRe33kt1ilPdT5E81k0WUVy73a5v2tQeuGGGDjfpEdBQj2Fuq+McYHE8+1Ig==, password_algo:SHA-512, iterations:10000, first_name:George, last_name:Washington, version:0]], prevCommandSet:[EHLO, MAIL]]
 
 	*/
+	def "the first password attempt"() {
+	    def userInfo = [:]
+	    userInfo.username = "some.user"
+	    def password = "this.is.a.password"
+	    userInfo.password_algo = 'SHA-512'
+	    userInfo.iterations = iterations
+	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
+	    userInfo.password_hash = rawHash.toBase64()
+	    userInfo.first_name = 'some'
+	    userInfo.last_name  = 'user'
+	    userInfo.userid = 10
+	    
+	    def bufferMap = [:]
+	    bufferMap.state = 'AUTHORIZATION'
+	    bufferMap.userInfo = userInfo
+	    def prevCommandSet = [] as Set
+        def resultMap
+	    def resultString
+	    when:
+	        resultMap = passCommand.process( "PASS this.is.a.password", resultSetEM,  bufferMap )
+	    then:
+	        resultMap.resultString == "+OK ${userInfo.username} authenticated"
+	        resultMap.bufferMap.state == 'TRANSACTION'
+	        
+	    when:
+	        bufferMap.state = 'AUTHORIZATION'
+	        resultMap = passCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
+	    then:
+	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
+	        resultMap.bufferMap.state == 'AUTHORIZATION'
+	}
+	/*
 	@Unroll( "#inputAddress gives #value" )
 	def "#inputAddress gives #value"() {
 	    def resultMap
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "USER ${inputAddress}", resultSetEM,  [ state: 'AUTHORIZATION' ] )
+            resultMap = passCommand.process( "USER ${inputAddress}", resultSetEM,  [ state: 'AUTHORIZATION' ] )
         then:
             // println "command was USER, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
@@ -110,7 +141,7 @@ class USERCommandSpec extends Specification {
             jaGroovy        | "+OK ${jaGroovy} is a valid mailbox"
             jackGroovy      | "+OK ${jackGroovy} is a valid mailbox"
 	}
-	
+	*/
 	/*
 	@Unroll( "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value" )
 	def "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value"() {
@@ -118,7 +149,7 @@ class USERCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", resultSetEMR, [ forwardPath:  hamilton ] )
+            resultMap = passCommand.process( "RCPT TO:<${inputAddress}>", resultSetEMR, [ forwardPath:  hamilton ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
@@ -140,7 +171,7 @@ class USERCommandSpec extends Specification {
 	    def resultString
 	    
         when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [ forwardPath: [ hamilton ] ] )
+            resultMap = passCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [ forwardPath: [ hamilton ] ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
@@ -169,7 +200,7 @@ class USERCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [:] )
+            resultMap = passCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [:] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
@@ -181,14 +212,14 @@ class USERCommandSpec extends Specification {
 
 	}
 	*/
-	
+	/*
 	@Unroll( "#someState gives #value" )
 	def "#someState gives #value"() {
 	    def resultMap
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "USER some.user", resultSetEM, [ state: "${someState}" ] )
+            resultMap = passCommand.process( "USER some.user", resultSetEM, [ state: "${someState}" ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
@@ -200,14 +231,15 @@ class USERCommandSpec extends Specification {
             'TRANSACTION'   | "-ERR Not in AUTHORIZATION state" | 'TRANSACTION'
             'UPDATE'        | "-ERR Not in AUTHORIZATION state" | 'UPDATE'
 	}
-
+	*/
+	/*
 	@Unroll( "non-existent user #inputAddress gives #value" )
 	def "non-existent user #inputAddress gives #value"() {
 	    def resultMap
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "USER ${inputAddress}", resultSetEM, [ state: 'AUTHORIZATION' ] )
+            resultMap = passCommand.process( "USER ${inputAddress}", resultSetEM, [ state: 'AUTHORIZATION' ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
@@ -229,7 +261,7 @@ class USERCommandSpec extends Specification {
             'oneill'        | "-ERR No such user oneill"        | 'AUTHORIZATION'
             'george.washington'  | "-ERR No such user george.washington"  | 'AUTHORIZATION' 
 	}
-	
+	*/
 	/*
 	@Unroll( "invalid address #inputAddress gives #value" )
 	def "invalid address #inputAddress gives #value"() {
@@ -237,7 +269,7 @@ class USERCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  hamilton ] )
+            resultMap = passCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  hamilton ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
@@ -271,7 +303,7 @@ class USERCommandSpec extends Specification {
 	/*
 	def "test happy path"() {
 	    when:
-	        def resultMap = userCommand.process( "RCPT TO:<${jackShell}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
+	        def resultMap = passCommand.process( "RCPT TO:<${jackShell}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
 	        def mailResponse = resultMap.resultString + crlf 
 	        def bMap = resultMap.bufferMap
 	    then:

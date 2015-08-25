@@ -124,7 +124,7 @@ https://github.com/wg/scrypt
 POP3, RFC 1939:
 Minimal POP3 Commands:
 
-USER name               valid in the AUTHORIZATION state
+x - USER name               valid in the AUTHORIZATION state
 PASS string
 QUIT
 
@@ -132,7 +132,7 @@ STAT                    valid in the TRANSACTION state
 LIST [msg]
 RETR msg
 DELE msg
-NOOP
+x - NOOP
 RSET
 QUIT
 
