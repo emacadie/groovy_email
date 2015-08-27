@@ -74,6 +74,9 @@ class MetaProgrammer {
         java.util.regex.Matcher.metaClass.getUserNameInMSSG = { ->
             delegate[ 0 ][ 2 ]
         }
+        java.util.regex.Matcher.metaClass.getPasswordInPASS = { ->
+            delegate[ 0 ][ 2 ]
+        }
     }
     
     static runStringBufferMetaProgramming() {

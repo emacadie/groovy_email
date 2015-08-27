@@ -74,6 +74,38 @@ class PASSCommandSpec extends Specification {
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
+    
+    def "test wrong buffer state"() {
+	    def userInfo = [:]
+	    userInfo.username = "some.user"
+	    def password = "this.is.a.password"
+	    userInfo.password_algo = 'SHA-512'
+	    userInfo.iterations = iterations
+	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
+	    userInfo.password_hash = rawHash.toBase64()
+	    userInfo.first_name = 'some'
+	    userInfo.last_name  = 'user'
+	    userInfo.userid = 10
+	    
+	    def bufferMap = [:]
+	    bufferMap.state = 'TRANSACTION'
+	    bufferMap.userInfo = userInfo
+	    def prevCommandSet = [] as Set
+        def resultMap
+	    def resultString
+	    when:
+	        resultMap = passCommand.process( "PASS ${password}", resultSetEM,  bufferMap )
+	    then:
+	        resultMap.resultString == "-ERR Not in AUTHORIZATION state"
+	        resultMap.bufferMap.state == 'TRANSACTION'
+	        
+	    when:
+	        bufferMap.state = 'AUTHORIZATION'
+	        resultMap = passCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
+	    then:
+	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
+	        resultMap.bufferMap.state == 'AUTHORIZATION'
+	}
     /*
 	def "test handling wrong command"() {
 	    
@@ -108,7 +140,7 @@ class PASSCommandSpec extends Specification {
         def resultMap
 	    def resultString
 	    when:
-	        resultMap = passCommand.process( "PASS this.is.a.password", resultSetEM,  bufferMap )
+	        resultMap = passCommand.process( "PASS ${password}", resultSetEM,  bufferMap )
 	    then:
 	        resultMap.resultString == "+OK ${userInfo.username} authenticated"
 	        resultMap.bufferMap.state == 'TRANSACTION'

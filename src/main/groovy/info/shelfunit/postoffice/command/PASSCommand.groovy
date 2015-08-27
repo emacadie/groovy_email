@@ -30,20 +30,21 @@ class PASSCommand {
         def regexResult = ( theMessage ==~ pattern )
         def q = theMessage =~ pattern
         if ( bufferMap.state != 'AUTHORIZATION' ) {
+            log.info "Here is bufferMap when state not AUTHORIZATION: ${bufferMap}"
             resultMap.resultString = "-ERR Not in AUTHORIZATION state"
         } else if ( !theMessage.startsWith( 'PASS ' ) ) {
-            resultMap.resultString = "-ERR Command not in proper form A"
+            resultMap.resultString = "-ERR Command not in proper form"
         } else if ( !regexResult ) {
-            resultMap.resultString = "-ERR Command not in proper form B"
+            resultMap.resultString = "-ERR Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
-            resultMap.resultString = "-ERR Command not in proper form C"
+            resultMap.resultString = "-ERR Command not in proper form"
         } else {
             def userInfo = bufferMap.userInfo
-            def password = q[ 0 ][ 2 ]
+            def password = q.getPasswordInPASS()
             def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
             def finalHash = rawHash.toBase64()
             
-            if ( userInfo.password_hash == finalHash ) { // row?.size() != null ) { //  != 0 ) {
+            if ( userInfo.password_hash == finalHash ) { 
                 resultMap.resultString = "+OK ${userInfo.username} authenticated"
                 bufferMap.state = 'TRANSACTION'
             } else {

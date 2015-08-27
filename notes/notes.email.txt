@@ -125,7 +125,7 @@ POP3, RFC 1939:
 Minimal POP3 Commands:
 
 x - USER name               valid in the AUTHORIZATION state
-PASS string
+x - PASS string
 QUIT
 
 STAT                    valid in the TRANSACTION state

@@ -126,7 +126,7 @@ class ModularPostOfficeSocketWorker {
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
-		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandSet.lastItem() == 'THE MESSAGE' && 
+		} else if ( theMessage.startsWith( 'QUIT' ) ) { 
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.startsWith( 'EXPN' ) ) {
 		    theResponse = '502 Command not implemented'
