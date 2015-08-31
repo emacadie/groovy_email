@@ -3,27 +3,25 @@ package info.shelfunit.postoffice.command
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
-import java.sql.Timestamp
-
 import org.apache.shiro.crypto.hash.Sha512Hash
 
 import visibility.Hidden
 
 @Slf4j
-class PASSCommand {
+class STATCommand {
     
     @Hidden Sql sql
-    PASSCommand( def argSql ) {
+    STATCommand( def argSql ) {
         log.info "Starting new USERCommand"
         this.sql = argSql
     }
 
-    static regex = '''^(PASS )(.*)$(?x)'''
+    static regex = '''^(STAT )(.*)$(?x)'''
 
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
-        log.info "Starting PASSCommand.process"
+        log.info "Starting STATCommand.process"
    
         def resultString
         def resultMap = [:]
@@ -31,12 +29,11 @@ class PASSCommand {
         
         def regexResult = ( theMessage ==~ pattern )
         def q = theMessage =~ pattern
-        bufferMap.timestamp = null
-        if ( bufferMap.state != 'AUTHORIZATION' ) {
-            resultMap.resultString = "-ERR Not in AUTHORIZATION state"
-        } else if ( !theMessage.startsWith( 'PASS ' ) ) {
+        if ( bufferMap.state != 'TRANSACTION' ) {
+            resultMap.resultString = "-ERR Not in TRANSACTION state"
+        } else if ( !theMessage.startsWith( 'STAT' ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
-        } else if ( !regexResult ) {
+        } else if ( !theMessage.length() == 4 ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
@@ -49,7 +46,6 @@ class PASSCommand {
             if ( userInfo.password_hash == finalHash ) { 
                 resultMap.resultString = "+OK ${userInfo.username} authenticated"
                 bufferMap.state = 'TRANSACTION'
-                bufferMap.timestamp = Timestamp.create()
             } else {
                 resultMap.resultString = "-ERR ${userInfo.username} not authenticated"
             }

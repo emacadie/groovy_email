@@ -8,7 +8,9 @@ import groovy.util.logging.Slf4j
 
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.postoffice.command.PASSCommand
+import info.shelfunit.postoffice.command.STATCommand
 import info.shelfunit.postoffice.command.USERCommand
+
 
 import info.shelfunit.smtp.command.EHLOCommand
 import info.shelfunit.smtp.command.MSSGCommand
@@ -32,8 +34,8 @@ class ModularPostOfficeSocketWorker {
 	@Hidden def commandObject
 	@Hidden def userCommand
 	@Hidden def passCommand
+	@Hidden def statCommand
 	
-	@Hidden def rcptCommand
 	@Hidden def rsetCommand
 	@Hidden def dataCommand
 	@Hidden def mssgCommand
@@ -56,6 +58,7 @@ class ModularPostOfficeSocketWorker {
         
         userCommand = new USERCommand( sql )
         passCommand = new PASSCommand( sql )
+        statCommand = new STATCommand( sql )
         
         ehloCommand = new EHLOCommand()
         rcptCommand = new RCPTCommand( sql, serverList )

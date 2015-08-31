@@ -12,6 +12,9 @@ class MetaProgrammer {
         runMatcherMetaProgramming() 
         runStringBufferMetaProgramming()
         runStringMetaProgramming()
+        java.sql.Timestamp.metaClass.static.create = {
+            return new java.sql.Timestamp( new java.util.Date().getTime() )
+        }
     }
     
     static runListMetaProgramming() {
