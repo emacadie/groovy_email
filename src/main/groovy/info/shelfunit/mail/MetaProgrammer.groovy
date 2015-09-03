@@ -1,5 +1,7 @@
 package info.shelfunit.mail
 
+import groovy.sql.Sql
+
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -8,6 +10,7 @@ class MetaProgrammer {
     static runMetaProgramming() {
         ExpandoMetaClass.enableGlobally()
         runListMetaProgramming()
+        runMapMetaProgramming()
         runSetMetaProgramming()
         runMatcherMetaProgramming() 
         runStringBufferMetaProgramming()
@@ -30,6 +33,34 @@ class MetaProgrammer {
             delegate.last().matches( 'MAIL|RCPT' ) 
         }
         java.util.List.metaClass.includes = { i -> i in delegate 
+        }
+    }
+    
+    static runMapMetaProgramming() {
+        java.util.Map.metaClass.hasSTATInfo = { ->
+            if ( ( delegate.containsKey( 'uuidList' ) ) && 
+            ( delegate.containsKey( 'totalMessageSize' ) ) &&
+            ( delegate.containsKey( 'timestamp' ) ) &&
+            ( delegate.uuidList != null ) && ( delegate.totalMessageSize != null ) && ( delegate.timestamp != null ) 
+            ) {
+                return true
+            } else {
+                return false
+            }
+        }
+        java.util.Map.metaClass.getSTATInfo = { Sql sql ->
+            def userName = delegate.userInfo.username
+            def totalSize
+            def uuidList = []
+            def rows = sql.rows( 'select sum( length( text_body ) ) from mail_store where username = ?', userName )
+            if ( rows.size() != 0 ) { 
+                bufferMap.totalMessageSize = rows[ 0 ].sum
+            } 
+            rows.clear()
+            sql.eachRow( 'select id from mail_store where username = ?', userName ) { nextRow ->
+                uuidList << nextRow.id
+            }
+            bufferMap.uuidList = uuidList
         }
     }
     
@@ -138,7 +169,7 @@ class MetaProgrammer {
                 returnValue = true
             } else 
             */
-            if( delegate.isHelloCommand() ) { 
+            if ( delegate.isHelloCommand() ) { 
                 returnValue = true
             } else if ( delegate.startsWith( 'MAIL' ) ) {
                 returnValue = true

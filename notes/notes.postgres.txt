@@ -120,5 +120,23 @@ import groovy.sql.*
 db = [ url: "jdbc:postgresql://localhost:5432/gemail_test_db", user: 'gemail_test', password: 'dev-word-to-pass002', driver: 'org.postgresql.Driver' ]
 sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
 ff= sql.
+---------------------
+groovy_mail_db=> select id, username, length(text_body), msg_timestamp from mail_store;
+                  id                  | username | length |         msg_timestamp         
+--------------------------------------+----------+--------+-------------------------------
+ c368da13-903b-47e3-823a-da7c54073f2d | malcolm  |    864 | 2015-08-19 22:11:27.474459-05
+ 1c9dc2ed-af78-44de-8dbf-9fe10905475f | info     |    601 | 2015-08-19 22:21:15.754619-05
+ 3f9b32f0-fcc6-416e-bbd8-e78cfb0ed89d | malcolm  |    847 | 2015-08-19 22:22:16.037523-05
+ e0423a87-1799-457c-b348-e2a282081789 | malcolm  |    650 | 2015-08-19 23:33:16.311189-05
+ f9e23d1b-1009-4ddc-98f5-c7fb36b7d9da | malcolm  |   1526 | 2015-08-20 20:17:04.009701-05
+ 8d049c0c-3e4d-4057-8728-6c5ce2b0e705 | malcolm  |    782 | 2015-08-22 20:05:28.472271-05
+ b138702a-6fdd-42e2-a3ed-538179d8d105 | info     |    782 | 2015-08-22 20:05:28.47548-05
+ 4df22c6a-fcc4-4af0-95a7-dd33b69c4ae5 | info     |    633 | 2015-08-23 10:43:29.516102-05
+ 0742623f-d3e7-49bb-af65-fb4751330ed4 | malcolm  |   1463 | 2015-08-23 10:45:52.96819-05
+ c1ae3700-aa65-4fbc-ba9c-1a91fd84deea | malcolm  |   2626 | 2015-08-23 10:48:38.753368-05
+ 39a0ce88-3e2b-436f-a311-66b287778e0c | info     |    660 | 2015-08-23 10:50:03.056408-05
+ 9b32741d-2c57-42af-8cdb-c5092f7052c3 | info     |    567 | 2015-08-23 10:50:53.477676-05
+ f5570911-9e01-4a6b-a61a-20cfe1fb117d | info     |    758 | 2015-08-23 10:51:20.84504-05
+ 8c56842d-7a7a-4c0c-8a50-fc8da12efc99 | malcolm  |   2861 | 2015-08-30 11:03:14.761366-05
 
 

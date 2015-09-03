@@ -26,7 +26,9 @@ class STATCommand {
         def resultString
         def resultMap = [:]
         resultMap.clear()
-        
+        if ( !bufferMap.hasSTATInfo() ) {
+            bufferMap.getSTATInfo( sql )
+        }
         def regexResult = ( theMessage ==~ pattern )
         def q = theMessage =~ pattern
         if ( bufferMap.state != 'TRANSACTION' ) {
@@ -39,6 +41,7 @@ class STATCommand {
             resultMap.resultString = "-ERR Command not in proper form"
         } else {
             def userInfo = bufferMap.userInfo
+            def timestamp = bufferMap.timestamp
             def password = q.getPasswordInPASS()
             def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
             def finalHash = rawHash.toBase64()
