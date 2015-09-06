@@ -1,5 +1,7 @@
 package info.shelfunit.postoffice.command
 
+import java.sql.Timestamp
+
 import spock.lang.Ignore
 import spock.lang.Specification
 // import spock.lang.Unroll
@@ -86,6 +88,7 @@ class STATCommandSpec extends Specification {
         def bufferInputMap = [:]
         def timestamp
         bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.timestamp = Timestamp.create()
         def userInfo = [:]
 	    userInfo.username = gwSTAT
         bufferInputMap.userInfo = userInfo
@@ -96,6 +99,26 @@ class STATCommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
         
+            
+        def messageStringB = 'aw' * 11
+        // totalMessageSizeTest = messageString.size()
+        // def toAddress = "${gwSTAT}@${domainList[ 0 ]}".toString()
+        when:
+            bufferInputMap = resultMap.bufferMap
+            params = [ UUID.randomUUID(), gwSTAT, 'hello@test.com', toAddress, messageStringB ]
+            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
+            def messageCount
+        
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwSTAT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+        then:
+            messageCount == 2
+        when:
+            resultMap = statCommand.process( 'STAT', [] as Set, bufferInputMap )
+        then:
+            resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
+            resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
         // timestamp = resultMap.bufferMap.timestamp
         // insertCounts = sql.withBatch(  )
 	}

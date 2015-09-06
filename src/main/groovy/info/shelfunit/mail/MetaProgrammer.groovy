@@ -61,6 +61,7 @@ class MetaProgrammer {
                 uuidList << nextRow.id
             }
             delegate.uuidList = uuidList
+            delegate.timestamp ?: java.sql.Timestamp.create() // ( new java.util.Date().getTime() )
         }
     }
     

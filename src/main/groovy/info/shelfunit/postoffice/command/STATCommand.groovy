@@ -20,6 +20,8 @@ class STATCommand {
         def resultString
         def resultMap = [:]
         resultMap.clear()
+        // log.info "Here is bufferMap: ${bufferMap}"
+        // log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( !bufferMap.hasSTATInfo() ) {
             bufferMap.getSTATInfo( sql )
         }
