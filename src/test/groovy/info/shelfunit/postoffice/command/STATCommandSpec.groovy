@@ -2,7 +2,7 @@ package info.shelfunit.postoffice.command
 
 import spock.lang.Ignore
 import spock.lang.Specification
-import spock.lang.Unroll
+// import spock.lang.Unroll
 
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -23,13 +23,14 @@ class STATCommandSpec extends Specification {
     static sql
     static iterations = 10000
     static statCommand
+    static somePassword = 'somePassword'
     static hamilton = 'alexander' // @shelfunit.info'
-    static gwShelf  = 'george.washingtons' // @shelfunit.info'
-    static jAdamsShelf = 'john.adamss' // @shelfunit.info'
-    static jackShelf = 'oneills' // @shelfunit.info'
-    static gwGroovy  = 'george.washingtons' // @groovy-is-groovy.org'
-    static jaGroovy  = 'john.adamss' // @groovy-is-groovy.org'
-    static jackGroovy = 'oneills' // @groovy-is-groovy.org'
+    static gwSTAT  = 'gwstat' // @shelfunit.info'
+    static jaSTAT = 'jastat' // @shelfunit.info'
+    static joSTAT = 'jostat' // @shelfunit.info'
+    static gwGroovy  = 'gwstat' // @groovy-is-groovy.org'
+    static jaGroovy  = 'jastat' // @groovy-is-groovy.org'
+    static jackGroovy = 'jostat' // @groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
     static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
@@ -51,78 +52,54 @@ class STATCommandSpec extends Specification {
         user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
         log.info "db is a ${db.getClass().name}"
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
-        // this.addUsers()
+        this.addUsers()
         statCommand = new STATCommand( sql )
         
     }     // run before the first feature method
     
     def cleanupSpec() {
-        // sql.execute "DELETE FROM email_user where username in ('george.washingtons', 'john.adamss', 'oneills')"
-        // sql.close()
+        sql.execute "DELETE FROM email_user where username in ( ${gwSTAT}, ${jaSTAT}, ${joSTAT} )"
+        sql.close()
     }   // run after the last feature method
    
     def addUsers() {
-        def numIterations = 10000
-        def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'somePassword', salt, 1000000 )
-        def params = [ 'george.washingtons', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
+        def params = [ gwSTAT, ( new Sha512Hash( somePassword, gwSTAT, iterations ).toBase64() ), 'SHA-512', iterations, 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'john.adamss', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
+        params = [ jaSTAT, ( new Sha512Hash( somePassword, jaSTAT, iterations ).toBase64() ), 'SHA-512', iterations, 'John', 'Adams', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'oneills', atx512.toBase64(), 'SHA-512', numIterations, 'Jack', "O'Neill", 0 ]
+        params = [ joSTAT, ( new Sha512Hash( somePassword, joSTAT, iterations ).toBase64() ), 'SHA-512', iterations, 'Jack', "O'Neill", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
 
-    @Ignore
-    def "test wrong buffer state"() {
-	    def userInfo = [:]
-	    userInfo.username = "some.user"
-	    def password = "this.is.a.password"
-	    userInfo.password_algo = 'SHA-512'
-	    userInfo.iterations = iterations
-	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
-	    userInfo.password_hash = rawHash.toBase64()
-	    userInfo.first_name = 'some'
-	    userInfo.last_name  = 'user'
-	    userInfo.userid = 10
-	    
-	    def bufferMap = [:]
-	    bufferMap.state = 'TRANSACTION'
-	    bufferMap.userInfo = userInfo
-	    def prevCommandSet = [] as Set
-        def resultMap
-	    def resultString
-	    when:
-	        resultMap = statCommand.process( "PASS ${password}", resultSetEM,  bufferMap )
-	    then:
-	        resultMap.resultString == "-ERR Not in AUTHORIZATION state"
-	        resultMap.bufferMap.state == 'TRANSACTION'
-	        
-	    when:
-	        bufferMap.state = 'AUTHORIZATION'
-	        resultMap = statCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
-	    then:
-	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
-	        resultMap.bufferMap.state == 'AUTHORIZATION'
+    def "test uuid list"() {
+        def uuidList = []
+        def uuid = UUID.randomUUID()
+        def totalMessageSizeTest = 0
+        def messageString = 'aq' * 10
+        totalMessageSizeTest = messageString.size()
+        def toAddress = "${gwSTAT}@${domainList[ 0 ]}".toString()
+        def params = [ uuid, gwSTAT, 'hello@test.com', toAddress, messageString ]
+        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
+        def bufferInputMap = [:]
+        def timestamp
+        bufferInputMap.state = 'TRANSACTION'
+        def userInfo = [:]
+	    userInfo.username = gwSTAT
+        bufferInputMap.userInfo = userInfo
+        sleep( 2 * 1000 )
+        when:
+            def resultMap = statCommand.process( 'STAT', [] as Set, bufferInputMap )
+        then:
+            resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
+            resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
+        
+        // timestamp = resultMap.bufferMap.timestamp
+        // insertCounts = sql.withBatch(  )
 	}
-    /*
-	def "test handling wrong command"() {
-	    
-	    when:
-	        def resultMap = statCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  [ hamilton ] ] )
-	        def mailResponse = resultMap.resultString + crlf 
-	    then:
-	        mailResponse == "501 Command not in proper form\r\n"
-	        resultMap.prevCommandSet == [ "RCPT" ] as Set
-	}
-	*/
 
-	/*00:44:46.135 [Test worker] INFO  i.s.postoffice.command.USERCommand - here is resultMap: [resultString:+OK george.washingtons is a valid mailbox, bufferMap:[state:AUTHORIZATION, userInfo:[userid:199, username:george.washingtons, password_hash:q84tQlFbTCkx/l5xyD4cvM81kCIRe33kt1ilPdT5E81k0WUVy73a5v2tQeuGGGDjfpEdBQj2Fuq+McYHE8+1Ig==, password_algo:SHA-512, iterations:10000, first_name:George, last_name:Washington, version:0]], prevCommandSet:[EHLO, MAIL]]
-
-	*/
 	@Ignore
 	def "the first password attempt"() {
 	    def userInfo = [:]
@@ -155,198 +132,6 @@ class STATCommandSpec extends Specification {
 	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
 	        resultMap.bufferMap.state == 'AUTHORIZATION'
 	}
-	/*
-	@Unroll( "#inputAddress gives #value" )
-	def "#inputAddress gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = statCommand.process( "USER ${inputAddress}", resultSetEM,  [ state: 'AUTHORIZATION' ] )
-        then:
-            // println "command was USER, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            // resultMap.prevCommandSet == resultSetEMR
-        where:
-            inputAddress    | value    
-            gwShelf         | "+OK ${gwShelf} is a valid mailbox"
-            jAdamsShelf     | "+OK ${jAdamsShelf} is a valid mailbox"
-            jackShelf       | "+OK ${jackShelf} is a valid mailbox"
-            gwGroovy        | "+OK ${gwGroovy} is a valid mailbox"
-            jaGroovy        | "+OK ${jaGroovy} is a valid mailbox"
-            jackGroovy      | "+OK ${jackGroovy} is a valid mailbox"
-	}
-	*/
-	/*
-	@Unroll( "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value" )
-	def "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = statCommand.process( "RCPT TO:<${inputAddress}>", resultSetEMR, [ forwardPath:  hamilton ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEMR
-        where:
-            inputAddress    | value    
-            gwShelf         | "250 OK"
-            jAdamsShelf     | '250 OK'
-            jackShell       | '250 OK'
-            gwGroovy        | "250 OK"
-            jaGroovy        | '250 OK'
-            jackGroovy      | '250 OK'
-	}
-	*/
-	/*
-	@Unroll( "#inputAddress with prev command sequence gives #value" )
-	def "#inputAddress with prev command sequence gives #value"() {
-	    def resultMap
-	    def resultString
-	    
-        when:
-            resultMap = statCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [ forwardPath: [ hamilton ] ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEMR
-            resultMap.bufferMap.forwardPath == forwardList
-        where:
-            inputAddress    | prevCommandSet    | value     | forwardList    
-            gwShelf         | resultSetEMR      | "250 OK"  | [ hamilton, gwShelf ]
-            jAdamsShelf     | resultSetEMR      | "250 OK"  | [ hamilton, jAdamsShelf ]
-            jackShell       | resultSetEMR      | "250 OK"  | [ hamilton, jackShell ]
-            gwGroovy        | resultSetEMR      | "250 OK"  | [ hamilton, gwGroovy ]
-            jaGroovy        | resultSetEMR      | "250 OK"  | [ hamilton, jaGroovy ]
-            jackGroovy      | resultSetEMR      | "250 OK"  | [ hamilton, jackGroovy ]
-            gwShelf         | resultSetEM       | "250 OK"  | [ hamilton, gwShelf ]
-            jAdamsShelf     | resultSetEM       | "250 OK"  | [ hamilton, jAdamsShelf ]
-            jackShell       | resultSetEM       | "250 OK"  | [ hamilton, jackShell ]
-            gwGroovy        | resultSetEM       | "250 OK"  | [ hamilton, gwGroovy ]
-            jaGroovy        | resultSetEM       | "250 OK"  | [ hamilton, jaGroovy ]
-            jackGroovy      | resultSetEM       | "250 OK"  | [ hamilton, jackGroovy ]
-	}
-	*/
-	/*
-	@Unroll( "#inputAddress with wrong prev command sequence gives #value" )
-	def "#inputAddress with wrong prev command sequence gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = statCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [:] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == prevCommandSet
-        where:
-            inputAddress    | prevCommandSet | value    
-            gwShelf         | [ 'EHLO' ] as Set | "503 Bad sequence of commands"
-            jAdamsShelf     | [ 'RSET' ] as Set | "503 Bad sequence of commands"
-
-	}
-	*/
-	/*
-	@Unroll( "#someState gives #value" )
-	def "#someState gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = statCommand.process( "USER some.user", resultSetEM, [ state: "${someState}" ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEM
-            resultMap.bufferMap.state == finalState
-        where:
-            someState       | value                             | finalState
-            'AUTHORIZATION' | "-ERR No such user some.user"     | 'AUTHORIZATION'
-            'TRANSACTION'   | "-ERR Not in AUTHORIZATION state" | 'TRANSACTION'
-            'UPDATE'        | "-ERR Not in AUTHORIZATION state" | 'UPDATE'
-	}
-	*/
-	/*
-	@Unroll( "non-existent user #inputAddress gives #value" )
-	def "non-existent user #inputAddress gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = statCommand.process( "USER ${inputAddress}", resultSetEM, [ state: 'AUTHORIZATION' ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEM
-        where:
-            inputAddress    | value                             | state
-            'mkyong'        | "-ERR No such user mkyong"        | 'AUTHORIZATION'
-            'mkyong-100'    | "-ERR No such user mkyong-100"    | 'AUTHORIZATION' 
-            'mkyong.100'    | "-ERR No such user mkyong.100"    | 'AUTHORIZATION'
-            'mkyong111'     | "-ERR No such user mkyong111"     | 'AUTHORIZATION'
-            'mkyong+100'    | "-ERR No such user mkyong+100"    | 'AUTHORIZATION'
-            'howTuser'      | "-ERR No such user howTuser"      | 'AUTHORIZATION'
-            'user'          | "-ERR No such user user"          | 'AUTHORIZATION'
-            'user1'         | "-ERR No such user user1"         | 'AUTHORIZATION'
-            'user.name'     | "-ERR No such user user.name"     | 'AUTHORIZATION'
-            'user_name'     | "-ERR No such user user_name"     | 'AUTHORIZATION'
-            'user-name'     | "-ERR No such user user-name"     | 'AUTHORIZATION'
-            'john.adams'    | "-ERR No such user john.adams"    | 'AUTHORIZATION'
-            'oneill'        | "-ERR No such user oneill"        | 'AUTHORIZATION'
-            'george.washington'  | "-ERR No such user george.washington"  | 'AUTHORIZATION' 
-	}
-	*/
-	/*
-	@Unroll( "invalid address #inputAddress gives #value" )
-	def "invalid address #inputAddress gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = statCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  hamilton ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.bufferMap?.reversePath == resultAddress
-            resultMap.prevCommandSet == resultSetEM
-        where:
-            inputAddress                | value                             | resultAddress
-            'mkyong'                    | "501 Command not in proper form"  | null 
-            'mkyong@.com.my'            | "501 Command not in proper form"  | null 
-            'mkyong123@gmail.a'         | "501 Command not in proper form"  | null 
-            'mkyong123@.com'            | "501 Command not in proper form"  | null 
-            'mkyong123@.com.com'        | "501 Command not in proper form"  | null 
-            '.mkyong@mkyong.com'        | "501 Command not in proper form"  | null 
-            'mkyong()*@gmail.com'       | "501 Command not in proper form"  | null 
-            'mkyong@%*.com'             | "501 Command not in proper form"  | null 
-            'mkyong..2002@gmail.com'    | "501 Command not in proper form"  | null 
-            'mkyong.@gmail.com'         | "501 Command not in proper form"  | null 
-            'mkyong@mkyong@gmail.com'   | "501 Command not in proper form"  | null 
-            'mkyong@gmail.com.1a'       | "501 Command not in proper form"  | null 
-            ''                | "501 Command not in proper form"  | null 
-            '.username'       | "501 Command not in proper form"  | null 
-            'username.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            '.username'       | "501 Command not in proper form"  | null 
-            'username.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.c'          | "501 Command not in proper form"  | null 
-            'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
-	}
-	*/
-	/*
-	def "test happy path"() {
-	    when:
-	        def resultMap = statCommand.process( "RCPT TO:<${jackShell}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
-	        def mailResponse = resultMap.resultString + crlf 
-	        def bMap = resultMap.bufferMap
-	    then:
-	        mailResponse == "250 OK\r\n"
-	        resultMap.prevCommandSet == resultSetEMR
-	        bMap.forwardPath == [ hamilton, jackShell ]
-	}
-	*/
 
 }
 

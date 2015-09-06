@@ -54,13 +54,13 @@ class MetaProgrammer {
             def uuidList = []
             def rows = sql.rows( 'select sum( length( text_body ) ) from mail_store where username = ?', userName )
             if ( rows.size() != 0 ) { 
-                bufferMap.totalMessageSize = rows[ 0 ].sum
+                delegate.totalMessageSize = rows[ 0 ].sum
             } 
             rows.clear()
-            sql.eachRow( 'select id from mail_store where username = ?', userName ) { nextRow ->
+            sql.eachRow( 'select id from mail_store where username = ?', [ userName ] ) { nextRow ->
                 uuidList << nextRow.id
             }
-            bufferMap.uuidList = uuidList
+            delegate.uuidList = uuidList
         }
     }
     

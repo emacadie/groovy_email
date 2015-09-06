@@ -75,17 +75,7 @@ class USERCommandSpec extends Specification {
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
-    /*
-	def "test handling wrong command"() {
-	    
-	    when:
-	        def resultMap = userCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  [ hamilton ] ] )
-	        def mailResponse = resultMap.resultString + crlf 
-	    then:
-	        mailResponse == "501 Command not in proper form\r\n"
-	        resultMap.prevCommandSet == [ "RCPT" ] as Set
-	}
-	*/
+
 
 	/*00:44:46.135 [Test worker] INFO  i.s.postoffice.command.USERCommand - here is resultMap: [resultString:+OK george.washingtonu is a valid mailbox, bufferMap:[state:AUTHORIZATION, userInfo:[userid:199, username:george.washingtonu, password_hash:q84tQlFbTCkx/l5xyD4cvM81kCIRe33kt1ilPdT5E81k0WUVy73a5v2tQeuGGGDjfpEdBQj2Fuq+McYHE8+1Ig==, password_algo:SHA-512, iterations:10000, first_name:George, last_name:Washington, version:0]], prevCommandSet:[EHLO, MAIL]]
 
@@ -110,77 +100,6 @@ class USERCommandSpec extends Specification {
             jaGroovy        | "+OK ${jaGroovy} is a valid mailbox"
             jackGroovy      | "+OK ${jackGroovy} is a valid mailbox"
 	}
-	
-	/*
-	@Unroll( "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value" )
-	def "#inputAddress with RCPT in previous command list does not add another RCPT and gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", resultSetEMR, [ forwardPath:  hamilton ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEMR
-        where:
-            inputAddress    | value    
-            gwShelf         | "250 OK"
-            jAdamsShelf     | '250 OK'
-            jackShell       | '250 OK'
-            gwGroovy        | "250 OK"
-            jaGroovy        | '250 OK'
-            jackGroovy      | '250 OK'
-	}
-	*/
-	/*
-	@Unroll( "#inputAddress with prev command sequence gives #value" )
-	def "#inputAddress with prev command sequence gives #value"() {
-	    def resultMap
-	    def resultString
-	    
-        when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [ forwardPath: [ hamilton ] ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEMR
-            resultMap.bufferMap.forwardPath == forwardList
-        where:
-            inputAddress    | prevCommandSet    | value     | forwardList    
-            gwShelf         | resultSetEMR      | "250 OK"  | [ hamilton, gwShelf ]
-            jAdamsShelf     | resultSetEMR      | "250 OK"  | [ hamilton, jAdamsShelf ]
-            jackShell       | resultSetEMR      | "250 OK"  | [ hamilton, jackShell ]
-            gwGroovy        | resultSetEMR      | "250 OK"  | [ hamilton, gwGroovy ]
-            jaGroovy        | resultSetEMR      | "250 OK"  | [ hamilton, jaGroovy ]
-            jackGroovy      | resultSetEMR      | "250 OK"  | [ hamilton, jackGroovy ]
-            gwShelf         | resultSetEM       | "250 OK"  | [ hamilton, gwShelf ]
-            jAdamsShelf     | resultSetEM       | "250 OK"  | [ hamilton, jAdamsShelf ]
-            jackShell       | resultSetEM       | "250 OK"  | [ hamilton, jackShell ]
-            gwGroovy        | resultSetEM       | "250 OK"  | [ hamilton, gwGroovy ]
-            jaGroovy        | resultSetEM       | "250 OK"  | [ hamilton, jaGroovy ]
-            jackGroovy      | resultSetEM       | "250 OK"  | [ hamilton, jackGroovy ]
-	}
-	*/
-	/*
-	@Unroll( "#inputAddress with wrong prev command sequence gives #value" )
-	def "#inputAddress with wrong prev command sequence gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [:] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == prevCommandSet
-        where:
-            inputAddress    | prevCommandSet | value    
-            gwShelf         | [ 'EHLO' ] as Set | "503 Bad sequence of commands"
-            jAdamsShelf     | [ 'RSET' ] as Set | "503 Bad sequence of commands"
-
-	}
-	*/
 	
 	@Unroll( "#someState gives #value" )
 	def "#someState gives #value"() {
@@ -230,56 +149,5 @@ class USERCommandSpec extends Specification {
             'george.washington'  | "-ERR No such user george.washington"  | 'AUTHORIZATION' 
 	}
 	
-	/*
-	@Unroll( "invalid address #inputAddress gives #value" )
-	def "invalid address #inputAddress gives #value"() {
-	    def resultMap
-	    def resultString
-
-        when:
-            resultMap = userCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  hamilton ] )
-        then:
-            println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.bufferMap?.reversePath == resultAddress
-            resultMap.prevCommandSet == resultSetEM
-        where:
-            inputAddress                | value                             | resultAddress
-            'mkyong'                    | "501 Command not in proper form"  | null 
-            'mkyong@.com.my'            | "501 Command not in proper form"  | null 
-            'mkyong123@gmail.a'         | "501 Command not in proper form"  | null 
-            'mkyong123@.com'            | "501 Command not in proper form"  | null 
-            'mkyong123@.com.com'        | "501 Command not in proper form"  | null 
-            '.mkyong@mkyong.com'        | "501 Command not in proper form"  | null 
-            'mkyong()*@gmail.com'       | "501 Command not in proper form"  | null 
-            'mkyong@%*.com'             | "501 Command not in proper form"  | null 
-            'mkyong..2002@gmail.com'    | "501 Command not in proper form"  | null 
-            'mkyong.@gmail.com'         | "501 Command not in proper form"  | null 
-            'mkyong@mkyong@gmail.com'   | "501 Command not in proper form"  | null 
-            'mkyong@gmail.com.1a'       | "501 Command not in proper form"  | null 
-            ''                | "501 Command not in proper form"  | null 
-            '.username'       | "501 Command not in proper form"  | null 
-            'username.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            '.username'       | "501 Command not in proper form"  | null 
-            'username.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.c'          | "501 Command not in proper form"  | null 
-            'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
-	}
-	*/
-	/*
-	def "test happy path"() {
-	    when:
-	        def resultMap = userCommand.process( "RCPT TO:<${jackShell}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
-	        def mailResponse = resultMap.resultString + crlf 
-	        def bMap = resultMap.bufferMap
-	    then:
-	        mailResponse == "250 OK\r\n"
-	        resultMap.prevCommandSet == resultSetEMR
-	        bMap.forwardPath == [ hamilton, jackShell ]
-	}
-	*/
-
 }
 
