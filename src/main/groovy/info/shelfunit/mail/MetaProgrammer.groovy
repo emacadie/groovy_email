@@ -142,6 +142,7 @@ class MetaProgrammer {
     }
     
     static runStringMetaProgramming() {
+        
         String.metaClass.firstFour = { ->
             return delegate.substring( 0, 4 )
         }
@@ -164,18 +165,24 @@ class MetaProgrammer {
                 return null
             }
         }
+
+        String.metaClass.static.getCommandList = { -> 
+            return [ 'MAIL', 'RCPT', 'RSET', 'DATA', 'USER', 'PASS', 'STAT', 'LIST' ]
+        }
+       
         // I REALLY need to come up with a better name than this
         String.metaClass.isEncapsulated = { -> 
             def returnValue = false
-            /* isMessage ->
             
-            if ( isMessage ) {
-                returnValue = true
-            } else 
-            */
             if ( delegate.isHelloCommand() ) { 
                 returnValue = true
-            } else if ( delegate.startsWith( 'MAIL' ) ) {
+            } 
+            String.commandList.each { comm ->
+                if ( delegate.startsWith( comm ) ) {
+                    returnValue = true
+                }
+            }
+            /* else if ( delegate.startsWith( 'MAIL' ) ) {
                 returnValue = true
             } else if ( delegate.startsWith( 'RCPT' ) ) {
                 returnValue = true
@@ -192,8 +199,9 @@ class MetaProgrammer {
             } else if ( delegate.startsWith( 'LIST' ) ) {
                 returnValue = true
             }
+            */
             returnValue
-        }
+        }  // line 200
         // for domain in EHLOCommand
         String.metaClass.isMoreThan255Char = { ->
             delegate.length() > 255
