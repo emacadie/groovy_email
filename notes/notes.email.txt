@@ -128,7 +128,7 @@ x - USER name               valid in the AUTHORIZATION state
 x - PASS string
 QUIT
 
-STAT                    valid in the TRANSACTION state
+x STAT                    valid in the TRANSACTION state
 LIST [msg]
 RETR msg
 DELE msg

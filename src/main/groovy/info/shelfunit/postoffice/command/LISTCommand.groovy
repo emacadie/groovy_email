@@ -6,16 +6,16 @@ import groovy.util.logging.Slf4j
 import visibility.Hidden
 
 @Slf4j
-class STATCommand {
+class LISTCommand {
     
     @Hidden Sql sql
-    STATCommand( def argSql ) {
-        log.info "Starting new STATCommand"
+    LISTCommand( def argSql ) {
+        log.info "Starting new LISTCommand"
         this.sql = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
-        log.info "Starting STATCommand.process"
+        log.info "Starting LISTCommand.process"
    
         def resultString
         def resultMap = [:]
@@ -28,7 +28,7 @@ class STATCommand {
 
         if ( bufferMap.state != 'TRANSACTION' ) {
             resultMap.resultString = "-ERR Not in TRANSACTION state"
-        } else if ( theMessage != 'STAT' ) {
+        } else if ( theMessage != 'LIST' ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else {
             def userInfo = bufferMap.userInfo

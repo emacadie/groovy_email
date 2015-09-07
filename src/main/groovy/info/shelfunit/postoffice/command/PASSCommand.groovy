@@ -14,7 +14,7 @@ class PASSCommand {
     
     @Hidden Sql sql
     PASSCommand( def argSql ) {
-        log.info "Starting new USERCommand"
+        log.info "Starting new PASSCommand"
         this.sql = argSql
     }
 

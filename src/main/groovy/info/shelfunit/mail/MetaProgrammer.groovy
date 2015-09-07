@@ -57,9 +57,12 @@ class MetaProgrammer {
                 delegate.totalMessageSize = rows[ 0 ].sum
             } 
             rows.clear()
+            /*
             sql.eachRow( 'select id from mail_store where username = ?', [ userName ] ) { nextRow ->
                 uuidList << nextRow.id
             }
+            */
+            uuidList = sql.rows( 'select id from mail_store where username = ?', [ userName ] )
             delegate.uuidList = uuidList
             delegate.timestamp ?: java.sql.Timestamp.create() // ( new java.util.Date().getTime() )
         }
@@ -183,6 +186,10 @@ class MetaProgrammer {
             } else if ( delegate.startsWith( 'USER' ) ) {
                 returnValue = true
             } else if ( delegate.startsWith( 'PASS' ) ) {
+                returnValue = true
+            } else if ( delegate.startsWith( 'STAT' ) ) {
+                returnValue = true
+            } else if ( delegate.startsWith( 'LIST' ) ) {
                 returnValue = true
             }
             returnValue
