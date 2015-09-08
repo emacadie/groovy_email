@@ -52,7 +52,8 @@ class MetaProgrammer {
             def userName = delegate.userInfo.username
             def totalSize
             def uuidList = []
-            def rows = sql.rows( 'select sum( length( text_body ) ) from mail_store where username = ?', userName )
+            delegate.timestamp ?: java.sql.Timestamp.create() // ( new java.util.Date().getTime() )
+            def rows = sql.rows( 'select sum( length( text_body ) ) from mail_store where username = ? and msg_timestamp < ?', [ userName, delegate.timestamp ] )
             if ( rows.size() != 0 ) { 
                 delegate.totalMessageSize = rows[ 0 ].sum
             } 
@@ -62,9 +63,9 @@ class MetaProgrammer {
                 uuidList << nextRow.id
             }
             */
-            uuidList = sql.rows( 'select id from mail_store where username = ?', [ userName ] )
+            uuidList = sql.rows( 'select id from mail_store where username = ? and msg_timestamp < ?', [ userName, delegate.timestamp ] )
             delegate.uuidList = uuidList
-            delegate.timestamp ?: java.sql.Timestamp.create() // ( new java.util.Date().getTime() )
+            
         }
     }
     

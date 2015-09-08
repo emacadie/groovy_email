@@ -25,7 +25,7 @@ class LISTCommand {
         if ( !bufferMap.hasSTATInfo() ) {
             bufferMap.getSTATInfo( sql )
         }
-
+        log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {
             resultMap.resultString = "-ERR Not in TRANSACTION state"
         } else if ( !theMessage.startsWith( 'LIST' ) ) {
@@ -42,13 +42,20 @@ class LISTCommand {
             } 
             resultMap.resultString = sBuff.toString()
         } else if ( theMessage.matches( "LIST\\s\\d+" ) ) {
+            log.info "in the reg ex part"
             def messageNum = Integer.parseInt( theMessage.allButFirstFour().trim() )
-            
-            def ans = sql.firstRow( "select length( text_body ) from mail_store where id = ?", [ bufferMap.uuidList[ messageNum - 1 ] ] )
-            if ( ans.isEmpty() ) {
+            if ( messageNum > bufferMap.uuidList.size() ) {
                 resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
             } else {
-                resultMap.resultString = "+OK ${messageNum - 1} ${ans.length()}"
+                def uuid = bufferMap.uuidList[ messageNum - 1 ].id
+                log.info "here is bufferMap.uuidList: ${bufferMap.uuidList}"
+                log.info "uuid is a ${uuid.getClass().name}"
+                def ans = sql.firstRow( "select length( text_body ) from mail_store where id = ?", [ uuid ] )
+                if ( ans.isEmpty() ) {
+                    resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
+                } else {
+                    resultMap.resultString = "+OK ${messageNum} ${ans.length}"
+                }
             }
         }
         resultMap.bufferMap = bufferMap
