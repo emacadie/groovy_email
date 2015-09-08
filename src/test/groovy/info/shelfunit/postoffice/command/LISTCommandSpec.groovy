@@ -107,7 +107,10 @@ class LISTCommandSpec extends Specification {
             def resultMap = listCommand.process( 'LIST', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK 3 ${totalMessageSizeTest}"
+            resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
+            "1 ${msgA.size()}\r\n" +
+            "2 ${msgB.size()}\r\n" +
+            "3 ${msgC.size()}\r\n"
         
             
         def messageStringB = 'aw' * 11
@@ -128,7 +131,10 @@ class LISTCommandSpec extends Specification {
             resultMap = listCommand.process( 'LIST', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK 3 ${totalMessageSizeTest}"
+            resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
+            "1 ${msgA.size()}\r\n" +
+            "2 ${msgB.size()}\r\n" +
+            "3 ${msgC.size()}\r\n"
         // timestamp = resultMap.bufferMap.timestamp
         // insertCounts = sql.withBatch(  )
 	}
