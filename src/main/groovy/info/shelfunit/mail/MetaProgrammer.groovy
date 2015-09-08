@@ -181,27 +181,10 @@ class MetaProgrammer {
                 if ( delegate.startsWith( comm ) ) {
                     returnValue = true
                 }
-            }
-            /* else if ( delegate.startsWith( 'MAIL' ) ) {
-                returnValue = true
-            } else if ( delegate.startsWith( 'RCPT' ) ) {
-                returnValue = true
-            } else if ( delegate.startsWith( 'RSET' ) ) {
-                returnValue = true
-            } else if ( delegate.startsWith( 'DATA' ) ) {
-                returnValue = true
-            } else if ( delegate.startsWith( 'USER' ) ) {
-                returnValue = true
-            } else if ( delegate.startsWith( 'PASS' ) ) {
-                returnValue = true
-            } else if ( delegate.startsWith( 'STAT' ) ) {
-                returnValue = true
-            } else if ( delegate.startsWith( 'LIST' ) ) {
-                returnValue = true
-            }
-            */
+            } // this could probably be done with "find"
             returnValue
         }  // line 200
+        
         // for domain in EHLOCommand
         String.metaClass.isMoreThan255Char = { ->
             delegate.length() > 255

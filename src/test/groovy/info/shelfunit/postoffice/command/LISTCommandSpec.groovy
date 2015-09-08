@@ -35,7 +35,13 @@ class LISTCommandSpec extends Specification {
     static jackGroovy = 'jolist' // @groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
     static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
-
+    static uuidA = UUID.randomUUID()
+    static uuidB = UUID.randomUUID()
+    static uuidC = UUID.randomUUID()
+    static msgA = 'aq' * 10
+    static msgB = 'bq' * 11
+    static msgC = 'cq' * 12
+    
     @Rule 
     TestName name = new TestName()
     
@@ -74,17 +80,21 @@ class LISTCommandSpec extends Specification {
         params = [ joLIST, ( new Sha512Hash( somePassword, joLIST, iterations ).toBase64() ), 'SHA-512', iterations, 'Jack', "O'Neill", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
+        this.addMessage( uuidA, gwLIST, msgA )
+        this.addMessage( uuidB, gwLIST, msgB )
+        this.addMessage( uuidC, gwLIST, msgC )
+    }
+    
+    def addMessage( uuid, userName, messageString ) {
+        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
+        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
+        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
 
     def "test uuid list"() {
         def uuidList = []
         def uuid = UUID.randomUUID()
-        def totalMessageSizeTest = 0
-        def messageString = 'aq' * 10
-        totalMessageSizeTest = messageString.size()
-        def toAddress = "${gwLIST}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, gwLIST, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
+        def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
         bufferInputMap.state = 'TRANSACTION'
@@ -97,15 +107,15 @@ class LISTCommandSpec extends Specification {
             def resultMap = listCommand.process( 'LIST', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
+            resultMap.resultString == "+OK 3 ${totalMessageSizeTest}"
         
             
         def messageStringB = 'aw' * 11
         // totalMessageSizeTest = messageString.size()
-        // def toAddress = "${gwLIST}@${domainList[ 0 ]}".toString()
+        def toAddress = "${gwLIST}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            params = [ UUID.randomUUID(), gwLIST, 'hello@test.com', toAddress, messageStringB ]
+            def params = [ UUID.randomUUID(), gwLIST, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
             def messageCount
         
@@ -113,12 +123,12 @@ class LISTCommandSpec extends Specification {
                 messageCount = nextRow.count
             }
         then:
-            messageCount == 2
+            messageCount == 4
         when:
             resultMap = listCommand.process( 'LIST', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
+            resultMap.resultString == "+OK 3 ${totalMessageSizeTest}"
         // timestamp = resultMap.bufferMap.timestamp
         // insertCounts = sql.withBatch(  )
 	}
