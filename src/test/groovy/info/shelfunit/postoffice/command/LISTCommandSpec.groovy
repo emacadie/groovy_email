@@ -2,8 +2,9 @@ package info.shelfunit.postoffice.command
 
 import java.sql.Timestamp
 
-import spock.lang.Ignore
+// import spock.lang.Ignore
 import spock.lang.Specification
+import spock.lang.Stepwise
 // import spock.lang.Unroll
 
 import org.junit.Rule
@@ -18,6 +19,7 @@ import groovy.util.logging.Slf4j
 import org.apache.shiro.crypto.hash.Sha512Hash
 
 @Slf4j
+@Stepwise
 class LISTCommandSpec extends Specification {
     
     def crlf = "\r\n"
@@ -112,7 +114,7 @@ class LISTCommandSpec extends Specification {
             resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}\r\n"
+            "3 ${msgC.size()}"
         
         def messageStringB = 'aw' * 11
         def toAddress = "${gwLIST}@${domainList[ 0 ]}".toString()
@@ -134,7 +136,7 @@ class LISTCommandSpec extends Specification {
             resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}\r\n"
+            "3 ${msgC.size()}"
         // timestamp = resultMap.bufferMap.timestamp
         // insertCounts = sql.withBatch(  )
 	}
@@ -197,42 +199,9 @@ class LISTCommandSpec extends Specification {
             resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}\r\n"
+            "3 ${msgC.size()}"
         // timestamp = resultMap.bufferMap.timestamp
         // insertCounts = sql.withBatch(  )
-	}
-	
-	@Ignore
-	def "the first password attempt"() {
-	    def userInfo = [:]
-	    userInfo.username = "some.user"
-	    def password = "this.is.a.password"
-	    userInfo.password_algo = 'SHA-512'
-	    userInfo.iterations = iterations
-	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
-	    userInfo.password_hash = rawHash.toBase64()
-	    userInfo.first_name = 'some'
-	    userInfo.last_name  = 'user'
-	    userInfo.userid = 10
-	    
-	    def bufferMap = [:]
-	    bufferMap.state = 'AUTHORIZATION'
-	    bufferMap.userInfo = userInfo
-	    def prevCommandSet = [] as Set
-        def resultMap
-	    def resultString
-	    when:
-	        resultMap = listCommand.process( "PASS ${password}", resultSetEM,  bufferMap )
-	    then:
-	        resultMap.resultString == "+OK ${userInfo.username} authenticated"
-	        resultMap.bufferMap.state == 'TRANSACTION'
-	        
-	    when:
-	        bufferMap.state = 'AUTHORIZATION'
-	        resultMap = listCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
-	    then:
-	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
-	        resultMap.bufferMap.state == 'AUTHORIZATION'
 	}
 
 }

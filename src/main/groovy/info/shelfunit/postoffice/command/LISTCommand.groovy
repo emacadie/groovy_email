@@ -36,7 +36,7 @@ class LISTCommand {
             sBuff << "+OK ${bufferMap.totalMessageSize}\r\n"
             rows.eachWithIndex { r, i ->
                 sBuff << "${i + 1} ${r.length}"
-                if ( i != rows.size() ) { 
+                if ( i != ( rows.size() - 1 ) ) { 
                     sBuff << "\r\n" 
                 }
             } 

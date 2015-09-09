@@ -2,7 +2,7 @@ package info.shelfunit.postoffice.command
 
 import java.sql.Timestamp
 
-import spock.lang.Ignore
+// import spock.lang.Ignore
 import spock.lang.Specification
 // import spock.lang.Unroll
 
@@ -121,39 +121,6 @@ class STATCommandSpec extends Specification {
             resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
         // timestamp = resultMap.bufferMap.timestamp
         // insertCounts = sql.withBatch(  )
-	}
-
-	@Ignore
-	def "the first password attempt"() {
-	    def userInfo = [:]
-	    userInfo.username = "some.user"
-	    def password = "this.is.a.password"
-	    userInfo.password_algo = 'SHA-512'
-	    userInfo.iterations = iterations
-	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
-	    userInfo.password_hash = rawHash.toBase64()
-	    userInfo.first_name = 'some'
-	    userInfo.last_name  = 'user'
-	    userInfo.userid = 10
-	    
-	    def bufferMap = [:]
-	    bufferMap.state = 'AUTHORIZATION'
-	    bufferMap.userInfo = userInfo
-	    def prevCommandSet = [] as Set
-        def resultMap
-	    def resultString
-	    when:
-	        resultMap = statCommand.process( "PASS ${password}", resultSetEM,  bufferMap )
-	    then:
-	        resultMap.resultString == "+OK ${userInfo.username} authenticated"
-	        resultMap.bufferMap.state == 'TRANSACTION'
-	        
-	    when:
-	        bufferMap.state = 'AUTHORIZATION'
-	        resultMap = statCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
-	    then:
-	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
-	        resultMap.bufferMap.state == 'AUTHORIZATION'
 	}
 
 }
