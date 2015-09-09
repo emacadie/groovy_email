@@ -26,15 +26,9 @@ class STATCommandSpec extends Specification {
     static iterations = 10000
     static statCommand
     static somePassword = 'somePassword'
-    static hamilton = 'alexander' // @shelfunit.info'
     static gwSTAT  = 'gwstat' // @shelfunit.info'
     static jaSTAT = 'jastat' // @shelfunit.info'
     static joSTAT = 'jostat' // @shelfunit.info'
-    static gwGroovy  = 'gwstat' // @groovy-is-groovy.org'
-    static jaGroovy  = 'jastat' // @groovy-is-groovy.org'
-    static jackGroovy = 'jostat' // @groovy-is-groovy.org'
-    static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-    static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
     @Rule 
     TestName name = new TestName()
@@ -99,10 +93,8 @@ class STATCommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
         
-            
         def messageStringB = 'aw' * 11
-        // totalMessageSizeTest = messageString.size()
-        // def toAddress = "${gwSTAT}@${domainList[ 0 ]}".toString()
+
         when:
             bufferInputMap = resultMap.bufferMap
             params = [ UUID.randomUUID(), gwSTAT, 'hello@test.com', toAddress, messageStringB ]
@@ -119,9 +111,7 @@ class STATCommandSpec extends Specification {
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
-        // timestamp = resultMap.bufferMap.timestamp
-        // insertCounts = sql.withBatch(  )
 	}
 
-}
+} // line 126
 

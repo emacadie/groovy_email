@@ -29,15 +29,9 @@ class LISTCommandSpec extends Specification {
     static listCommand
     static somePassword = 'somePassword'
     static theTimestamp
-    static hamilton = 'alexander' // @shelfunit.info'
     static gwLIST  = 'gwlist' // @shelfunit.info'
     static jaLIST = 'jalist' // @shelfunit.info'
     static joLIST = 'jolist' // @shelfunit.info'
-    static gwGroovy  = 'gwlist' // @groovy-is-groovy.org'
-    static jaGroovy  = 'jalist' // @groovy-is-groovy.org'
-    static jackGroovy = 'jolist' // @groovy-is-groovy.org'
-    static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-    static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
     static uuidA = UUID.randomUUID()
     static uuidB = UUID.randomUUID()
     static uuidC = UUID.randomUUID()
@@ -137,8 +131,6 @@ class LISTCommandSpec extends Specification {
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
             "3 ${msgC.size()}"
-        // timestamp = resultMap.bufferMap.timestamp
-        // insertCounts = sql.withBatch(  )
 	}
 
 	
@@ -200,8 +192,6 @@ class LISTCommandSpec extends Specification {
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
             "3 ${msgC.size()}"
-        // timestamp = resultMap.bufferMap.timestamp
-        // insertCounts = sql.withBatch(  )
 	}
 
 }

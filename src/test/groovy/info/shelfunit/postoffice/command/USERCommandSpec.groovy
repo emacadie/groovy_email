@@ -22,15 +22,12 @@ class USERCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
     static userCommand
-    static hamilton = 'alexander' // @shelfunit.info'
     static gwShelf  = 'george.washingtonu' // @shelfunit.info'
     static jAdamsShelf = 'john.adamsu' // @shelfunit.info'
     static jackShelf = 'oneillu' // @shelfunit.info'
     static gwGroovy  = 'george.washingtonu' // @groovy-is-groovy.org'
     static jaGroovy  = 'john.adamsu' // @groovy-is-groovy.org'
     static jackGroovy = 'oneillu' // @groovy-is-groovy.org'
-    static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-    static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
     @Rule 
     TestName name = new TestName()
@@ -86,11 +83,9 @@ class USERCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "USER ${inputAddress}", resultSetEM,  [ state: 'AUTHORIZATION' ] )
+            resultMap = userCommand.process( "USER ${inputAddress}", [] as Set,  [ state: 'AUTHORIZATION' ] )
         then:
-            // println "command was USER, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            // resultMap.prevCommandSet == resultSetEMR
         where:
             inputAddress    | value    
             gwShelf         | "+OK ${gwShelf} is a valid mailbox"
@@ -107,11 +102,10 @@ class USERCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "USER some.user", resultSetEM, [ state: "${someState}" ] )
+            resultMap = userCommand.process( "USER some.user", [] as Set, [ state: "${someState}" ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEM
             resultMap.bufferMap.state == finalState
         where:
             someState       | value                             | finalState
@@ -126,11 +120,10 @@ class USERCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = userCommand.process( "USER ${inputAddress}", resultSetEM, [ state: 'AUTHORIZATION' ] )
+            resultMap = userCommand.process( "USER ${inputAddress}", [] as Set, [ state: 'AUTHORIZATION' ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEM
         where:
             inputAddress    | value                             | state
             'mkyong'        | "-ERR No such user mkyong"        | 'AUTHORIZATION'
@@ -149,5 +142,5 @@ class USERCommandSpec extends Specification {
             'george.washington'  | "-ERR No such user george.washington"  | 'AUTHORIZATION' 
 	}
 	
-}
+} // line 152
 

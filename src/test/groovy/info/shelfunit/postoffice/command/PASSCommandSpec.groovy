@@ -22,15 +22,9 @@ class PASSCommandSpec extends Specification {
     static sql
     static iterations = 10000
     static passCommand
-    static hamilton = 'alexander' // @shelfunit.info'
     static gwShelf  = 'george.washingtonp' // @shelfunit.info'
     static jAdamsShelf = 'john.adamsp' // @shelfunit.info'
     static jackShelf = 'oneillp' // @shelfunit.info'
-    static gwGroovy  = 'george.washingtonp' // @groovy-is-groovy.org'
-    static jaGroovy  = 'john.adamsp' // @groovy-is-groovy.org'
-    static jackGroovy = 'oneillp' // @groovy-is-groovy.org'
-    static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-    static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
     @Rule 
     TestName name = new TestName()
@@ -81,8 +75,7 @@ class PASSCommandSpec extends Specification {
 	    def password = "this.is.a.password"
 	    userInfo.password_algo = 'SHA-512'
 	    userInfo.iterations = iterations
-	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
-	    userInfo.password_hash = rawHash.toBase64()
+	    userInfo.password_hash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) .toBase64()
 	    userInfo.first_name = 'some'
 	    userInfo.last_name  = 'user'
 	    userInfo.userid = 10
@@ -90,18 +83,17 @@ class PASSCommandSpec extends Specification {
 	    def bufferMap = [:]
 	    bufferMap.state = 'TRANSACTION'
 	    bufferMap.userInfo = userInfo
-	    def prevCommandSet = [] as Set
         def resultMap
-	    def resultString
+
 	    when:
-	        resultMap = passCommand.process( "PASS ${password}", resultSetEM,  bufferMap )
+	        resultMap = passCommand.process( "PASS ${password}", [] as Set, bufferMap )
 	    then:
 	        resultMap.resultString == "-ERR Not in AUTHORIZATION state"
 	        resultMap.bufferMap.state == 'TRANSACTION'
 	        
 	    when:
 	        bufferMap.state = 'AUTHORIZATION'
-	        resultMap = passCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
+	        resultMap = passCommand.process( "PASS tdsgghrd", [] as Set, bufferMap )
 	    then:
 	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
 	        resultMap.bufferMap.state == 'AUTHORIZATION'
@@ -113,8 +105,7 @@ class PASSCommandSpec extends Specification {
 	    def password = "this.is.a.password"
 	    userInfo.password_algo = 'SHA-512'
 	    userInfo.iterations = iterations
-	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
-	    userInfo.password_hash = rawHash.toBase64()
+	    userInfo.password_hash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) .toBase64()
 	    userInfo.first_name = 'some'
 	    userInfo.last_name  = 'user'
 	    userInfo.userid = 10
@@ -122,11 +113,10 @@ class PASSCommandSpec extends Specification {
 	    def bufferMap = [:]
 	    bufferMap.state = 'AUTHORIZATION'
 	    bufferMap.userInfo = userInfo
-	    def prevCommandSet = [] as Set
         def resultMap
-	    def resultString
+
 	    when:
-	        resultMap = passCommand.process( "PASS ${password}", resultSetEM,  bufferMap )
+	        resultMap = passCommand.process( "PASS ${password}", [] as Set, bufferMap )
 	    then:
 	        resultMap.resultString == "+OK ${userInfo.username} authenticated"
 	        resultMap.bufferMap.state == 'TRANSACTION'
@@ -134,7 +124,7 @@ class PASSCommandSpec extends Specification {
 	        
 	    when:
 	        bufferMap.state = 'AUTHORIZATION'
-	        resultMap = passCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
+	        resultMap = passCommand.process( "PASS tdsgghrd", [] as Set, bufferMap )
 	    then:
 	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
 	        resultMap.bufferMap.state == 'AUTHORIZATION'
@@ -147,8 +137,7 @@ class PASSCommandSpec extends Specification {
 	    def password = "this.is.a.password"
 	    userInfo.password_algo = 'SHA-512'
 	    userInfo.iterations = iterations
-	    def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) 
-	    userInfo.password_hash = rawHash.toBase64()
+	    userInfo.password_hash = new Sha512Hash( password, userInfo.username, userInfo.iterations ) .toBase64()
 	    userInfo.first_name = 'some'
 	    userInfo.last_name  = 'user'
 	    userInfo.userid = 10
@@ -156,18 +145,16 @@ class PASSCommandSpec extends Specification {
 	    def bufferMap = [:]
 	    bufferMap.state = 'AUTHORIZATION'
 	    bufferMap.userInfo = userInfo
-	    def prevCommandSet = [] as Set
         def resultMap
-	    def resultString
 	   
 	    when:
 	        bufferMap.state = 'AUTHORIZATION'
-	        resultMap = passCommand.process( "PASS tdsgghrd", resultSetEM,  bufferMap )
+	        resultMap = passCommand.process( "PASS tdsgghrd", [] as Set, bufferMap )
 	    then:
 	        resultMap.resultString == "-ERR ${userInfo.username} not authenticated"
 	        resultMap.bufferMap.state == 'AUTHORIZATION'
 	        resultMap.bufferMap.timestamp == null
 	}
 
-}
+} // line 172
 
