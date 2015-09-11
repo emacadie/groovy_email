@@ -106,12 +106,7 @@ class RETRCommandSpec extends Specification {
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR Command not in proper form"
-       /*
-            "+OK ${totalMessageSizeTest}\r\n" +
-            "1 ${msgA.size()}\r\n" +
-            "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}"
-        */
+
         def messageStringB = 'aw' * 11
         def toAddress = "${gwRETR}@${domainList[ 0 ]}".toString()
         when:
@@ -130,12 +125,6 @@ class RETRCommandSpec extends Specification {
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR Command not in proper form"
-            /*
-            "+OK ${totalMessageSizeTest}\r\n" +
-            "1 ${msgA.size()}\r\n" +
-            "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}"
-            */
 	}
 
 	
@@ -155,21 +144,20 @@ class RETRCommandSpec extends Specification {
             def resultMap = retrCommand.process( 'RETR 1', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." // +OK 1 20(\r\naqaqaqaqaqaqaqaqaqaq\r\n.)
+            resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." 
         
         when:
             resultMap = retrCommand.process( 'RETR 3', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK ${msgC.size()} octets${crlf}" + "${msgC}${crlf}" + "." 
-            // resultMap.resultString == "+OK 3 ${msgC.size()}"
             
         when:
             resultMap = retrCommand.process( 'RETR 2', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK ${msgB.size()} octets${crlf}" + "${msgB}${crlf}" + "." 
-            // resultMap.resultString == "+OK 2 ${msgB.size()}"
+
         
         def messageStringB = 'aw' * 11
         def toAddress = "${gwRETR}@${domainList[ 0 ]}".toString()
@@ -190,6 +178,12 @@ class RETRCommandSpec extends Specification {
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR no such message, only 3 messages in maildrop"
+            
+        when:
+            resultMap = retrCommand.process( 'RETR 1', [] as Set, bufferInputMap )
+        then:
+            resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
+            resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." 
 	}
 
 }

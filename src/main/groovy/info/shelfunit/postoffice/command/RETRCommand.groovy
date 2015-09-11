@@ -51,6 +51,7 @@ class RETRCommand {
                     sBuff << "\r\n"
                     sBuff << "."
                     resultMap.resultString = sBuff.toString() 
+                    // def result = sql.execute( "delete from mail_store where id = ?", [ uuid ] )
                 }
             }
         }
