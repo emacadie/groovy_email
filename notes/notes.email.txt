@@ -130,7 +130,7 @@ QUIT
 
 x STAT                    valid in the TRANSACTION state
 x LIST [msg]
-RETR msg
+x RETR msg
 DELE msg
 x - NOOP
 RSET

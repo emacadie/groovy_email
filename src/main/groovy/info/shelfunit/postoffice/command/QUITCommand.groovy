@@ -6,18 +6,18 @@ import groovy.util.logging.Slf4j
 import visibility.Hidden
 
 @Slf4j
-class RETRCommand {
+class QUITCommand {
     
     @Hidden def regex = "RETR\\s\\d+"
     
     @Hidden Sql sql
-    RETRCommand( def argSql ) {
-        log.info "Starting new RETRCommand"
+    QUITCommand( def argSql ) {
+        log.info "Starting new QUITCommand"
         this.sql = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
-        log.info "Starting RETRCommand.process"
+        log.info "Starting QUITCommand.process"
    
         def resultString
         def resultMap = [:]
@@ -34,7 +34,7 @@ class RETRCommand {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( theMessage.matches( regex ) ) {
             log.info "in the reg ex part"
-            def messageNum = theMessage.getIntInPOP3Command() 
+            def messageNum = Integer.parseInt( theMessage.allButFirstFour().trim() )
             if ( messageNum > bufferMap.uuidList.size() ) {
                 resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
             } else {

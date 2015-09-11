@@ -6,22 +6,23 @@ import groovy.util.logging.Slf4j
 import visibility.Hidden
 
 @Slf4j
-class RETRCommand {
+class DELECommand {
     
-    @Hidden def regex = "RETR\\s\\d+"
+    @Hidden def regex = "DELE\\s\\d+"
     
     @Hidden Sql sql
-    RETRCommand( def argSql ) {
-        log.info "Starting new RETRCommand"
+    DELECommand( def argSql ) {
+        log.info "Starting new DELECommand"
         this.sql = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
-        log.info "Starting RETRCommand.process"
+        log.info "Starting DELECommand.process"
    
         def resultString
         def resultMap = [:]
         resultMap.clear()
+        def deleteMap = bufferMap.deleteMap ?: [:]
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( !bufferMap.hasSTATInfo() ) {
@@ -41,20 +42,14 @@ class RETRCommand {
                 def uuid = bufferMap.uuidList[ messageNum - 1 ].id
                 log.info "here is bufferMap.uuidList: ${bufferMap.uuidList}"
                 log.info "uuid is a ${uuid.getClass().name}"
-                def ans = sql.firstRow( "select length( text_body ),text_body from mail_store where id = ?", [ uuid ] )
-                if ( ans.isEmpty() ) {
-                    resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
+                if ( deleteMap.containsKey( messageNum ) ) {
+                    resultMap.resultString = "-ERR message ${messageNum} already deleted"
                 } else {
-                    def sBuff = new StringBuffer()
-                    sBuff << "+OK ${ans.length} octets\r\n"
-                    sBuff << ans.text_body
-                    sBuff << "\r\n"
-                    sBuff << "."
-                    resultMap.resultString = sBuff.toString() 
-                    // def result = sql.execute( "delete from mail_store where id = ?", [ uuid ] )
+                    deleteMap[ messageNum ] = bufferMap.uuidList[ messageNum - 1 ].id
                 }
             }
         }
+        bufferMap.deleteMap = deleteMap
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
 

@@ -43,7 +43,7 @@ class LISTCommand {
             resultMap.resultString = sBuff.toString()
         } else if ( theMessage.matches( "LIST\\s\\d+" ) ) {
             log.info "in the reg ex part"
-            def messageNum = Integer.parseInt( theMessage.allButFirstFour().trim() )
+            def messageNum = theMessage.getIntInPOP3Command() 
             if ( messageNum > bufferMap.uuidList.size() ) {
                 resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
             } else {

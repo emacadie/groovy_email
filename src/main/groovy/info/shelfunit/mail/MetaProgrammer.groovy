@@ -200,6 +200,13 @@ class MetaProgrammer {
                 false
             }
         }
+        
+        String.metaClass.toInt = { ->
+            return Integer.parseInt( delegate )
+        }
+        String.metaClass.getIntInPOP3Command { ->
+            Integer.parseInt( delegate.allButFirstFour().trim() )
+        }
     }
 }
 
