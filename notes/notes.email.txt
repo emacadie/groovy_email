@@ -129,7 +129,7 @@ x - PASS string
 QUIT
 
 x STAT                    valid in the TRANSACTION state
-LIST [msg]
+x LIST [msg]
 RETR msg
 DELE msg
 x - NOOP
