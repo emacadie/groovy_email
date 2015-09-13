@@ -89,7 +89,7 @@ class DELECommandSpec extends Specification {
         sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
     
-    @Ignore
+    // @Ignore
     def "test uuid list"() {
         def uuidList = []
         def uuid = UUID.randomUUID()
@@ -103,9 +103,8 @@ class DELECommandSpec extends Specification {
         bufferInputMap.userInfo = userInfo
         sleep( 2 * 1000 )
         when:
-            def resultMap = deleCommand.process( 'RETR', [] as Set, bufferInputMap )
+            def resultMap = deleCommand.process( 'DELE', [] as Set, bufferInputMap )
         then:
-            resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR Command not in proper form"
 
         def messageStringB = 'aw' * 11
@@ -122,13 +121,11 @@ class DELECommandSpec extends Specification {
         then:
             messageCount == 4
         when:
-            resultMap = deleCommand.process( 'RETR', [] as Set, bufferInputMap )
+            resultMap = deleCommand.process( 'DELE', [] as Set, bufferInputMap )
         then:
-            resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR Command not in proper form"
 	}
 
-	@Ignore
 	def "test individual messages"() {
         def uuidList = []
         def uuid = UUID.randomUUID()
@@ -142,22 +139,30 @@ class DELECommandSpec extends Specification {
         bufferInputMap.userInfo = userInfo
         sleep( 2 * 1000 )
         when:
-            def resultMap = deleCommand.process( 'RETR 1', [] as Set, bufferInputMap )
+            def resultMap = deleCommand.process( 'DELE 1', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." 
+            resultMap.resultString == "+OK message 1 deleted"  
+            resultMap.bufferMap.deleteMap.containsKey( 1 ) == true
+            resultMap.bufferMap.deleteMap.containsKey( 2 ) == false
+            resultMap.bufferMap.deleteMap[ 1 ].toString() == uuidA.toString()
         
         when:
-            resultMap = deleCommand.process( 'RETR 3', [] as Set, bufferInputMap )
+            resultMap = deleCommand.process( 'DELE 3', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK ${msgC.size()} octets${crlf}" + "${msgC}${crlf}" + "." 
+            resultMap.resultString == "+OK message 3 deleted"  
+            resultMap.bufferMap.deleteMap.containsKey( 3 ) == true
+            resultMap.bufferMap.deleteMap.containsKey( 2 ) == false
+            resultMap.bufferMap.deleteMap[ 3 ].toString() == uuidC.toString()
             
         when:
-            resultMap = deleCommand.process( 'RETR 2', [] as Set, bufferInputMap )
+            resultMap = deleCommand.process( 'DELE 2', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK ${msgB.size()} octets${crlf}" + "${msgB}${crlf}" + "." 
+            resultMap.resultString == "+OK message 2 deleted" 
+            resultMap.bufferMap.deleteMap.containsKey( 2 ) == true
+            resultMap.bufferMap.deleteMap[ 2 ].toString() == uuidB.toString()
         
         def messageStringB = 'aw' * 11
         def toAddress = "${gwDELE}@${domainList[ 0 ]}".toString()
@@ -174,16 +179,17 @@ class DELECommandSpec extends Specification {
             messageCount == 5
         
         when:
-            resultMap = deleCommand.process( 'RETR 4', [] as Set, bufferInputMap )
+            resultMap = deleCommand.process( 'DELE 4', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR no such message, only 3 messages in maildrop"
             
         when:
-            resultMap = deleCommand.process( 'RETR 1', [] as Set, bufferInputMap )
+            resultMap = deleCommand.process( 'DELE 1', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
-            resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." 
+            resultMap.resultString != "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "."
+            log.info "here is resultMap.resultString at end of test: ${resultMap.resultString}"
 	}
 
 }

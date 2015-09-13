@@ -46,6 +46,7 @@ class DELECommand {
                     resultMap.resultString = "-ERR message ${messageNum} already deleted"
                 } else {
                     deleteMap[ messageNum ] = bufferMap.uuidList[ messageNum - 1 ].id
+                    resultMap.resultString = "+OK message ${messageNum} deleted"
                 }
             }
         }

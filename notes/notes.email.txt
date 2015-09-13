@@ -2,6 +2,7 @@ Index of RFCs: http://tools.ietf.org/rfc/index
 
 http://tools.ietf.org/html/rfc5321: Simple Mail Transfer Protocol (have read)
 http://tools.ietf.org/html/rfc1939: Post Office Protocol - Version 3 (have read)
+http://tools.ietf.org/html/rfc6152: SMTP Service Extension for 8-bit MIME Transport (read, implemented)
 
 http://tools.ietf.org/html/rfc1047: DUPLICATE MESSAGES AND SMTP
 http://tools.ietf.org/html/rfc1870: SMTP Service Extension for Message Size Declaration
@@ -21,6 +22,7 @@ http://tools.ietf.org/html/rfc4954: SMTP Service Extension for Authentication
 http://tools.ietf.org/html/rfc5034: The Post Office Protocol (POP3) Simple Authentication and Security Layer (SASL) Authentication Mechanism
 http://tools.ietf.org/html/rfc5248: A Registry for SMTP Enhanced Mail System Status Codes (updates but does not obsolete 4954)
 http://tools.ietf.org/html/rfc5322: Internet Message Format
+
 http://tools.ietf.org/html/rfc6186: Use of SRV Records for Locating Email Submission/Access Services
 http://tools.ietf.org/html/rfc6409: Message Submission for Mail
 http://tools.ietf.org/html/rfc6531: SMTP Extension for Internationalized Email
