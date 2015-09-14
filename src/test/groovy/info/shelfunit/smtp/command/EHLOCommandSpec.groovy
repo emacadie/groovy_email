@@ -1,5 +1,6 @@
 package info.shelfunit.smtp.command
 
+import spock.lang.Ignore
 import spock.lang.Specification
 
 import org.junit.Rule
@@ -103,6 +104,7 @@ class EHLOCommandSpec extends Specification {
 	        1 == 1
 	}
 	
+	@Ignore
 	def "test without mocks or stubs"() {
 	    when:
             def domain = "www.shelfunit.info"

@@ -32,7 +32,6 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "In RCPTCommand"
-        def resultString
         def resultMap = [:]
         resultMap.clear()
         

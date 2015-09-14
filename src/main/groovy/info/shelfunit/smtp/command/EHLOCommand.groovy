@@ -14,7 +14,6 @@ class EHLOCommand {
     // RFC 5321, 3.2.  Client Initiation: You must return simple HELO 
     // theMessage is a String
     def process( theMessage, prevCommandSet, bufferMap ) {
-        def resultString
         def resultMap = [:]
         resultMap.clear()
         bufferMap.clear()
