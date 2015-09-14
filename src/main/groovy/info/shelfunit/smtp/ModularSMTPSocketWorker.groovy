@@ -12,6 +12,7 @@ import info.shelfunit.smtp.command.EHLOCommand
 import info.shelfunit.smtp.command.MAILCommand
 import info.shelfunit.smtp.command.MSSGCommand
 import info.shelfunit.smtp.command.RCPTCommand
+import info.shelfunit.smtp.command.QUITCommand
 import info.shelfunit.smtp.command.RSETCommand
 
 import visibility.Hidden
@@ -35,6 +36,7 @@ class ModularSMTPSocketWorker {
 	@Hidden def rsetCommand
 	@Hidden def dataCommand
 	@Hidden def mssgCommand
+	@Hidden def quitCommand
 	@Hidden def commandResultMap
 
 	ModularSMTPSocketWorker( argIn, argOut, argServerList ) {
@@ -56,6 +58,7 @@ class ModularSMTPSocketWorker {
         rsetCommand = new RSETCommand()
         dataCommand = new DATACommand()
         mssgCommand = new MSSGCommand( sql, serverList )
+        quitCommand = new QUITCommand( serverList )
 	}
 
 	def doWork() {
@@ -121,8 +124,6 @@ class ModularSMTPSocketWorker {
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			theResponse = '250 OK'
-		} else if ( theMessage.startsWith( 'QUIT' ) ) { // prevCommandSet.lastItem() == 'THE MESSAGE' && 
-			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.startsWith( 'EXPN' ) ) {
 		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'NOOP' ) ) {
@@ -151,6 +152,8 @@ class ModularSMTPSocketWorker {
 		    return rsetCommand
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 		    return dataCommand
+		} else if ( theMessage.startsWith( 'QUIT' ) ) {
+		    return quitCommand
 		}
 	}
 }

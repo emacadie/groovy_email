@@ -168,7 +168,7 @@ class MetaProgrammer {
         }
 
         String.metaClass.static.getCommandList = { -> 
-            return [ 'MAIL', 'RCPT', 'RSET', 'DATA', 'USER', 'PASS', 'STAT', 'LIST' ]
+            return [ 'MAIL', 'RCPT', 'RSET', 'DATA', 'USER', 'PASS', 'STAT', 'LIST', 'QUIT' ]
         }
        
         // I REALLY need to come up with a better name than this

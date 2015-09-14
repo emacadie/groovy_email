@@ -7,16 +7,14 @@ import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import info.shelfunit.mail.ConfigHolder
+import info.shelfunit.postoffice.command.DELECommand
 import info.shelfunit.postoffice.command.LISTCommand
 import info.shelfunit.postoffice.command.PASSCommand
+import info.shelfunit.postoffice.command.QUITCommand
+import info.shelfunit.postoffice.command.RETRCommand
+import info.shelfunit.postoffice.command.RSETCommand
 import info.shelfunit.postoffice.command.STATCommand
 import info.shelfunit.postoffice.command.USERCommand
-
-
-import info.shelfunit.smtp.command.EHLOCommand
-import info.shelfunit.smtp.command.MSSGCommand
-import info.shelfunit.smtp.command.RCPTCommand
-import info.shelfunit.smtp.command.RSETCommand
 
 import visibility.Hidden
 
@@ -33,14 +31,14 @@ class ModularPostOfficeSocketWorker {
 	@Hidden def sql
 	@Hidden def serverList
 	@Hidden def commandObject
-	@Hidden def userCommand
-	@Hidden def passCommand
-	@Hidden def statCommand
-	@Hidden def listCommand
 	
+	@Hidden def listCommand
+	@Hidden def quitCommand
+	@Hidden def passCommand
 	@Hidden def rsetCommand
-	@Hidden def dataCommand
-	@Hidden def mssgCommand
+	@Hidden def retrCommand
+	@Hidden def statCommand
+	@Hidden def userCommand
 	
 	@Hidden def commandResultMap
 
@@ -62,11 +60,10 @@ class ModularPostOfficeSocketWorker {
         passCommand = new PASSCommand( sql )
         statCommand = new STATCommand( sql )
         listCommand = new LISTCommand( sql )
-        
-        ehloCommand = new EHLOCommand()
-        rcptCommand = new RCPTCommand( sql, serverList )
-        rsetCommand = new RSETCommand()
-        mssgCommand = new MSSGCommand( sql, serverList )
+        deleCommand = new DELECommand( sql )
+        quitCommand = new QUITCommand( sql )
+        retrCommand = new RETRCommand( sql )
+        rsetCommand = new RSETCommand( sql )
 	}
 
 	def doWork() {
@@ -92,22 +89,6 @@ class ModularPostOfficeSocketWorker {
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
 		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
-
-	        } else if ( prevCommandSet.lastItem() == 'DATA' ) {
-		        def sBuffer = new StringBuffer()
-		        while ( !newString.equals( "." ) ) {
-		            sBuffer << newString << '\n'
-			        try {
-				        newString = reader?.readLine()
-				        // log.info "Here is sBuffer in while loop: ${sBuffer}"
-			        } catch ( Exception ex ) {
-				        log.info "exception: ${ex.printMessage()}"
-				        ex.printStackTrace()
-			        }
-		        }
-		        log.info( "broke out of while loop for DATA" )
-		        responseString = this.handleMessage( sBuffer.toString(), true )
-		        prevCommandSet << 'THE MESSAGE'
 	        } else {
 		        responseString = this.handleMessage( newString )
 	        }
@@ -129,17 +110,10 @@ class ModularPostOfficeSocketWorker {
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
-		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
-			log.info "prevCommand is DATA, here is the message: ${theMessage}"
-			theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'QUIT' ) ) { 
 			theResponse = "221 ${serverName} Service closing transmission channel"
-		} else if ( theMessage.startsWith( 'EXPN' ) ) {
-		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
 		    theReponse = '+OK'
-		} else if ( theMessage.startsWith( 'VRFY' ) ) {
-		    "252 VRFY Disabled, returning argument ${theMesssage.allButFirstFour()}"
 		} else if ( theMessage.isObsoleteCommand() ) { 
 		    theResponse = '502 Command not implemented'
 		} else {
@@ -152,22 +126,23 @@ class ModularPostOfficeSocketWorker {
 	    log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
 		if ( isActualMessage ) {
 		    return mssgCommand
-		} else if ( theMessage.isHelloCommand() ) {
-		    return ehloCommand
 		} else if ( theMessage.startsWith( 'USER' ) ) {
 			return userCommand
 		} else if ( theMessage.startsWith( 'PASS' ) ) {
 			return passCommand
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    return rsetCommand
-		} else if ( theMessage.startsWith( 'DATA' ) ) {
-		    return dataCommand
 		} else if ( theMessage.startsWith( 'STAT' ) ) {
 		    return statCommand
+		} else if ( theMessage.startsWith( 'RETR' ) ) {
+		    return retrCommand
 		} else if ( theMessage.startsWith( 'LIST' ) ) {
 		    return listCommand
+		} else if ( theMessage.startsWith( 'QUIT' ) ) {
+		    return quitCommand
+		} else if ( theMessage.startsWith( 'DELE' ) ) {
+		    return deleCommand
 		}
 	}
 }
-
 
