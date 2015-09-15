@@ -61,7 +61,7 @@ class ModularPostOfficeSocketWorker {
         statCommand = new STATCommand( sql )
         listCommand = new LISTCommand( sql )
         deleCommand = new DELECommand( sql )
-        quitCommand = new QUITCommand( sql )
+        quitCommand = new QUITCommand( sql, serverName )
         retrCommand = new RETRCommand( sql )
         rsetCommand = new RSETCommand( sql )
 	}
