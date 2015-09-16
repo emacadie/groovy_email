@@ -37,12 +37,13 @@ class QUITCommand {
             bufferMap.clear()
             resultMap.resultString = "+OK ${serverName}  POP3 server signing off"
         } else if ( bufferMap.state == 'TRANSACTION' ) {
-            bufferMap.state = 'UPDATE'
+            
             log.info "in the reg ex part"
             log.info "here is bufferMap in QUITCommand.process: ${bufferMap}"
-            def idsToDelete = bufferMap.deleteMap.values()
-            resultMap.resultString = "+OK ${serverName}  POP3 server signing off"
+            def idsToDelete = bufferMap.deleteMap.values() as List
+            resultMap.resultString = "+OK ${serverName} POP3 server signing off"
             def qMarks = []
+            def result = '250 OK'
             (1..idsToDelete.size()).each { qMarks << '?' }
             try {
                 sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
@@ -63,6 +64,8 @@ class QUITCommand {
                     }
                 }
                 */
+                bufferMap.clear()
+                bufferMap.state = 'UPDATE'
             } catch ( Exception e ) {
                 result = '500 Something went wrong'
                 SQLException ex = e.getNextException()
