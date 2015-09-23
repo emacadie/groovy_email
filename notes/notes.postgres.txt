@@ -138,5 +138,27 @@ groovy_mail_db=> select id, username, length(text_body), msg_timestamp from mail
  9b32741d-2c57-42af-8cdb-c5092f7052c3 | info     |    567 | 2015-08-23 10:50:53.477676-05
  f5570911-9e01-4a6b-a61a-20cfe1fb117d | info     |    758 | 2015-08-23 10:51:20.84504-05
  8c56842d-7a7a-4c0c-8a50-fc8da12efc99 | malcolm  |   2861 | 2015-08-30 11:03:14.761366-05
+.
+calculating size:
+select pg_total_relation_size('mail_store');
+from http://www.postgresql.org/docs/9.1/static/functions-admin.html#FUNCTIONS-ADMIN-DBSIZE
+http://www.postgresonline.com/journal/archives/110-Determining-size-of-database,-schema,-tables,-and-geometry.html
+SELECT pg_size_pretty(pg_total_relation_size('mail_store')) As fulltblsize;
+SELECT pg_size_pretty( pg_total_relation_size( 'mail_store' ) ) As fulltblsize, 
+pg_size_pretty( pg_relation_size( 'mail_store' ) ) As justthetblsize;
+SELECT pg_total_relation_size('mail_store') As fulltblsize;
+SELECT pg_total_relation_size('email_user') As fulltblsize;
+
+SELECT
+    table_schema || '.' || table_name AS table_full_name,
+    pg_size_pretty(pg_total_relation_size('"' || table_schema || '"."' || table_name || '"')) AS size
+FROM information_schema.tables
+ORDER BY
+    pg_total_relation_size('"' || table_schema || '"."' || table_name || '"') DESC;
+.
+http://stackoverflow.com/questions/2596624/how-do-you-find-the-disk-size-of-a-postgres-postgresql-table-and-its-indexes
+http://sharpe-s-postgres.blogspot.com/2012/06/how-to-find-out-sizes-of-postgresql.html
+https://wiki-bsse.ethz.ch/display/ITDOC/Check+size+of+tables+and+objects+in+PostgreSQL+database
+https://www.niwi.nz/2013/02/17/postgresql-database-table-indexes-size/
 
 
