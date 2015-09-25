@@ -42,7 +42,10 @@ class USERCommand {
             log.info "Here is rows, it's a : ${rows.class.name}"
             if ( rows.size() != 0 ) { 
                 bufferMap.userInfo = rows[ 0 ]
-                log.info "bufferMap.userInfo  is a ${bufferMap.userInfo.getClass().getName()}"
+                // log.info "here is rows[ 0 ]: ${rows[ 0 ]}"
+                // log.info "here is bufferMap.userInfo: ${bufferMap.userInfo}"
+                // log.info "Here is bufferMap.userInfo.iterations: ${bufferMap.userInfo.iterations} and it's a ${bufferMap.userInfo.iterations.getClass().name}"
+                // log.info "bufferMap.userInfo  is a ${bufferMap.userInfo.getClass().getName()}"
                 resultMap.resultString = "+OK ${userName} is a valid mailbox"
             } else {
                 resultMap.resultString = "-ERR No such user ${userName}"

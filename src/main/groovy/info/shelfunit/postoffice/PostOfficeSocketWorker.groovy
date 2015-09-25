@@ -118,7 +118,7 @@ class PostOfficeSocketWorker {
 		} else if ( theMessage.startsWith( 'EXPN' ) ) {
 		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'NOOP' ) ) {
-		    theReponse = '250 OK'
+		    theResponse = '250 OK'
 		} else {
 			// log.info "prevCommand is DATA, here is the message: ${theMessage}"
 			// this should probably not stay 250

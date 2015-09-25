@@ -32,6 +32,7 @@ class ModularPostOfficeSocketWorker {
 	@Hidden def serverList
 	@Hidden def commandObject
 	
+	@Hidden def deleCommand
 	@Hidden def listCommand
 	@Hidden def quitCommand
 	@Hidden def passCommand
@@ -113,7 +114,7 @@ class ModularPostOfficeSocketWorker {
 		} else if ( theMessage.startsWith( 'QUIT' ) ) { 
 			theResponse = "221 ${serverName} Service closing transmission channel"
 		} else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
-		    theReponse = '+OK'
+		    theResponse = '+OK'
 		} else if ( theMessage.isObsoleteCommand() ) { 
 		    theResponse = '502 Command not implemented'
 		} else {

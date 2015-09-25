@@ -57,7 +57,7 @@ class PASSCommandSpec extends Specification {
     def addUsers() {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'somePassword', salt, 1000000 )
+        def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
         def params = [ 'george.washingtonp', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         

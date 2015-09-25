@@ -64,10 +64,10 @@ x EHLO
 x HELO
 x MAIL
 x RCPT
-DATA
+xx DATA
 x RSET
 x NOOP
-QUIT
+x QUIT
 VRFY
 .
 Others:

@@ -127,7 +127,7 @@ class ModularSMTPSocketWorker {
 		} else if ( theMessage.startsWith( 'EXPN' ) ) {
 		    theResponse = '502 Command not implemented'
 		} else if ( theMessage.startsWith( 'NOOP' ) ) {
-		    theReponse = '250 OK'
+		    theResponse = '250 OK'
 		} else if ( theMessage.startsWith( 'VRFY' ) ) {
 		    "252 VRFY Disabled, returning argument ${theMesssage.allButFirstFour()}"
 		} else if ( theMessage.isObsoleteCommand() ) { 
