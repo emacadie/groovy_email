@@ -118,7 +118,7 @@ class ModularPostOfficeSocketWorker {
 		} else if ( theMessage.isObsoleteCommand() ) { 
 		    theResponse = '502 Command not implemented'
 		} else {
-			theResponse = '250 OK'
+			theResponse = '+OK'
 		}
 		theResponse + "\r\n"
 	}
