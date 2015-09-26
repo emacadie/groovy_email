@@ -13,6 +13,9 @@ gradle test --tests info.shelfunit.socket.command.RCPTCommandSpec -info
 gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info
 
+gradle test --tests info.shelfunit.postoffice.ModularPostOfficeSocketWorkerSpec -info
+gradle test --tests info.shelfunit.postoffice.ModularPostOfficeSocketWorkerSpec -info
+
 gradle test --tests info.shelfunit.prep.FirstPrepSpec -info -Ddatabase.prep=true
 gradle test --tests info.shelfunit.teardown.FirstTeardownSpec -info -Ddatabase.teardown=true
 

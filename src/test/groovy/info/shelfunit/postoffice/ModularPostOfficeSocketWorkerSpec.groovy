@@ -47,16 +47,45 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ 'gwashmps', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
+        def params = [ 'gwashmps', ( new Sha512Hash( 'somePassword', 'gwashmps', numIterations ).toBase64() ), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'jadamsmps', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
+        params = [ 'jadamsmps', ( new Sha512Hash( 'somePassword', 'jadamsmps', numIterations ).toBase64() ), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'tee-jaymps', atx512.toBase64(), 'SHA-512', numIterations, 'Thomas', "Jefferson", 0 ]
+        params = [ 'tee-jaymps', ( new Sha512Hash( 'somePassword', 'tee-jaymps', numIterations ).toBase64() ), 'SHA-512', numIterations, 'Thomas', "Jefferson", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
+    
+    def addMessage( uuid, userName, messageString ) {
+        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
+        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
+        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
+    }
+    
+    def "test the love"() {
+	    when:
+            def domain = "hot-groovy.com"
+            def bString = "USER gwashmps${crlf}" + 
+            "PASS somePassword${crlf}" +
+            "STAT${crlf}" +
+            "QUIT${crlf}"
+            byte[] data = bString.getBytes()
+    
+            InputStream input = new ByteArrayInputStream( data )
+            OutputStream output = new ByteArrayOutputStream() 
+            
+            def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) // , sql )
+            ssWorker.doWork()
+            
+	    then:
+	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
+                "+OK gwashmps is a valid mailbox\r\n" +
+                "+OK gwashmps authenticated\r\n" +
+                "+OK 0 null\r\n" +
+                "+OK shelfunit.info POP3 server signing off\r\n"
+	}
 
     /*
 	def "test handling EHLO"() {

@@ -40,22 +40,24 @@ class QUITCommand {
             
             log.info "in the reg ex part"
             log.info "here is bufferMap in QUITCommand.process: ${bufferMap}"
-            def idsToDelete = bufferMap.deleteMap.values() as List
+            def idsToDelete = bufferMap.deleteMap?.values() as List
             resultMap.resultString = "+OK ${serverName} POP3 server signing off"
             def qMarks = []
             def result = '250 OK'
-            (1..idsToDelete.size()).each { qMarks << '?' }
-            try {
-                sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
-                bufferMap.clear()
-                bufferMap.state = 'UPDATE'
-            } catch ( Exception e ) {
-                result = '500 Something went wrong'
-                SQLException ex = e.getNextException()
-                log.info "Next exception message: ${ex.getMessage()}"
-                // ex.printStrackTrace()
-                log.error "something went wrong", ex 
-                // log.error "Failed to format {}", result, ex
+            if ( idsToDelete ) {
+                ( 1..idsToDelete.size() ).each { qMarks << '?' }
+                try {
+                    sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
+                    bufferMap.clear()
+                    bufferMap.state = 'UPDATE'
+                } catch ( Exception e ) {
+                    result = '500 Something went wrong'
+                    SQLException ex = e.getNextException()
+                    log.info "Next exception message: ${ex.getMessage()}"
+                    // ex.printStrackTrace()
+                    log.error "something went wrong", ex 
+                    // log.error "Failed to format {}", result, ex
+                }
             }
         }
         resultMap.bufferMap = bufferMap
