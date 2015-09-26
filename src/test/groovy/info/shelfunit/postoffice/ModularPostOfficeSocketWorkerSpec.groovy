@@ -95,6 +95,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             def bString = "USER jadamsmps${crlf}" + 
             "PASS somePassword${crlf}" +
             "STAT${crlf}" +
+            "RETR 1${crlf}" +
             "QUIT${crlf}"
             byte[] data = bString.getBytes()
     
@@ -109,6 +110,9 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
                 "+OK jadamsmps is a valid mailbox\r\n" +
                 "+OK jadamsmps authenticated\r\n" +
                 "+OK 1 ${theMess.size()}\r\n" +
+                "+OK ${theMess.size()} octets\r\n" +
+                "${theMess}\r\n" +
+                ".\r\n" +
                 "+OK shelfunit.info POP3 server signing off\r\n"
 	}
 	
