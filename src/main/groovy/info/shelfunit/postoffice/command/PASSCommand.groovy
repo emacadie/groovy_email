@@ -24,7 +24,7 @@ class PASSCommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "Starting PASSCommand.process"
-   
+        log.info "Here is bufferMap.userInfo: ${bufferMap.userInfo}"
         def resultString
         def resultMap = [:]
         resultMap.clear()
@@ -40,6 +40,8 @@ class PASSCommand {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
+        } else if ( !bufferMap.userInfo ) {
+            resultMap.resultString = "-ERR Command not in proper form - No user sent"
         } else {
             def userInfo = bufferMap.userInfo
             def password = q.getPasswordInPASS()

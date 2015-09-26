@@ -27,9 +27,7 @@ class QUITCommand {
         resultMap.clear()
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
-        if ( !bufferMap.hasSTATInfo() ) {
-            bufferMap.getSTATInfo( sql )
-        }
+        
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( theMessage != 'QUIT' ) {
             resultMap.resultString = "-ERR Command not in proper form"
@@ -37,7 +35,9 @@ class QUITCommand {
             bufferMap.clear()
             resultMap.resultString = "+OK ${serverName}  POP3 server signing off"
         } else if ( bufferMap.state == 'TRANSACTION' ) {
-            
+            if ( !bufferMap.hasSTATInfo() && !bufferMap.userInfo ) {
+                bufferMap.getSTATInfo( sql )
+            }
             log.info "in the reg ex part"
             log.info "here is bufferMap in QUITCommand.process: ${bufferMap}"
             def idsToDelete = bufferMap.deleteMap?.values() as List
@@ -45,7 +45,7 @@ class QUITCommand {
             def qMarks = []
             def result = '250 OK'
             if ( idsToDelete ) {
-                ( 1..idsToDelete.size() ).each { qMarks << '?' }
+                ( 1..idsToDelete.size() ).each { qMarks << '?' } // Or: ( idsToDelete.size() ).times { qMarks << '?' }
                 try {
                     sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
                     bufferMap.clear()
