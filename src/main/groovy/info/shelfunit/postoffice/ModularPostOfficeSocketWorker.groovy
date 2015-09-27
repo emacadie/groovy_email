@@ -111,12 +111,14 @@ class ModularPostOfficeSocketWorker {
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
+		/*
 		} else if ( theMessage.startsWith( 'QUIT' ) ) { 
 			theResponse = "221 ${serverName} Service closing transmission channel"
+		*/
 		} else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
 		    theResponse = '+OK'
-		} else if ( theMessage.isObsoleteCommand() ) { 
-		    theResponse = '502 Command not implemented'
+		} else if ( theMessage.isRFC5034Command() ) { 
+		    theResponse = '-ERR Command not implemented'
 		} else {
 			theResponse = '+OK'
 		}

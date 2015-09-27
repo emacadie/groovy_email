@@ -128,15 +128,17 @@ Minimal POP3 Commands:
 
 x - USER name               valid in the AUTHORIZATION state
 x - PASS string
-QUIT
+x- QUIT
 
 x - STAT                    valid in the TRANSACTION state
 x - LIST [msg]
 x - RETR msg
 x - DELE msg
 x - NOOP
-RSET
-QUIT
+x- RSET
+x - QUIT
+
+look at https://tools.ietf.org/html/rfc5034
 
 Optional POP3 Commands:
 

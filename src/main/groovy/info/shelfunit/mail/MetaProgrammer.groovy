@@ -168,7 +168,7 @@ class MetaProgrammer {
 
         String.metaClass.static.getCommandList = { -> 
             return [ 'DATA',  'MAIL', // smtp
-            'LIST', 'RCPT', 'PASS', 'RETR', 'STAT', 'USER', // pop3  
+            'DELE', 'LIST', 'RCPT', 'PASS', 'RETR', 'STAT', 'USER', // pop3  
             'RSET', 'QUIT' // both  
             ]
         }
@@ -198,6 +198,14 @@ class MetaProgrammer {
         String.metaClass.isObsoleteCommand = { ->
             if ( delegate.length() >= 4 ) {
                 return delegate.firstFour().matches( "SAML|SEND|SOML|TURN" )
+            } else {
+                false
+            }
+        }
+        
+        String.metaClass.isRFC5034Command = { ->
+            if ( delegate.length() >= 4 ) {
+                return delegate.firstFour().matches( "CAPA|AUTH" )
             } else {
                 false
             }

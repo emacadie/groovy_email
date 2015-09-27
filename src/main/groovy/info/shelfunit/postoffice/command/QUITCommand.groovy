@@ -28,7 +28,7 @@ class QUITCommand {
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         
-        log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
+        
         if ( theMessage != 'QUIT' ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( bufferMap.state == 'AUTHORIZATION' ) {
@@ -47,7 +47,9 @@ class QUITCommand {
             if ( idsToDelete ) {
                 ( 1..idsToDelete.size() ).each { qMarks << '?' } // Or: ( idsToDelete.size() ).times { qMarks << '?' }
                 try {
+                    log.info "here is idsToDelete: ${idsToDelete}"
                     sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
+                    log.info "Called the delete command"
                     bufferMap.clear()
                     bufferMap.state = 'UPDATE'
                 } catch ( Exception e ) {
