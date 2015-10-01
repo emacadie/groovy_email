@@ -1,7 +1,6 @@
 package info.shelfunit.postoffice
 
 import java.net.ServerSocket
-// import info.shelfunit.socket.ModularSMTPSocketWorker
 import groovy.util.logging.Slf4j 
 
 @Slf4j

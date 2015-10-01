@@ -10,8 +10,6 @@ import info.shelfunit.mail.MetaProgrammer
 
 import groovy.sql.Sql
 
-// import org.apache.shiro.crypto.hash.Sha512Hash
-
 class VRFYCommandSpec extends Specification {
     
     def crlf = "\r\n"

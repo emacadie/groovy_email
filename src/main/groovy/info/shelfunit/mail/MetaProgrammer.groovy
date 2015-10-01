@@ -202,7 +202,7 @@ class MetaProgrammer {
                 false
             }
         }
-        
+        // at some point these might be implemented
         String.metaClass.isRFC5034Command = { ->
             if ( delegate.length() >= 4 ) {
                 return delegate.firstFour().matches( "CAPA|AUTH" )
