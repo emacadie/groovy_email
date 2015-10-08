@@ -88,7 +88,7 @@ class ModularSMTPSocketWorker {
 	        } else if ( prevCommandSet.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        while ( !newString.equals( "." ) ) {
-		            sBuffer << newString << '\n'
+		            sBuffer << newString << "\n"
 			        try {
 				        newString = reader?.readLine()
 				        // log.info "Here is sBuffer in while loop: ${sBuffer}"
@@ -97,6 +97,7 @@ class ModularSMTPSocketWorker {
 				        ex.printStackTrace()
 			        }
 		        }
+		        sBuffer << newString << "\n"
 		        log.info( "broke out of while loop for DATA" )
 		        responseString = this.handleMessage( sBuffer.toString(), true )
 		        prevCommandSet << 'THE MESSAGE'
