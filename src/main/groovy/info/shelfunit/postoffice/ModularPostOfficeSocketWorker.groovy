@@ -85,7 +85,9 @@ class ModularPostOfficeSocketWorker {
 	        def newString =  reader.readLine() 
 	        log.info "Here is newString: ${newString}"
 	        
-	        if ( newString.startsWith( 'QUIT' ) ) {
+	        if ( newString == null ) { 
+	            responseString = "+OK\r\n"
+	        } else if ( newString.startsWith( 'QUIT' ) ) {
 		        log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
 		        responseString = this.handleMessage( newString )
 		        gotQuitCommand = true
