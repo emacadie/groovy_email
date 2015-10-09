@@ -45,11 +45,10 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "501 Command not in proper form"
-        } else if ( !domainList.includes( q.extractDomain() ) ) {
-            resultMap.resultString = "550 No such user"
+        } else if ( !domainList.includes( q.extractDomainRCPT() ) ) {
+            resultMap.resultString = "550 No such user" // make it case insensitive here
         } else {
             
-            // log.info "Here is q[ 0 ][ 2 ]: ${q[0][2]}, Here is q[ 0 ][ 3 ]: ${q[0][3]}"
             def userName = q.extractUserNameInRCPT() 
             // log.info "here is userName: ${userName}"
             def rows = sql.rows( 'select * from email_user where username=?', userName )

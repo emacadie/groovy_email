@@ -103,7 +103,7 @@ class MetaProgrammer {
         java.util.regex.Matcher.metaClass.handles8BitInMAIL = { ->
             delegate[ 0 ][ 3 ]
         }
-        java.util.regex.Matcher.metaClass.extractDomain = { ->
+        java.util.regex.Matcher.metaClass.extractDomainRCPT = { ->
             delegate[ 0 ][ 3 ]
         }
         java.util.regex.Matcher.metaClass.getWholeAddressInMSSG = { ->
