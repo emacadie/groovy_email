@@ -121,7 +121,7 @@ class ModularSMTPSocketWorker {
 		    commandResultMap.clear()
 		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
-		    bufferMap = commandResultMap.bufferMap.clone() 
+		    bufferMap = commandResultMap.bufferMap?.clone() 
 			theResponse = commandResultMap.resultString
 		} else if ( prevCommandSet.lastItem() == 'DATA' ) {
 			log.info "prevCommand is DATA, here is the message: ${theMessage}"

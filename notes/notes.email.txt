@@ -33,14 +33,12 @@ https://cafe.bevocal.com/docs/grammar/abnf.html
 http://www.freesoft.org/CIE/RFC/1945/7.htm
 https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form
 
-
 http://www.iana.org/assignments/mail-parameters/mail-parameters.xhtml
 List of James RFCs: http://james.apache.org/server/rfclist.html
 http://www.smtp2go.com/articles/smtp-protocol
 http://en.wikipedia.org/wiki/Extended_SMTP
 
 List of standards: http://www.rfc-editor.org/search/standards.php
-
 
 Look at using http://email.jcabi.com/
 http://www.yegor256.com/2014/11/07/how-immutability-helps.html

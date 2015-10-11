@@ -74,20 +74,22 @@ class MetaProgrammer {
                 delegate.last()
             }
         }
+        
         java.util.Set.metaClass.lastCommandPrecedesMail = { ->
-            delegate.last().matches( 'EHLO|HELO|RSET' )
+            ( !delegate.isEmpty() ) && ( delegate.last().matches( 'EHLO|HELO|RSET' ) )
         }
         java.util.Set.metaClass.lastCommandPrecedesRCPT = { ->
-            delegate.last().matches( 'MAIL|RCPT' ) 
+            ( !delegate.isEmpty() ) &&  ( delegate.last().matches( 'MAIL|RCPT' ) ) 
         }
         java.util.Set.metaClass.lastCommandPrecedesDATA = { ->
-            delegate.last().matches( 'RCPT' ) 
+            ( !delegate.isEmpty() ) &&  (delegate.last().matches( 'RCPT' ) ) 
         }
         java.util.Set.metaClass.lastCommandPrecedesMSSG = { ->
-            delegate.last().matches( 'DATA' ) 
+            ( !delegate.isEmpty() ) &&  ( delegate.last().matches( 'DATA' ) ) 
         }
         java.util.Set.metaClass.includes = { i -> i in delegate 
         }
+        
     }
     
     static runMatcherMetaProgramming() {
