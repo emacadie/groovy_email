@@ -105,7 +105,13 @@ class ModularPostOfficeSocketWorker {
 	def handleMessage( theMessage, def isActualMessage = false ) {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
-		if ( theMessage.isEncapsulated( ) || isActualMessage ) {
+		if ( theMessage.isOptionalPostOfficeCommand() ) {
+		    theResponse = '-ERR Command not implemented'
+        } else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
+		    theResponse = '+OK'
+		} else if ( theMessage.isRFC5034Command() ) { 
+		    theResponse = '-ERR Command not implemented'
+		} else if ( theMessage.isEncapsulated( ) || isActualMessage ) {
 		    commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
 		    log.info "returned a command object that is a ${commandObject.class.name}"
 		    commandResultMap.clear()
@@ -113,16 +119,9 @@ class ModularPostOfficeSocketWorker {
 		    prevCommandSet = commandResultMap.prevCommandSet.clone()
 		    bufferMap = commandResultMap.bufferMap.clone() 
 			theResponse = commandResultMap.resultString
-		/*
-		} else if ( theMessage.startsWith( 'QUIT' ) ) { 
-			theResponse = "221 ${serverName} Service closing transmission channel"
-		*/
-		} else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
-		    theResponse = '+OK'
-		} else if ( theMessage.isRFC5034Command() ) { 
-		    theResponse = '-ERR Command not implemented'
+		
 		} else {
-			theResponse = '+OK'
+			theResponse = '-ERR Command not implemented'
 		}
 		theResponse + "\r\n"
 	}

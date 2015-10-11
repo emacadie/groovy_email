@@ -15,6 +15,7 @@ class PostOfficeServer {
     }
     
     def doStuff( port ) {
+        log.info "In doStuff and port ${port} is a ${port.getClass().getName()}"
         def server = new ServerSocket( port )
  
         while ( true ) { 

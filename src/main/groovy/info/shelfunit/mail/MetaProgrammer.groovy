@@ -210,6 +210,14 @@ class MetaProgrammer {
                 false
             }
         }
+        // at some point these might be implemented
+        String.metaClass.isOptionalPostOfficeCommand = { ->
+            if ( delegate.length() >= 4 ) {
+                return delegate.firstFour().matches( "TOP|UIDL|APOP" )
+            } else {
+                false
+            }
+        }
         
         String.metaClass.toInt = { ->
             return Integer.parseInt( delegate )

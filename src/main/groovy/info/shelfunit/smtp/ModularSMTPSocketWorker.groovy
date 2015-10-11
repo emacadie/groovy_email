@@ -85,7 +85,7 @@ class ModularSMTPSocketWorker {
 		        gotQuitCommand = true
 		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
 
-	        } else if ( prevCommandSet.lastItem() == 'DATA' ) {
+	        } else if ( prevCommandSet?.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
 		        while ( !newString.equals( "." ) ) {
 		            sBuffer << newString 

@@ -13,7 +13,7 @@ import info.shelfunit.smtp.SMTPServer
 @Slf4j
 class MailRunner {
 
-    def withActors( def path ) {
+    def runWithActors( def path ) {
         ConfigHolder.instance.setConfObject( path )
         def config = ConfigHolder.instance.getConfObject()
         def serverList = [ config.smtp.server.name ]
@@ -30,22 +30,30 @@ class MailRunner {
         poActor.send( new PostOfficeRunnerMessage( serverList ) )
     }
     
-    def withoutActors( def path ) {
-        ConfigHolder.instance.setConfObject( args[ 0 ] )
+    def runWithoutActors( def path ) {
+        ConfigHolder.instance.setConfObject( path )
         def config = ConfigHolder.instance.getConfObject()
         def serverList = [ config.smtp.server.name ]
         config.smtp.other.domains.isEmpty() ?: ( serverList += config.smtp.other.domains )
         PostOfficeServer postO = new PostOfficeServer( serverList )
-        postO.doStuff( config.postoffice.server.port.toInteger() )
-        
+        log.info "About to call doStuff with port ${config.postoffice.server.port} and it's a ${config.postoffice.server.port.getClass().getName()}"
+        Thread.start( "postoffice" ) {
+            postO.doStuff( config.postoffice.server.port.toInteger() )
+        }
         SMTPServer smtp = new SMTPServer( serverList )
         log.info "About to call doStuff with port ${config.smtp.server.port.toInteger()} and it's a ${config.smtp.server.port.toInteger().getClass().getName()}"
-        smtp.doStuff( config.smtp.server.port.toInteger() )
+        Thread.start( "smtp" ) {
+            smtp.doStuff( config.smtp.server.port.toInteger() )
+        }
     }
     
     static main( args ) {
         MetaProgrammer.runMetaProgramming()
         log.info "in MailRunner"
+        def mRunner = new MailRunner()
+        mRunner.runWithoutActors( args[ 0 ] )
+        
+        /*        
         def stringPath = args[ 0 ]
         ConfigHolder.instance.setConfObject( args[ 0 ] )
         def config = ConfigHolder.instance.getConfObject()
@@ -62,6 +70,7 @@ class MailRunner {
         
         def poActor = new PostOfficeActor().start()
         poActor.send( new PostOfficeRunnerMessage( serverList ) )
+        */
     }
 }
 

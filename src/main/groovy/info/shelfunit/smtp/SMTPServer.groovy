@@ -15,7 +15,7 @@ class SMTPServer {
     }
     
     def doStuff( def port ) {
-        log.info "In doStuff and port is a ${port.getClass().getName()}"
+        log.info "In doStuff and port ${port} is a ${port.getClass().getName()}"
         def server = new ServerSocket( port )
  
         while ( true ) { 
