@@ -3,7 +3,7 @@ package info.shelfunit.postoffice
 import groovy.util.logging.Slf4j 
 
 import info.shelfunit.mail.ConfigHolder
-import info.shelfunit.mail.MetaProgrammer
+import info.shelfunit.mail.meta.MetaProgrammer
 
 @Slf4j
 class PostOfficeRunner {

@@ -6,7 +6,7 @@ import spock.lang.Unroll
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import info.shelfunit.mail.MetaProgrammer
+import info.shelfunit.mail.meta.MetaProgrammer
 
 class MAILCommandSpec extends Specification {
     

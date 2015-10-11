@@ -1,4 +1,4 @@
-package info.shelfunit.mail
+package info.shelfunit.mail.meta
 
 import groovy.sql.Sql
 

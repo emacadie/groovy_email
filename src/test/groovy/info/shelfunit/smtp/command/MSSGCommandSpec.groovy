@@ -7,7 +7,7 @@ import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
-import info.shelfunit.mail.MetaProgrammer
+import info.shelfunit.mail.meta.MetaProgrammer
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 

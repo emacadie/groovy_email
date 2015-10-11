@@ -11,7 +11,7 @@ import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
-import info.shelfunit.mail.MetaProgrammer
+import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.smtp.command.EHLOCommand
 import org.apache.shiro.crypto.hash.Sha512Hash
 

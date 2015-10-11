@@ -5,7 +5,7 @@ import spock.lang.Specification
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import info.shelfunit.mail.MetaProgrammer
+import info.shelfunit.mail.meta.MetaProgrammer
 
 import groovy.sql.Sql
 

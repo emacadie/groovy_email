@@ -2,6 +2,8 @@ package info.shelfunit.mail
 
 import groovy.util.logging.Slf4j 
 
+import info.shelfunit.mail.meta.MetaProgrammer
+
 import info.shelfunit.postoffice.PostOfficeActor
 import info.shelfunit.postoffice.PostOfficeRunnerMessage
 import info.shelfunit.postoffice.PostOfficeServer

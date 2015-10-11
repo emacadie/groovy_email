@@ -5,6 +5,8 @@ import java.io.OutputStream
 
 import groovy.util.logging.Slf4j 
 
+// I don't think this is used, I could probably remove it
+
 @Slf4j
 class PostOfficeSocketWorker {
 
