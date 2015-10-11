@@ -108,7 +108,8 @@ class LISTCommandSpec extends Specification {
             resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}"
+            "3 ${msgC.size()}\r\n" +
+            "."
         
         def messageStringB = 'aw' * 11
         def toAddress = "${gwLIST}@${domainList[ 0 ]}".toString()
@@ -130,7 +131,8 @@ class LISTCommandSpec extends Specification {
             resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}"
+            "3 ${msgC.size()}\r\n" +
+            "."
 	}
 
 	
@@ -191,7 +193,8 @@ class LISTCommandSpec extends Specification {
             resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +
             "1 ${msgA.size()}\r\n" +
             "2 ${msgB.size()}\r\n" +
-            "3 ${msgC.size()}"
+            "3 ${msgC.size()}\r\n" +
+            "."
 	}
 
 }

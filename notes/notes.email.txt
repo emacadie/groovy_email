@@ -162,3 +162,8 @@ James SMTP does this:
 250-DELIVERBY
 250 HELP
 
+Logging thunderbird:
+https://wiki.mozilla.org/MailNews:Logging
+http://forums.mozillazine.org/viewtopic.php?f=28&t=31199
+
+

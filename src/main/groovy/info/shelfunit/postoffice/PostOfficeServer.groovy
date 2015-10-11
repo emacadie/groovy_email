@@ -9,8 +9,9 @@ class PostOfficeServer {
     def serverList = []
     
     PostOfficeServer( def argServer ) {
+        log.info "Starting server, list is ${argServer}"
         serverList = argServer
-        log.info "the server is ${argServer}"
+        log.info "server starting"
     }
     
     def doStuff( port ) {

@@ -5,9 +5,9 @@ import groovy.util.logging.Slf4j
 @Slf4j
 final class PostOfficeRunnerMessage {
     
-    final String serverList;
+    final List serverList;
 
-    PostOfficeRunnerMessage( final String argServerList ) {
+    PostOfficeRunnerMessage( final List argServerList ) {
         serverList = argServerList
     }
 }

@@ -5,10 +5,12 @@ import groovy.util.logging.Slf4j
 @Slf4j
 final class SMTPRunnerMessage {
     
-    final String serverList;
+    final List serverList
+    final int port
 
-    SMTPRunnerMessage( final String argServerList ) {
+    SMTPRunnerMessage( final List argServerList, final int argPort ) {
         serverList = argServerList
+        port = argPort
     }
 }
 

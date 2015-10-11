@@ -36,10 +36,9 @@ class LISTCommand {
             sBuff << "+OK ${bufferMap.totalMessageSize}\r\n"
             rows.eachWithIndex { r, i ->
                 sBuff << "${i + 1} ${r.length}"
-                if ( i != ( rows.size() - 1 ) ) { 
-                    sBuff << "\r\n" 
-                }
+                sBuff << "\r\n" 
             } 
+            sBuff << "."
             resultMap.resultString = sBuff.toString()
         } else if ( theMessage.matches( "LIST\\s\\d+" ) ) {
             log.info "in the reg ex part"
@@ -63,6 +62,6 @@ class LISTCommand {
 
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap
-    }
+    } // line 65
 }
 

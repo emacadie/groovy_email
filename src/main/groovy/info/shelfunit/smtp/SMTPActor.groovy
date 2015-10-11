@@ -4,12 +4,22 @@ import groovy.util.logging.Slf4j
 
 import groovyx.gpars.actor.DynamicDispatchActor
 
+import info.shelfunit.mail.ConfigHolder
+
 @Slf4j
 class SMTPActor extends DynamicDispatchActor {
     
     void onMessage( SMTPRunnerMessage message ) {
-        SMTPServer smtp = new SMTPServer( serverList )
-        smtp.doStuff( config.smtp.server.port.toInteger() )
+        log.info "About to start the server"
+        log.info "here is the serverList: ${message.serverList} and it's a ${message.serverList.getClass().getName()}"
+        SMTPServer smtp = new SMTPServer( message.serverList )
+        log.info "About to get config"
+        // def config = ConfigHolder.instance.getConfObject()
+        // def config = ConfigHolder.instance.confObject
+        // ConfigHolder.instance.setConfObject( args[ 0 ] )
+        // def config = ConfigHolder.instance.getConfObject()
+        log.info "About to call doStuff with port ${message.port} and it's a ${message.port.getClass().getName()}"
+        smtp.doStuff( message.port )
     }
 }
 

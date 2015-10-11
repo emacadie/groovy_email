@@ -9,11 +9,13 @@ class SMTPServer {
     def serverList = []
     
     def SMTPServer( def argServer ) {
+        log.info "the server list is ${argServer} and it's a ${argServer.getClass().getName()}"
         serverList = argServer
-        log.info "the server is ${argServer}"
+        log.info "the server is starting"
     }
     
-    def doStuff( port ) {
+    def doStuff( def port ) {
+        log.info "In doStuff and port is a ${port.getClass().getName()}"
         def server = new ServerSocket( port )
  
         while ( true ) { 
