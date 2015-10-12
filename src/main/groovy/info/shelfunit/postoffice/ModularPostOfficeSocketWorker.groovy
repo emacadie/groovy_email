@@ -49,8 +49,9 @@ class ModularPostOfficeSocketWorker {
         
         def db = ConfigHolder.instance.returnDbMap()         
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
-        
-        serverList = argServerList
+        log.info "argServerList is a ${argServerList.class.name}"
+        serverList = []
+        argServerList.collect{ serverList << it.toLowerCase() }
         serverName = serverList[ 0 ]
         log.info "server name is ${serverName}"
         prevCommandSet = [] as Set

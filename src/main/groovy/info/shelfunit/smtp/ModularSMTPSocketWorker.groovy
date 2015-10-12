@@ -45,8 +45,9 @@ class ModularSMTPSocketWorker {
         
         def db = ConfigHolder.instance.returnDbMap()         
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        serverList = []
+        argServerList.collect{ serverList << it.toLowerCase() }
         
-        serverList = argServerList
         serverName = serverList[ 0 ]
         log.info "server name is ${serverName}"
         prevCommandSet = [] as Set
