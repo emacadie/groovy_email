@@ -109,6 +109,7 @@ class ModularSMTPSocketWorker {
 	        log.info "responseString: ${responseString}"
 	        output << responseString
         }
+        sql.close()
         log.info "Here is prevCommandSet: ${prevCommandSet}"
         log.info "ending doWork"
 	} 
