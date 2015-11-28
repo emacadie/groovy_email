@@ -37,7 +37,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
             prevCommandSet << 'MAIL'
             
             def q = theMessage =~ pattern
-            bufferMap.clear()
+            bufferMap?.clear()
             bufferMap.forwardPath = [] // for RCPT command
             bufferMap.reversePath =  q.getEmailAddressInMAIL()
             if ( q.handles8BitInMAIL() ) {

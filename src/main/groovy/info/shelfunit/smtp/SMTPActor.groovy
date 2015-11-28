@@ -9,10 +9,12 @@ import info.shelfunit.mail.ConfigHolder
 @Slf4j
 class SMTPActor extends DynamicDispatchActor {
     
+    SMTPServer smtp = null
+    
     void onMessage( SMTPRunnerMessage message ) {
         log.info "About to start the server"
         log.info "here is the serverList: ${message.serverList} and it's a ${message.serverList.getClass().getName()}"
-        SMTPServer smtp = new SMTPServer( message.serverList )
+        smtp = new SMTPServer( message.serverList )
         log.info "About to get config"
         // def config = ConfigHolder.instance.getConfObject()
         // def config = ConfigHolder.instance.confObject

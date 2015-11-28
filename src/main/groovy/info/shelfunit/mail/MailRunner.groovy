@@ -26,10 +26,17 @@ class MailRunner {
         
         def smtpActor = new SMTPActor().start()
         // sendAndPromise later?
-        smtpActor.send( new SMTPRunnerMessage( serverList, config.smtp.server.port.toInteger()  ) )
+        def smtpPromise = smtpActor.sendAndPromise( new SMTPRunnerMessage( serverList, config.smtp.server.port.toInteger()  ) )
         
         def poActor = new PostOfficeActor().start()
         poActor.send( new PostOfficeRunnerMessage( serverList ) )
+        
+        def keepGoing = true
+        
+        while ( keepGoing ) {
+            sleep( 4 * 1000 )
+            log.info "still going in runWithActors"
+        }
     }
     
     def runWithoutActors( def path ) {
@@ -53,8 +60,8 @@ class MailRunner {
         MetaProgrammer.runMetaProgramming()
         log.info "in MailRunner"
         def mRunner = new MailRunner()
-        mRunner.runWithoutActors( args[ 0 ] )
-        
+        // mRunner.runWithoutActors( args[ 0 ] )
+        mRunner.runWithActors( args[ 0 ] )
         /*        
         def stringPath = args[ 0 ]
         ConfigHolder.instance.setConfObject( args[ 0 ] )

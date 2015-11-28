@@ -16,8 +16,11 @@ gradle runJava -PmainClass=info.shelfunit.socket.JTCPClient -PmainArgs=6789
 gradle runJava -PmainClass=info.shelfunit.socket.JTCPServer -PmainArgs=25
 
 
+
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner
 gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner -PmainArgs="src/main/resources/application.conf"
+gradle runGroovy -PmainClass=info.shelfunit.mail.MailRunner -PmainArgs="/home/ericm/tmp/groovy/groovy.email.conf"
+
 gradle runGroovy -PmainClass=info.shelfunit.mail.BinaryMailRunner -PmainArgs="src/main/resources/application.conf"
 gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath=/src/test/resources/application.test.conf -user=lionel.richie -fName=Lionel -lName=Richie -pass='Hello, is it me you're looking for' -iterations=10"
 
@@ -29,7 +32,8 @@ gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-confi
 gradle runGroovy -PmainClass=info.shelfunit.mail.UserInserter -PmainArgs="-configPath src/test/resources/application.test.conf -user maildude -fName Dude -lName Abiding -pass L3bowsk_ii -iterations 10"
 
 .
-
+/home/ericm/github/groovy_email/.gradle/2.9/taskArtifacts/cache.properties.lock
+.
     UserInserter( def args ) {
         
         def cli = new CliBuilder( usage:'UserInserter' )

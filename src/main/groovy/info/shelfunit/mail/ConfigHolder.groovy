@@ -4,8 +4,6 @@ import groovy.lang.Singleton
 import groovy.util.ConfigObject 
 import groovy.util.ConfigSlurper
 
-// import visibility.Hidden
-
 @Singleton
 class ConfigHolder {
     ConfigObject confObject

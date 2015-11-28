@@ -17,8 +17,10 @@ class PostOfficeServer {
     def doStuff( port ) {
         log.info "In doStuff and port ${port} is a ${port.getClass().getName()}"
         def server = new ServerSocket( port )
- 
-        while ( true ) { 
+        
+        while ( true ) {
+            sleep( 3 * 1000 )
+            log.info "done sleeping in POP"
             server.accept {  socket ->
                 log.info "processing new connection..."
                 socket.setSoTimeout( 1000 * 60 * 10 ) // RFC 5321 states timeouts should be 2-10 minutes
