@@ -35,6 +35,7 @@ https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form
 
 http://www.iana.org/assignments/mail-parameters/mail-parameters.xhtml
 List of James RFCs: http://james.apache.org/server/rfclist.html
+http://james.apache.org/server/2/smtp_auth.html
 http://www.smtp2go.com/articles/smtp-protocol
 http://en.wikipedia.org/wiki/Extended_SMTP
 
@@ -56,6 +57,9 @@ https://technet.microsoft.com/en-us/magazine/2005.11.howitworkssmtp.aspx
 java.net.SocketInputStream:
 http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/java/net/SocketInputStream.java?av=f
 http://www.docjar.com/docs/api/java/net/SocketInputStream.html
+
+Authentication:
+http://blog.trifork.com/2009/11/10/securing-connections-with-tls/
 
 5321 minimum implementation:
 x EHLO
@@ -120,6 +124,7 @@ http://www.cryptoworkshop.com/guide/
 
 http://www.mindrot.org/projects/jBCrypt/
 https://github.com/wg/scrypt
+http://www.jroller.com/dancruz/entry/send_smtp_auth_email_with
 -------
 POP3, RFC 1939:
 Minimal POP3 Commands:
@@ -167,4 +172,5 @@ http://forums.mozillazine.org/viewtopic.php?f=28&t=31199
 SMTP auth in alpine
 http://weldon.whipple.org/sendmail/pine-smtpauth.html
 
+SMTP command limit: 512 characters
 
