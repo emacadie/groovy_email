@@ -1,4 +1,3 @@
-//
 // Built on Thu Jun 11 10:36:44 CEST 2015 by logback-translator
 // For more information on configuration files in Groovy please see http://logback.qos.ch/manual/groovy.html
 
@@ -19,6 +18,8 @@ appender( "STDOUT", ConsoleAppender ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
+root( DEBUG, [ "STDOUT" ] )
+
 appender( "FILE-smtp", RollingFileAppender ) {
   rollingPolicy( TimeBasedRollingPolicy ) {
     fileNamePattern = "log/smtp.%d{yyyy-MM-dd}.log"
@@ -28,7 +29,6 @@ appender( "FILE-smtp", RollingFileAppender ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
-root( DEBUG, [ "STDOUT" ] )
 logger( "info.shelfunit.smtp", INFO, [ "FILE-smtp" ] )
 
 appender( "FILE-postoffice", RollingFileAppender ) {
@@ -40,6 +40,5 @@ appender( "FILE-postoffice", RollingFileAppender ) {
     pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
   }
 }
-
 logger( "info.shelfunit.postoffice", INFO, [ "FILE-postoffice" ] )
 

@@ -23,5 +23,9 @@ class SMTPActor extends DynamicDispatchActor {
         log.info "About to call doStuff with port ${message.port} and it's a ${message.port.getClass().getName()}"
         smtp.doStuff( message.port )
     }
+    
+    void onMessage( Object message ) {
+        log.info "Caught generic message which is type ${message.getClass().name()}" 
+    }
 }
 

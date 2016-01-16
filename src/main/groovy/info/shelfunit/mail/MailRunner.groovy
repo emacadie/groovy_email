@@ -19,6 +19,10 @@ class MailRunner {
         ConfigHolder.instance.setConfObject( path )
         def config = ConfigHolder.instance.getConfObject()
         def serverList = [ config.smtp.server.name ]
+        log.info "here is config.watch.dir: ${config.watch.dir}"
+        log.info "config.watch.dir is a ${config.watch.dir.getClass().name}"
+        log.info "here is config.watch.dir.toString(): ${config.watch.dir.toString()}"
+        DirectoryWatcher.init( config.watch.dir.toString() )
 
         config.smtp.other.domains.isEmpty() ?: ( serverList += config.smtp.other.domains )
         // SMTPServer smtp = new SMTPServer( serverList )
@@ -32,7 +36,8 @@ class MailRunner {
         poActor.send( new PostOfficeRunnerMessage( serverList ) )
         
         def keepGoing = true
-        
+        sleep( 4 * 1000 )
+        DirectoryWatcher.watch()
         while ( keepGoing ) {
             sleep( 4 * 1000 )
             log.info "still going in runWithActors"
@@ -62,24 +67,6 @@ class MailRunner {
         def mRunner = new MailRunner()
         // mRunner.runWithoutActors( args[ 0 ] )
         mRunner.runWithActors( args[ 0 ] )
-        /*        
-        def stringPath = args[ 0 ]
-        ConfigHolder.instance.setConfObject( args[ 0 ] )
-        def config = ConfigHolder.instance.getConfObject()
-        def serverList = [ config.smtp.server.name ]
-
-        config.smtp.other.domains.isEmpty() ?: ( serverList += config.smtp.other.domains )
-        // SMTPServer smtp = new SMTPServer( serverList )
-        // smtp.doStuff( config.smtp.server.port.toInteger() )
-        
-        def smtpActor = new SMTPActor()
-        smtpActor.start()
-        // sendAndPromise later?
-        smtpActor.send( new SMTPRunnerMessage( serverList, config.smtp.server.port.toInteger()  ) )
-        
-        def poActor = new PostOfficeActor().start()
-        poActor.send( new PostOfficeRunnerMessage( serverList ) )
-        */
     }
 }
 
