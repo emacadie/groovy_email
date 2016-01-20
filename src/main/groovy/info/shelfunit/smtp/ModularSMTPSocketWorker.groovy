@@ -29,7 +29,7 @@ class ModularSMTPSocketWorker {
 	@Hidden def bufferMap
 	@Hidden def sql
 	@Hidden def serverList
-	@Hidden def commandObject
+	
 	@Hidden def mailCommand
 	@Hidden def ehloCommand
 	@Hidden def rcptCommand
@@ -118,7 +118,7 @@ class ModularSMTPSocketWorker {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
 		if ( theMessage.isEncapsulated( ) || isActualMessage ) {
-		    commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
+		    def commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
 		    log.info "returned a command object that is a ${commandObject.class.name}"
 		    commandResultMap.clear()
 		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 

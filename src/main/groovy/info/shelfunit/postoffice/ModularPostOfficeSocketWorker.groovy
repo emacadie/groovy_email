@@ -30,7 +30,6 @@ class ModularPostOfficeSocketWorker {
 	@Hidden def bufferMap
 	@Hidden def sql
 	@Hidden def serverList
-	@Hidden def commandObject
 	
 	@Hidden def deleCommand
 	@Hidden def listCommand
@@ -114,7 +113,7 @@ class ModularPostOfficeSocketWorker {
 		} else if ( theMessage.isRFC5034Command() ) { 
 		    theResponse = '-ERR Command not implemented'
 		} else if ( theMessage.isEncapsulated( ) || isActualMessage ) {
-		    commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
+		    def commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
 		    log.info "returned a command object that is a ${commandObject.class.name}"
 		    commandResultMap.clear()
 		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 

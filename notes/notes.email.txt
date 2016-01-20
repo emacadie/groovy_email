@@ -19,7 +19,7 @@ http://tools.ietf.org/html/rfc3464: An Extensible Message Format for Delivery St
 https://tools.ietf.org/html/rfc3696#section-3 - covers email addresses
 http://tools.ietf.org/html/rfc3974: SMTP Operational Experience in Mixed IPv4/v6 Environments
 http://tools.ietf.org/html/rfc4954: SMTP Service Extension for Authentication
-http://tools.ietf.org/html/rfc5034: The Post Office Protocol (POP3) Simple Authentication and Security Layer (SASL) Authentication Mechanism
+http://tools.ietf.org/html/rfc5034: The Post Office Protocol (POP3) Simple Authentication and Security Layer (SASL) Authentication Mechanism (AUTH and CAPA mentioned here)
 http://tools.ietf.org/html/rfc5248: A Registry for SMTP Enhanced Mail System Status Codes (updates but does not obsolete 4954)
 http://tools.ietf.org/html/rfc5322: Internet Message Format
 
@@ -171,6 +171,8 @@ http://forums.mozillazine.org/viewtopic.php?f=28&t=31199
 
 SMTP auth in alpine
 http://weldon.whipple.org/sendmail/pine-smtpauth.html
+I think to get alpine logs, alpine -d 5
+See https://www.washington.edu/alpine/faq/usage.html
 
 SMTP command limit: 512 characters
 
