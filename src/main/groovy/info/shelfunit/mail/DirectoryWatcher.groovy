@@ -8,7 +8,6 @@ import groovy.util.logging.Slf4j
 // import java.io.IOException;
 // import java.net.URI;
 // import java.net.URISyntaxException;
-// import java.nio.file.*;
 import java.nio.file.FileSystems
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -43,7 +42,9 @@ class DirectoryWatcher {
             WatchKey key = watchService.take()
         
             // Poll all the events queued for the key
-            for ( WatchEvent<?> event: key.pollEvents() ) {
+            // orig
+            // for ( WatchEvent<?> event: key.pollEvents() ) {
+            for ( WatchEvent event: key.pollEvents() ) {
                 WatchEvent.Kind kind = event.kind()
                 switch ( kind.name( ) ) {
                     case "ENTRY_MODIFY":

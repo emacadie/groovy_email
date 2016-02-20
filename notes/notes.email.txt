@@ -171,8 +171,15 @@ http://forums.mozillazine.org/viewtopic.php?f=28&t=31199
 
 SMTP auth in alpine
 http://weldon.whipple.org/sendmail/pine-smtpauth.html
+https://www.washington.edu/alpine/tech-notes/config.html
 I think to get alpine logs, alpine -d 5
 See https://www.washington.edu/alpine/faq/usage.html
 
 SMTP command limit: 512 characters
+
+SASL:
+http://stackoverflow.com/questions/2077768/how-to-use-the-java-sasl-api-and-cram-md5
+https://docs.oracle.com/javase/8/docs/technotes/guides/security/sasl/sasl-refguide.html
+
+http://stackoverflow.com/questions/186827/smtp-with-cram-md5-in-java?rq=1
 
