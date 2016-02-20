@@ -180,6 +180,7 @@ SMTP command limit: 512 characters
 SASL:
 http://stackoverflow.com/questions/2077768/how-to-use-the-java-sasl-api-and-cram-md5
 https://docs.oracle.com/javase/8/docs/technotes/guides/security/sasl/sasl-refguide.html
+https://docs.oracle.com/javase/8/docs/api/index.html?javax/security/sasl/Sasl.html
 
 http://stackoverflow.com/questions/186827/smtp-with-cram-md5-in-java?rq=1
 
