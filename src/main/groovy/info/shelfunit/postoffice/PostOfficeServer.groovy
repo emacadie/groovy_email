@@ -26,8 +26,14 @@ class PostOfficeServer {
                 socket.setSoTimeout( 1000 * 60 * 10 ) // RFC 5321 states timeouts should be 2-10 minutes
                 socket.withStreams { input, output ->
                     log.info "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverList}"
-                    ModularPostOfficeSocketWorker sSockW = new ModularPostOfficeSocketWorker( input, output, serverList )
-                    sSockW.doWork(  )
+                    
+                    ModularPostOfficeSocketWorker sSockW 
+                    try  {
+                        sSockW = new ModularPostOfficeSocketWorker( input, output, serverList )
+                        sSockW.doWork(  )
+                    } finally {
+                        sSockW.cleanup()
+                    }
                 }
                 log.info "processing/thread complete......................"
             }

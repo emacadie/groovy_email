@@ -78,6 +78,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             
             def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) // , sql )
             ssWorker.doWork()
+            ssWorker.cleanup()
             
 	    then:
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
@@ -104,6 +105,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             
             def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) // , sql )
             ssWorker.doWork()
+            ssWorker.cleanup()
             
 	    then:
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
@@ -132,6 +134,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             
             def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) // , sql )
             ssWorker.doWork()
+            ssWorker.cleanup()
             
 	    then:
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
@@ -244,7 +247,9 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new ModularPostOfficeSocketWorker( input, output, domainList ).doWork()
+            def worker = ModularPostOfficeSocketWorker( input, output, domainList )
+            worker.doWork()
+            worker.cleanup()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
