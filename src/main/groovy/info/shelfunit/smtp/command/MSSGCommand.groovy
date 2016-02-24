@@ -11,26 +11,9 @@ import visibility.Hidden
 class MSSGCommand {
     
     @Hidden def uuidSet
-/*    
-    static regex = '''([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)'''
-*/
-   static regex = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
+    static regex = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
 *+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)'''    
-/*
-groovy:001> *+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)''' 
-===> (([\w!#$%&’*+/=?`{|}~^-]+(?:\.[\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}))$(?x)
-groovy:000> q = address =~ regex
-===> java.util.regex.Matcher[pattern=(([\w!#$%&’*+/=?`{|}~^-]+(?:\.[\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\.)+[a-zA-Z]{2,6}))$(?x) region=0,24 lastmatch=]
-groovy:000> q[0][2]
-===> jack.oneill
-groovy:000> q[0][1]
-===> jack.oneill@stargate.mil
-groovy:000> q[0][3]
-===> stargate.mil
-*/
+
     @Hidden Sql sql
     @Hidden List domainList
     MSSGCommand( def argSql, def argDomainList ) {
@@ -40,25 +23,6 @@ groovy:000> q[0][3]
         this.domainList = argDomainList
         uuidSet = [] as Set
     }
-    
-    /*
-    myList = [ 1, 2, 3, 4 ]
-for ( item in myList ) {
-   println item
-   if ( item == 2 ) { break }
-}
-
-myList = [ 1, 2, 3, 4 ]
-for ( item in myList ) {
-   println item
-   if ( item == 2 ) { break }
-}
-
-1.upto(4) {
-   println "Test ${it}"
-   if (it == 2) {break}
-}
-    */
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "In MSSGCommand"
@@ -70,7 +34,7 @@ for ( item in myList ) {
             uuidSet << UUID.randomUUID() 
         }
 
-        if ( !prevCommandSet.lastCommandPrecedesMSSG() ) {
+        if ( !prevCommandSet.lastSMTPCommandPrecedesMSSG() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
             resultMap.resultString =  this.addMessageToDatabase( theMessage, bufferMap, uuidSet )

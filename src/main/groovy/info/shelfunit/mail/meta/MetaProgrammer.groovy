@@ -26,10 +26,10 @@ class MetaProgrammer {
                 delegate.last()
             }
         }
-        java.util.List.metaClass.lastCommandPrecedesMail = { ->
+        java.util.List.metaClass.lastSMTPCommandPrecedesMail = { ->
             delegate.last().matches( 'EHLO|HELO|RSET' )
         }
-        java.util.List.metaClass.lastCommandPrecedesRCPT = { ->
+        java.util.List.metaClass.lastSMTPCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
         }
         java.util.List.metaClass.includes = { i -> i in delegate 
@@ -75,24 +75,22 @@ class MetaProgrammer {
             }
         }
         
-        java.util.Set.metaClass.lastCommandPrecedesMail = { ->
+        java.util.Set.metaClass.lastSMTPCommandPrecedesMail = { ->
             ( !delegate.isEmpty() ) && ( delegate.last().matches( 'EHLO|HELO|RSET' ) )
         }
-        java.util.Set.metaClass.lastCommandPrecedesRCPT = { ->
+        java.util.Set.metaClass.lastSMTPCommandPrecedesRCPT = { ->
             ( !delegate.isEmpty() ) &&  ( delegate.last().matches( 'MAIL|RCPT' ) ) 
         }
-        java.util.Set.metaClass.lastCommandPrecedesDATA = { ->
+        java.util.Set.metaClass.lastSMTPCommandPrecedesDATA = { ->
             ( !delegate.isEmpty() ) &&  (delegate.last().matches( 'RCPT' ) ) 
         }
-        java.util.Set.metaClass.lastCommandPrecedesMSSG = { ->
+        java.util.Set.metaClass.lastSMTPCommandPrecedesMSSG = { ->
             ( !delegate.isEmpty() ) &&  ( delegate.last().matches( 'DATA' ) ) 
         }
         java.util.Set.metaClass.includes = { i -> i in delegate 
         }
         
     }
-    
-
     
     static runStringBufferMetaProgramming() {
         StringBuffer.metaClass.endsWith = { end ->
