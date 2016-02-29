@@ -133,6 +133,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             
             def ssWorker = new ModularSMTPSocketWorker( input, output, domainList ) // , sql )
             ssWorker.doWork()
+            ssWorker.cleanup()
             
 	    then:
 	        output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
@@ -155,7 +156,9 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            new ModularSMTPSocketWorker( input, output, domainList ).doWork()
+            def worker = new ModularSMTPSocketWorker( input, output, domainList )
+            worker.doWork()
+            worker.cleanup()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -189,6 +192,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             OutputStream output = new ByteArrayOutputStream() 
             def msmtpw = new ModularSMTPSocketWorker( input, output, domainList )
             msmtpw.doWork()
+            msmtpw.cleanup()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"
@@ -217,6 +221,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             OutputStream output = new ByteArrayOutputStream() 
             def ssWorker = new ModularSMTPSocketWorker( input, output, domainList )
             ssWorker.doWork()
+            ssWorker.cleanup()
             
 	    then:
             println "output to string: ++++\n${output.toString()}"

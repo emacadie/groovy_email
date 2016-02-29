@@ -19,7 +19,7 @@ class DATACommand {
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !theMessage.startsWith( 'DATA' )  ) {
             resultMap.resultString = "503 Bad sequence of commands"
-        } else if ( !prevCommandSet.lastCommandPrecedesDATA() ) {
+        } else if ( !prevCommandSet.lastSMTPCommandPrecedesDATA() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
 		    prevCommandSet << "DATA"

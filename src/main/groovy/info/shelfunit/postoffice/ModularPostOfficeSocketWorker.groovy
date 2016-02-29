@@ -98,10 +98,14 @@ class ModularPostOfficeSocketWorker {
 	        log.info "responseString: ${responseString}"
 	        output << responseString
         }
-        sql.close()
+        
         log.info "Here is prevCommandSet: ${prevCommandSet}"
         log.info "ending doWork"
 	} 
+	
+	def cleanup () {
+	    sql.close()
+	}
 
 	def handleMessage( theMessage, def isActualMessage = false ) {
 		theResponse = ""

@@ -13,11 +13,7 @@ class MAILCommand {
     // http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
     static regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
 *+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6})>(\\s{0,}BODY=8BITMIME)?$(?x)'''
-/*
- regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+([a-zA-Z]{2,6}))>$(?x)'''
-regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}>$'''
-*/
+
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -25,7 +21,7 @@ regexB = '''^(MAIL FROM):<[\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~
         def resultMap = [:]
         resultMap.clear()
         def regexResult = ( theMessage ==~ pattern )
-        if ( !prevCommandSet.lastCommandPrecedesMail() ) {
+        if ( !prevCommandSet.lastSMTPCommandPrecedesMail() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else if ( !theMessage.startsWith( 'MAIL FROM:' ) ) {
             resultMap.resultString = "501 Command not in proper form"
