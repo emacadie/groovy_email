@@ -183,3 +183,13 @@ https://docs.oracle.com/javase/8/docs/technotes/guides/security/sasl/sasl-refgui
 
 http://stackoverflow.com/questions/186827/smtp-with-cram-md5-in-java?rq=1
 
+IMAP DEBUG 01:12:07 2/29: RSET
+IMAP DEBUG 01:12:07 2/29: 250 OK
+IMAP DEBUG 01:12:07 2/29: MAIL FROM:<malcolm@shelfunit.info>
+IMAP DEBUG 01:12:07 2/29: 250 OK
+IMAP DEBUG 01:12:07 2/29: RCPT TO:<emacadie9@gmail.com>
+IMAP DEBUG 01:12:07 2/29: 550 No such user
+IMAP DEBUG 01:12:07 2/29: RSET
+IMAP DEBUG 01:12:07 2/29: 250 OK
+
+

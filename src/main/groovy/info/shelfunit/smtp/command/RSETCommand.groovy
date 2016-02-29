@@ -10,6 +10,7 @@ class RSETCommand {
         def resultString
         bufferMap.clear()
         prevCommandSet.clear()
+        prevCommandSet << 'RSET'
         resultMap.bufferMap = bufferMap
 		resultMap.prevCommandSet = prevCommandSet
 		resultMap.resultString = "250 OK"

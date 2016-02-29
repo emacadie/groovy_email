@@ -41,7 +41,7 @@ class RSETCommandSpec extends Specification {
 	        def mailResponse = resultMap.resultString + crlf 
 	    then:
 	        mailResponse == "250 OK\r\n"
-	        resultMap.prevCommandSet == [ ] as Set
+	        resultMap.prevCommandSet == [ 'RSET' ] as Set
 	}
 
 	@Unroll( "#inputAddress gives #value" )
@@ -53,7 +53,7 @@ class RSETCommandSpec extends Specification {
             resultMap = rsetCommand.process( "RSET", [ 'EHLO', 'MAIL' ] as Set, [:] )
         then:
             resultMap.resultString == value
-            resultMap.prevCommandSet == [  ] as Set
+            resultMap.prevCommandSet == [ 'RSET' ] as Set
         where:
             inputAddress                | value    
             'george.washington@shelfunit.info'  | "250 OK"
@@ -73,7 +73,7 @@ class RSETCommandSpec extends Specification {
             resultMap = rsetCommand.process( "RSET", [ 'EHLO', 'MAIL', 'RCPT' ] as Set, [:] )
         then:
             resultMap.resultString == value
-            resultMap.prevCommandSet == [  ] as Set
+            resultMap.prevCommandSet == [ 'RSET' ] as Set
         where:
             inputAddress                | value    
             'george.washington@shelfunit.info'  | "250 OK"
@@ -90,11 +90,11 @@ class RSETCommandSpec extends Specification {
 	    def resultString
 
         when:
-            resultMap = rsetCommand.process( "RSET", prevCommandSet, [:] )
+            resultMap = rsetCommand.process( "RSET", [ 'EHLO', 'MAIL', 'RCPT' ] as Set, [:] ) // prevCommandSet, [:] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == [  ] as Set
+            resultMap.prevCommandSet == [ 'RSET' ] as Set
         where:
             inputAddress                | prevCommandSet | value    
             'george.washington@shelfunit.info'  | [ 'EHLO', 'MAIL', 'RCPT' ] as Set | "250 OK"
@@ -121,7 +121,8 @@ class RSETCommandSpec extends Specification {
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet.isEmpty()
+            // resultMap.prevCommandSet.isEmpty()
+            resultMap.prevCommandSet == [ 'RSET' ] as Set
         where:
             inputAddress                        | prevCommandSet | value    
             'george.washington@shelfunit.info'  | [ 'EHLO', 'MAIL' ] as Set | "250 OK"
@@ -138,7 +139,7 @@ class RSETCommandSpec extends Specification {
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
             resultMap.resultString == value
-            resultMap.prevCommandSet == [  ] as Set
+            resultMap.prevCommandSet == [ 'RSET' ] as Set
         where:
             inputAddress                | value    
             'mkyong@yahoo.com'          | "250 OK" 
@@ -179,7 +180,7 @@ class RSETCommandSpec extends Specification {
 	        def bMap = resultMap.bufferMap
 	    then:
 	        mailResponse == "250 OK\r\n"
-	        resultMap.prevCommandSet == [ ] as Set
+	        resultMap.prevCommandSet == [ 'RSET' ] as Set
 	        bMap.forwardPath == null
 	}
 
