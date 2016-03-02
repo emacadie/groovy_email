@@ -13,10 +13,11 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 
+import org.apache.shiro.crypto.hash.Sha512Hash
+import static info.shelfunit.mail.GETestUtils.getBase64Hash
+
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
-
-import org.apache.shiro.crypto.hash.Sha512Hash
 
 @Slf4j
 @Stepwise
@@ -66,16 +67,17 @@ class DELECommandSpec extends Specification {
         sql.execute "DELETE FROM email_user where username in ( ${gwDELE}, ${jaDELE}, ${joDELE} )"
         sql.close()
     }   // run after the last feature method
-   
+    
     def addUsers() {
-        def params = [ gwDELE, ( new Sha512Hash( somePassword, gwDELE, iterations ).toBase64() ), 'SHA-512', iterations, 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwDELE, ( new Sha512Hash( somePassword, gwDELE, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwDELE, somePassword ), 'George', 'Washington', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jaDELE, ( new Sha512Hash( somePassword, jaDELE, iterations ).toBase64() ), 'SHA-512', iterations, 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaDELE, ( new Sha512Hash( somePassword, jaDELE, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwDELE, somePassword ), 'John', 'Adams', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ joDELE, ( new Sha512Hash( somePassword, joDELE, iterations ).toBase64() ), 'SHA-512', iterations, 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ joDELE, ( new Sha512Hash( somePassword, joDELE, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwDELE, somePassword ), 'Jack', "O'Neill", 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        
         // sql.commit()
         this.addMessage( uuidA, gwDELE, msgA )
         this.addMessage( uuidB, gwDELE, msgB )

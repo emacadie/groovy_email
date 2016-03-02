@@ -31,15 +31,6 @@ class ModularPostOfficeSocketWorker {
 	@Hidden def sql
 	@Hidden def serverList
 	
-	@Hidden def deleCommand
-	@Hidden def listCommand
-	@Hidden def quitCommand
-	@Hidden def passCommand
-	@Hidden def rsetCommand
-	@Hidden def retrCommand
-	@Hidden def statCommand
-	@Hidden def userCommand
-	
 	@Hidden def commandResultMap
 
 	ModularPostOfficeSocketWorker( argIn, argOut, argServerList ) {
@@ -56,15 +47,6 @@ class ModularPostOfficeSocketWorker {
         prevCommandSet = [] as Set
         commandResultMap = [:]
         bufferMap = [:]
-        
-        userCommand = new USERCommand( sql )
-        passCommand = new PASSCommand( sql )
-        statCommand = new STATCommand( sql )
-        listCommand = new LISTCommand( sql )
-        deleCommand = new DELECommand( sql )
-        quitCommand = new QUITCommand( sql, serverName )
-        retrCommand = new RETRCommand( sql )
-        rsetCommand = new RSETCommand( sql )
 	}
 
 	def doWork() {
@@ -136,22 +118,22 @@ class ModularPostOfficeSocketWorker {
 		if ( isActualMessage ) {
 		    return mssgCommand
 		} else if ( theMessage.startsWith( 'USER' ) ) {
-			return userCommand
+			return new USERCommand( sql )
 		} else if ( theMessage.startsWith( 'PASS' ) ) {
-			return passCommand
+			return new PASSCommand( sql )
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
-		    return rsetCommand
+		    return new RSETCommand( sql )
 		} else if ( theMessage.startsWith( 'STAT' ) ) {
-		    return statCommand
+		    return new STATCommand( sql )
 		} else if ( theMessage.startsWith( 'RETR' ) ) {
-		    return retrCommand
+		    return new RETRCommand( sql )
 		} else if ( theMessage.startsWith( 'LIST' ) ) {
-		    return listCommand
+		    return new LISTCommand( sql )
 		} else if ( theMessage.startsWith( 'QUIT' ) ) {
-		    return quitCommand
+		    return new QUITCommand( sql, serverName )
 		} else if ( theMessage.startsWith( 'DELE' ) ) {
-		    return deleCommand
+		    return new DELECommand( sql )
 		}
 	}
-}
+} // line 156
 

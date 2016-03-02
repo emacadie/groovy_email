@@ -12,6 +12,7 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
+import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import info.shelfunit.smtp.command.EHLOCommand
 import org.apache.shiro.crypto.hash.Sha512Hash
 
@@ -47,14 +48,14 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ 'gwashmps', ( new Sha512Hash( 'somePassword', 'gwashmps', numIterations ).toBase64() ), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ 'gwashmps', ( new Sha512Hash( 'somePassword', 'gwashmps', numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'gwashmps', 'somePassword' ), 'George', 'Washington', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'jadamsmps', ( new Sha512Hash( 'somePassword', 'jadamsmps', numIterations ).toBase64() ), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ 'jadamsmps', ( new Sha512Hash( 'somePassword', 'jadamsmps', numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'jadamsmps', 'somePassword' ), 'John', 'Adams', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'tee-jaymps', ( new Sha512Hash( 'somePassword', 'tee-jaymps', numIterations ).toBase64() ), 'SHA-512', numIterations, 'Thomas', "Jefferson", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ 'tee-jaymps', ( new Sha512Hash( 'somePassword', 'tee-jaymps', numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'tee-jaymps', 'somePassword' ), 'Thomas', "Jefferson", 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
     

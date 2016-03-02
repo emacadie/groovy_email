@@ -6,6 +6,10 @@ To run a single test, do this:
 gradle -Dtest.single=HelloSpock test -info   
 gradle -Dtest.single=DSRecordSpockTest test -info  
 
+gradle -Dtest.single=info.shelfunit.postoffice.command.DELECommandSpec test -info 
+gradle test --tests info.shelfunit.postoffice.command.DELECommandSpec test -info
+gradle test --tests info.shelfunit.postoffice.command.DELECommandSpec -info
+gradle test --tests info.shelfunit.smtp.command.MSSGCommandSpec -info
 
 To run with Groovy:   
 gradle runGroovy -PmainClass="org.lookup"    

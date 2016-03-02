@@ -29,14 +29,6 @@ class ModularSMTPSocketWorker {
 	@Hidden def bufferMap
 	@Hidden def sql
 	@Hidden def serverList
-	
-	@Hidden def mailCommand
-	@Hidden def ehloCommand
-	@Hidden def rcptCommand
-	@Hidden def rsetCommand
-	@Hidden def dataCommand
-	@Hidden def mssgCommand
-	@Hidden def quitCommand
 	@Hidden def commandResultMap
 
 	ModularSMTPSocketWorker( argIn, argOut, argServerList ) {
@@ -53,13 +45,6 @@ class ModularSMTPSocketWorker {
         prevCommandSet = [] as Set
         commandResultMap = [:]
         bufferMap = [:]
-        mailCommand = new MAILCommand()
-        ehloCommand = new EHLOCommand()
-        rcptCommand = new RCPTCommand( sql, serverList )
-        rsetCommand = new RSETCommand()
-        dataCommand = new DATACommand()
-        mssgCommand = new MSSGCommand( sql, serverList )
-        quitCommand = new QUITCommand( serverList )
 	}
 
 	def doWork() {
@@ -148,21 +133,22 @@ class ModularSMTPSocketWorker {
 	def returnCurrentCommand( theMessage, isActualMessage ) {
 	    log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
 		if ( isActualMessage ) {
-		    return mssgCommand
+		    return new MSSGCommand( sql, serverList )
 		} else if ( theMessage.isHelloCommand() ) {
-		    return ehloCommand
+		    return new EHLOCommand()
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
-			return mailCommand
+			return new MAILCommand()
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
-			return rcptCommand
+			return new RCPTCommand( sql, serverList )
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
-		    return rsetCommand
+		    return new RSETCommand()
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
-		    return dataCommand
+		    return new DATACommand()
 		} else if ( theMessage.startsWith( 'QUIT' ) ) {
-		    return quitCommand
+		    return new QUITCommand( serverList )
 		}
 	}
-}
+
+} // line 166
 
 

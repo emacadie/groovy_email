@@ -8,6 +8,7 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
+import static info.shelfunit.mail.GETestUtils.getBase64Hash
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
@@ -21,13 +22,13 @@ class RCPTCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
     static rcptCommand
-    static hamilton = 'alexander@shelfunit.info'
-    static gwShelf  = 'george.washington@shelfunit.info'
-    static jAdamsShelf = 'john.adams@shelfunit.info'
-    static jackShell = 'oneill@shelfunit.info'
-    static gwGroovy  = 'george.washington@groovy-is-groovy.org'
-    static jaGroovy  = 'john.adams@groovy-is-groovy.org'
-    static jackGroovy = 'oneill@groovy-is-groovy.org'
+    static hamilton     = 'alexander@shelfunit.info'
+    static gwShelf      = 'george.washingtonrcpt@shelfunit.info'
+    static jAdamsShelf  = 'john.adams@shelfunit.info'
+    static jackShell    = 'oneill@shelfunit.info'
+    static gwGroovy     = 'george.washingtonrcpt@groovy-is-groovy.org'
+    static jaGroovy     = 'john.adams@groovy-is-groovy.org'
+    static jackGroovy   = 'oneill@groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
     static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
@@ -53,22 +54,22 @@ class RCPTCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ('george.washington', 'john.adams', 'oneill')"
+        sql.execute "DELETE FROM email_user where username in ('george.washingtonrcpt', 'john.adams', 'oneill')"
         sql.close()
     }   // run after the last feature method
    
     def addUsers() {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'somePassword', salt, 1000000 )
-        def params = [ 'george.washington', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
+        def params = [ 'george.washingtonrcpt', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonrcpt', 'somePassword' ), 'George', 'Washington', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'john.adams', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ 'john.adams', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adams', 'somePassword' ), 'John', 'Adams', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'oneill', atx512.toBase64(), 'SHA-512', numIterations, 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ 'oneill', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneill', 'somePassword' ), 'Jack', "O'Neill", 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
     
@@ -208,7 +209,7 @@ class RCPTCommandSpec extends Specification {
             'user.name@domain.com'      | "550 No such user"    | [ hamilton ]
             'user_name@domain.com'      | "550 No such user"    | [ hamilton ]
             'username@yahoo.corporate.in'       | "550 No such user" | [ hamilton ]    
-            'george.washington@mtvernon.co'  | "550 No such user"  | [ hamilton ] 
+            'george.washingtonrcpt@mtvernon.co'  | "550 No such user"  | [ hamilton ] 
             'john.adams@his-rotundity.org' | "550 No such user" | [ hamilton ]
             'oneill@stargate.mil'       | "550 No such user"    | [ hamilton ]
             // 'user@domaincom'            | "550 No such user" 

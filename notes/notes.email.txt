@@ -60,8 +60,11 @@ java.net.SocketInputStream:
 http://grepcode.com/file/repository.grepcode.com/java/root/jdk/openjdk/8-b132/java/net/SocketInputStream.java?av=f
 http://www.docjar.com/docs/api/java/net/SocketInputStream.html
 
-Authentication:
+Authentication, running TLS:
 http://blog.trifork.com/2009/11/10/securing-connections-with-tls/
+https://github.com/voodoodyne/subethasmtp/blob/master/src/main/java/org/subethamail/smtp/server/SMTPServer.java
+
+Making certs: http://tomcat.apache.org/tomcat-9.0-doc/ssl-howto.html
 
 5321 minimum implementation:
 x EHLO
@@ -193,5 +196,29 @@ IMAP DEBUG 01:12:07 2/29: RCPT TO:<emacadie9@gmail.com>
 IMAP DEBUG 01:12:07 2/29: 550 No such user
 IMAP DEBUG 01:12:07 2/29: RSET
 IMAP DEBUG 01:12:07 2/29: 250 OK
+
+Thunderbird sent:
+479:11:37:32.720 [Thread-20] INFO  i.s.smtp.ModularSMTPSocketWorker - Incoming message: AUTH PLAIN AG1hbGNvbG0ARml4V2g0dDVfYnJva2U=
+
+def encoded = "${Character.MIN_VALUE}malcolm${Character.MIN_VALUE}FixWh4t5_broke".bytes.encodeBase64().toString()
+println "encoded: ${encoded}"
+Gives:
+encoded: AG1hbGNvbG0ARml4V2g0dDVfYnJva2U=
+
+http://www.fehcom.de/qmail/smtpauth.html
+
+/////
+IMAP DEBUG 23:51:23 2/28: 220 shelfunit.info Simple Mail Transfer Service Ready
+IMAP DEBUG 23:51:23 2/28: EHLO shelfunit.info
+IMAP DEBUG 23:51:23 2/28: 250-Hello shelfunit.info
+IMAP DEBUG 23:51:23 2/28: 250-8BITMIME
+IMAP DEBUG 23:51:23 2/28: 250 HELP
+Opened SMTP server "mail.shelfunit.info"
+IMAP DEBUG 23:51:23 2/28: RSET
+IMAP DEBUG 23:51:23 2/28: 250 OK
+IMAP DEBUG 23:51:23 2/28: MAIL FROM:<malcolm@shelfunit.info>
+IMAP DEBUG 23:51:23 2/28: 503 Bad sequence of commands
+
+
 
 

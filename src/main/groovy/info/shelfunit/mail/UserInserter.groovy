@@ -25,22 +25,37 @@ class UserInserter {
                 log.info "Here is options.configPath: ${options.configPath}"
                 ConfigHolder.instance.setConfObject( options.configPath )
                 
-                def db = ConfigHolder.instance.returnDbMap()         
-                
-                def sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
-                
-                log.info "Here is options.iterations: ${options.iterations}"
-                log.info "Here is options.user: ${options.user}"
-                log.info "Here is options.fName: ${options.fName}"
-                log.info "Here is options.lName: ${options.lName}"
-                log.info "Here is options.pass: ${options.pass}"
-                def numIterations = ( options.iterations.toInteger() ) * 1000
-                def salt = options.user
-                def hashedPass = new Sha512Hash( options.pass, options.user, numIterations )
-                def params = [ options.user, hashedPass.toBase64(), 'SHA-512', numIterations, options.fName, options.lName, 0 ]
-                log.info "params: ${params}"
-                sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+                def db = ConfigHolder.instance.returnDbMap() 
+                def userMap = [ iterations: options.iterations, user: options.user, fName: options.fName, lName: options.lName, pass: options.pass ]
+                createUser( db, userMap )
             }
+            
+        } catch ( Exception e ) {
+            log.error "Exception: ", e
+        }
+    }
+     /**
+     Expects a map with info for database connection, with following keys: dbMap.url, dbMap.user, dbMap.password, dbMap.driver.
+     Also a map with information about the user, with the following keys: userMap.iterations, userMap.user, userMap.fName, userMap.lName, userMap.pass
+     */
+    def createUser( dbMap, userMap ) {
+        
+        try {
+            def sql = Sql.newInstance( dbMap.url, dbMap.user, dbMap.password, dbMap.driver )
+                
+            log.info "Here is userMap.iterations: ${userMap.iterations}"
+            log.info "Here is userMap.user: ${userMap.user}"
+            log.info "Here is userMap.fName: ${userMap.fName}"
+            log.info "Here is userMap.lName: ${userMap.lName}"
+            log.info "Here is userMap.pass: ${userMap.pass}"
+            def numIterations = ( userMap.iterations.toInteger() ) * 1000
+            def salt = options.user
+            def hashedPass = new Sha512Hash( userMap.pass, userMap.user, numIterations )
+            def base64Hash = "${Character.MIN_VALUE}${userMap.user}${Character.MIN_VALUE}${userMap.pass}".bytes.encodeBase64().toString()
+            def params = [ userMap.user, hashedPass.toBase64(), 'SHA-512', numIterations, base64Hash, userMap.fName, userMap.lName, 0 ]
+            log.info "params: ${params}"
+            sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+           
         } catch ( Exception pe ) {
             pe.printStackTrace()
         }
@@ -71,6 +86,7 @@ class UserInserter {
         log.info "in UserInserters"
         
         def uInsert = new UserInserter( args )
+        
     }
 }
 

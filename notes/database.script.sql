@@ -4,8 +4,10 @@ CREATE TABLE email_user (
     password_hash character varying( 150 ) not null,
     password_algo character varying( 32 ) not null,
     iterations bigint not null,
+    base_64_hash character varying( 150 ) not null,
     first_name character varying( 30 ) not null,
     last_name character varying( 30 ) not null,
+    logged_in boolean,
     version bigint NOT NULL
 );
 

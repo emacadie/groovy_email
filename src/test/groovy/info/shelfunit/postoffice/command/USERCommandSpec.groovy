@@ -8,6 +8,7 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
+import static info.shelfunit.mail.GETestUtils.getBase64Hash
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
@@ -60,16 +61,16 @@ class USERCommandSpec extends Specification {
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512
         atx512 = new Sha512Hash( 'somePassword', 'george.washingtonu', numIterations )
-        def params = [ 'george.washingtonu', atx512.toBase64(), 'SHA-512', numIterations, 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ 'george.washingtonu', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonu', 'somePassword' ), 'George', 'Washington', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
         atx512 = new Sha512Hash( 'somePassword', 'john.adamsu', numIterations )
-        params = [ 'john.adamsu', atx512.toBase64(), 'SHA-512', numIterations, 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ 'john.adamsu', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adamsu', 'somePassword' ), 'John', 'Adams', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
         atx512 = new Sha512Hash( 'somePassword', 'oneillu', numIterations )
-        params = [ 'oneillu', atx512.toBase64(), 'SHA-512', numIterations, 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ 'oneillu', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneillu', 'somePassword' ), 'Jack', "O'Neill", 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
 

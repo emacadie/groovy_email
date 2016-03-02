@@ -12,11 +12,11 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
+import org.apache.shiro.crypto.hash.Sha512Hash
+import static info.shelfunit.mail.GETestUtils.getBase64Hash
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
-
-import org.apache.shiro.crypto.hash.Sha512Hash
 
 @Slf4j
 @Stepwise
@@ -66,17 +66,17 @@ class LISTCommandSpec extends Specification {
         sql.execute "DELETE FROM email_user where username in ( ${gwLIST}, ${jaLIST}, ${joLIST} )"
         sql.close()
     }   // run after the last feature method
-   
+
     def addUsers() {
-        def params = [ gwLIST, ( new Sha512Hash( somePassword, gwLIST, iterations ).toBase64() ), 'SHA-512', iterations, 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwLIST, ( new Sha512Hash( somePassword, gwLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'George', 'Washington', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jaLIST, ( new Sha512Hash( somePassword, jaLIST, iterations ).toBase64() ), 'SHA-512', iterations, 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaLIST, ( new Sha512Hash( somePassword, jaLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'John', 'Adams', 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ joLIST, ( new Sha512Hash( somePassword, joLIST, iterations ).toBase64() ), 'SHA-512', iterations, 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ? )', params
-        // sql.commit()
+        params = [ joLIST, ( new Sha512Hash( somePassword, joLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'Jack', "O'Neill", 0 ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        
         this.addMessage( uuidA, gwLIST, msgA )
         this.addMessage( uuidB, gwLIST, msgB )
         this.addMessage( uuidC, gwLIST, msgC )
