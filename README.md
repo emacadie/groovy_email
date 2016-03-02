@@ -5,7 +5,7 @@ An email server written in Groovy
 
 Currently, it can only receive, but not send.  
 
-Attemtps to implement SSL have not been succesful.   
+Attempts to implement SSL have not been succesful.   
 
 I might just do SMTP AUTH PLAIN and leave it at that for now.    
 
