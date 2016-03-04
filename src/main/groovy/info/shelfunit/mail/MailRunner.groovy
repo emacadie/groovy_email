@@ -36,10 +36,10 @@ class MailRunner {
         poActor.send( new PostOfficeRunnerMessage( serverList ) )
         
         def keepGoing = true
-        sleep( 4 * 1000 )
+        sleep( 4.seconds() )
         DirectoryWatcher.watch()
         while ( keepGoing ) {
-            sleep( 4 * 1000 )
+            sleep( 4.seconds() )
             log.info "still going in runWithActors"
         }
     }

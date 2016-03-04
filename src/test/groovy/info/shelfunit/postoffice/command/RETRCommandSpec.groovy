@@ -100,7 +100,7 @@ class RETRCommandSpec extends Specification {
         def userInfo = [:]
 	    userInfo.username = gwRETR
         bufferInputMap.userInfo = userInfo
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = retrCommand.process( 'RETR', [] as Set, bufferInputMap )
         then:
@@ -139,7 +139,7 @@ class RETRCommandSpec extends Specification {
         def userInfo = [:]
 	    userInfo.username = gwRETR
         bufferInputMap.userInfo = userInfo
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = retrCommand.process( 'RETR 1', [] as Set, bufferInputMap )
         then:

@@ -87,7 +87,7 @@ class STATCommandSpec extends Specification {
         def userInfo = [:]
 	    userInfo.username = gwSTAT
         bufferInputMap.userInfo = userInfo
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = statCommand.process( 'STAT', [] as Set, bufferInputMap )
         then:

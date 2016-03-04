@@ -9,6 +9,7 @@ class MetaProgrammer {
     
     static runMetaProgramming() {
         ExpandoMetaClass.enableGlobally()
+        runNumberMetaProgramming()
         runListMetaProgramming()
         runMapMetaProgramming()
         runSetMetaProgramming()
@@ -17,6 +18,15 @@ class MetaProgrammer {
         runStringMetaProgramming()
         java.sql.Timestamp.metaClass.static.create = {
             return new java.sql.Timestamp( new java.util.Date().getTime() )
+        }
+    }
+    
+    static runNumberMetaProgramming() {
+        java.lang.Number.metaClass.seconds = { ->
+            return delegate * 1000
+        }
+        java.lang.Number.metaClass.minutes = { ->
+            return ( ( delegate * 1000 ) * 60 )
         }
     }
     

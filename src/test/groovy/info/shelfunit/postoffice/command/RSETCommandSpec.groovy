@@ -110,7 +110,7 @@ class RSETCommandSpec extends Specification {
 	    userInfo.username = gwRSET
         bufferInputMap.userInfo = userInfo
         bufferInputMap.deleteMap = this.createDeleteMap()
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         
         when:
             def resultMap = rsetCommand.process( 'RSET', [] as Set, bufferInputMap )
@@ -154,7 +154,7 @@ class RSETCommandSpec extends Specification {
 	    userInfo.username = gwRSET
         bufferInputMap.userInfo = userInfo
         bufferInputMap.deleteMap = this.createDeleteMap()
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = rsetCommand.process( 'RSET 1', [] as Set, bufferInputMap )
         then:

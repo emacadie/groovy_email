@@ -103,7 +103,7 @@ class DELECommandSpec extends Specification {
         def userInfo = [:]
 	    userInfo.username = gwDELE
         bufferInputMap.userInfo = userInfo
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = deleCommand.process( 'DELE', [] as Set, bufferInputMap )
         then:
@@ -139,7 +139,7 @@ class DELECommandSpec extends Specification {
         def userInfo = [:]
 	    userInfo.username = gwDELE
         bufferInputMap.userInfo = userInfo
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = deleCommand.process( 'DELE 1', [] as Set, bufferInputMap )
         then:

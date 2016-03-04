@@ -138,9 +138,9 @@ class USERCommandSpec extends Specification {
             'user.name'     | "-ERR No such user user.name"     | 'AUTHORIZATION'
             'user_name'     | "-ERR No such user user_name"     | 'AUTHORIZATION'
             'user-name'     | "-ERR No such user user-name"     | 'AUTHORIZATION'
-            'john.adams'    | "-ERR No such user john.adams"    | 'AUTHORIZATION'
-            'oneill'        | "-ERR No such user oneill"        | 'AUTHORIZATION'
-            'george.washington'  | "-ERR No such user george.washington"  | 'AUTHORIZATION' 
+            'john.adamsuu'  | "-ERR No such user john.adamsuu"  | 'AUTHORIZATION'
+            'oneilluu'      | "-ERR No such user oneilluu"      | 'AUTHORIZATION'
+            'george.washingtonuu' | "-ERR No such user george.washingtonuu"  | 'AUTHORIZATION' 
 	}
 	
 } // line 152

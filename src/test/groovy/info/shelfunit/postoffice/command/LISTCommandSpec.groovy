@@ -100,7 +100,7 @@ class LISTCommandSpec extends Specification {
         def userInfo = [:]
 	    userInfo.username = gwLIST
         bufferInputMap.userInfo = userInfo
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = listCommand.process( 'LIST', [] as Set, bufferInputMap )
         then:
@@ -147,7 +147,7 @@ class LISTCommandSpec extends Specification {
         def userInfo = [:]
 	    userInfo.username = gwLIST
         bufferInputMap.userInfo = userInfo
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = listCommand.process( 'LIST 1', [] as Set, bufferInputMap )
         then:

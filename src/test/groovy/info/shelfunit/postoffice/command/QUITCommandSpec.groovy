@@ -103,7 +103,7 @@ class QUITCommandSpec extends Specification {
         bufferInputMap.userInfo = userInfo
         def deleteMap = [ 1: uuidA, 3: uuidC, 2: uuidB ]
         bufferInputMap.deleteMap = deleteMap
-        sleep( 2 * 1000 )
+        sleep( 2.seconds() )
         when:
             def resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
         then:
