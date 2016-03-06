@@ -14,6 +14,7 @@ import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 import org.apache.shiro.crypto.hash.Sha512Hash
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.getRandomString
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
@@ -29,15 +30,16 @@ class RETRCommandSpec extends Specification {
     static retrCommand
     static somePassword = 'somePassword'
     static theTimestamp
-    static gwRETR  = 'gwretr' // @shelfunit.info'
-    static jaRETR = 'jaretr' // @shelfunit.info'
-    static joRETR = 'joretr' // @shelfunit.info'
-    static uuidA = UUID.randomUUID()
-    static uuidB = UUID.randomUUID()
-    static uuidC = UUID.randomUUID()
-    static msgA = 'aq' * 10
-    static msgB = 'bq' * 11
-    static msgC = 'cq' * 12
+    static rString = getRandomString()
+    static gwRETR  = 'gw' + rString // @shelfunit.info'
+    static jaRETR  = 'ja' + rString // @shelfunit.info'
+    static joRETR  = 'jo' + rString // @shelfunit.info'
+    static uuidA   = UUID.randomUUID()
+    static uuidB   = UUID.randomUUID()
+    static uuidC   = UUID.randomUUID()
+    static msgA    = 'aq' * 10
+    static msgB    = 'bq' * 11
+    static msgC    = 'cq' * 12
     
     @Rule 
     TestName name = new TestName()

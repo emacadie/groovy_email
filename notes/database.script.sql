@@ -22,4 +22,16 @@ create table mail_store (
     FOREIGN KEY ( username ) REFERENCES email_user ( username ) on delete cascade
 );
 
+create table mail_spool (
+    id UUID PRIMARY KEY  NOT NULL unique,
+    username character varying( 64 ) not null,
+    from_address character varying( 255 ) not null,
+    to_address_list text not null,
+    message bytea,
+    text_body text not null,
+    from_user_logged_in boolean,
+    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null,
+    FOREIGN KEY ( username ) REFERENCES email_user ( username ) on delete cascade
+);
+
 

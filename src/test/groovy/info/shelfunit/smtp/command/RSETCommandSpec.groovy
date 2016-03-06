@@ -14,7 +14,6 @@ class RSETCommandSpec extends Specification {
     
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
     static rsetCommand
 
     @Rule 

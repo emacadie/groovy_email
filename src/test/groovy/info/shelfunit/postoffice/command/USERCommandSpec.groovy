@@ -9,6 +9,7 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.getRandomString
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
@@ -23,12 +24,13 @@ class USERCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
     static userCommand
-    static gwShelf  = 'george.washingtonu' // @shelfunit.info'
-    static jAdamsShelf = 'john.adamsu' // @shelfunit.info'
-    static jackShelf = 'oneillu' // @shelfunit.info'
-    static gwGroovy  = 'george.washingtonu' // @groovy-is-groovy.org'
-    static jaGroovy  = 'john.adamsu' // @groovy-is-groovy.org'
-    static jackGroovy = 'oneillu' // @groovy-is-groovy.org'
+    static rString     = getRandomString()
+    static gwShelf     = 'gw' + rString // @shelfunit.info'
+    static jAdamsShelf = 'ja' + rString // @shelfunit.info'
+    static jackShelf   = 'on' + rString // @shelfunit.info'
+    static gwGroovy    = 'gw' + rString // @groovy-is-groovy.org'
+    static jaGroovy    = 'ja' + rString // @groovy-is-groovy.org'
+    static jackGroovy  = 'on' + rString // @groovy-is-groovy.org'
 
     @Rule 
     TestName name = new TestName()
@@ -52,7 +54,7 @@ class USERCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ('george.washingtonu', 'john.adamsu', 'oneillu')"
+        sql.execute "DELETE FROM email_user where username in ( ?, ?, ?)", [ gwShelf, jAdamsShelf, jackShelf ]
         sql.close()
     }   // run after the last feature method
    
@@ -60,24 +62,24 @@ class USERCommandSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512
-        atx512 = new Sha512Hash( 'somePassword', 'george.washingtonu', numIterations )
-        def params = [ 'george.washingtonu', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonu', 'somePassword' ), 'George', 'Washington', 0 ]
+        atx512 = new Sha512Hash( 'somePassword', gwShelf, numIterations )
+        def params = [ gwShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonu', 'somePassword' ), 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        atx512 = new Sha512Hash( 'somePassword', 'john.adamsu', numIterations )
-        params = [ 'john.adamsu', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adamsu', 'somePassword' ), 'John', 'Adams', 0 ]
+        atx512 = new Sha512Hash( 'somePassword', jAdamsShelf, numIterations )
+        params = [ jAdamsShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adamsu', 'somePassword' ), 'John', 'Adams', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        atx512 = new Sha512Hash( 'somePassword', 'oneillu', numIterations )
-        params = [ 'oneillu', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneillu', 'somePassword' ), 'Jack', "O'Neill", 0 ]
+        atx512 = new Sha512Hash( 'somePassword', jackShelf, numIterations )
+        params = [ jackShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneillu', 'somePassword' ), 'Jack', "O'Neill", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
 
 
 	/*00:44:46.135 [Test worker] INFO  i.s.postoffice.command.USERCommand - here is resultMap: [resultString:+OK george.washingtonu is a valid mailbox, bufferMap:[state:AUTHORIZATION, userInfo:[userid:199, username:george.washingtonu, password_hash:q84tQlFbTCkx/l5xyD4cvM81kCIRe33kt1ilPdT5E81k0WUVy73a5v2tQeuGGGDjfpEdBQj2Fuq+McYHE8+1Ig==, password_algo:SHA-512, iterations:10000, first_name:George, last_name:Washington, version:0]], prevCommandSet:[EHLO, MAIL]]
-
 	*/
+	
 	@Unroll( "#inputAddress gives #value" )
 	def "#inputAddress gives #value"() {
 	    def resultMap
@@ -88,13 +90,13 @@ class USERCommandSpec extends Specification {
         then:
             resultMap.resultString == value
         where:
-            inputAddress    | value    
-            gwShelf         | "+OK ${gwShelf} is a valid mailbox"
-            jAdamsShelf     | "+OK ${jAdamsShelf} is a valid mailbox"
-            jackShelf       | "+OK ${jackShelf} is a valid mailbox"
-            gwGroovy        | "+OK ${gwGroovy} is a valid mailbox"
-            jaGroovy        | "+OK ${jaGroovy} is a valid mailbox"
-            jackGroovy      | "+OK ${jackGroovy} is a valid mailbox"
+            inputAddress | value    
+            gwShelf      | "+OK ${gwShelf} is a valid mailbox"
+            jAdamsShelf  | "+OK ${jAdamsShelf} is a valid mailbox"
+            jackShelf    | "+OK ${jackShelf} is a valid mailbox"
+            gwGroovy     | "+OK ${gwGroovy} is a valid mailbox"
+            jaGroovy     | "+OK ${jaGroovy} is a valid mailbox"
+            jackGroovy   | "+OK ${jackGroovy} is a valid mailbox"
 	}
 	
 	@Unroll( "#someState gives #value" )
@@ -140,7 +142,7 @@ class USERCommandSpec extends Specification {
             'user-name'     | "-ERR No such user user-name"     | 'AUTHORIZATION'
             'john.adamsuu'  | "-ERR No such user john.adamsuu"  | 'AUTHORIZATION'
             'oneilluu'      | "-ERR No such user oneilluu"      | 'AUTHORIZATION'
-            'george.washingtonuu' | "-ERR No such user george.washingtonuu"  | 'AUTHORIZATION' 
+            'grg.wshngtnuu' | "-ERR No such user grg.wshngtnuu" | 'AUTHORIZATION' 
 	}
 	
 } // line 152

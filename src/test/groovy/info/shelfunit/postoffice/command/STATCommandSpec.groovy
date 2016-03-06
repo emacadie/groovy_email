@@ -12,6 +12,7 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.getRandomString
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
@@ -27,9 +28,10 @@ class STATCommandSpec extends Specification {
     static iterations = 10000
     static statCommand
     static somePassword = 'somePassword'
-    static gwSTAT  = 'gwstat' // @shelfunit.info'
-    static jaSTAT = 'jastat' // @shelfunit.info'
-    static joSTAT = 'jostat' // @shelfunit.info'
+    static rString = getRandomString()
+    static gwSTAT  = 'gwstat' + rString // @shelfunit.info'
+    static jaSTAT  = 'jastat' + rString // @shelfunit.info'
+    static joSTAT  = 'jostat' + rString // @shelfunit.info'
 
     @Rule 
     TestName name = new TestName()

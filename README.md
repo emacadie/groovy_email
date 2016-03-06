@@ -13,7 +13,8 @@ People have to log into a POP server to use the SMTP, so I might use that as wel
 
 It seems like TLS is pretty hard.   
 
-Also: I am sticking with PostGres, and testing against the DB.   
+Also: I am sticking with Postgres, and testing against a test Postgres DB.   
+See YCombinator story [Don't test with SQLite when you use Postgres in Production](https://news.ycombinator.com/item?id=10002142)    
 
 Uses dnsjava: http://www.dnsjava.org/  
 

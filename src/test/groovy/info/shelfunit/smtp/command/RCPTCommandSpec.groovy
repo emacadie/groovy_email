@@ -9,6 +9,7 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.getRandomString
 
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
@@ -22,13 +23,17 @@ class RCPTCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
     static rcptCommand
+    static rString = getRandomString()
     static hamilton     = 'alexander@shelfunit.info'
-    static gwShelf      = 'george.washingtonrcpt@shelfunit.info'
-    static jAdamsShelf  = 'john.adams@shelfunit.info'
-    static jackShell    = 'oneill@shelfunit.info'
-    static gwGroovy     = 'george.washingtonrcpt@groovy-is-groovy.org'
-    static jaGroovy     = 'john.adams@groovy-is-groovy.org'
-    static jackGroovy   = 'oneill@groovy-is-groovy.org'
+    static gwString = 'gw' + rString
+    static jaString = 'ja' + rString
+    static joString = 'jo' + rString
+    static gwShelf      = gwString + '@shelfunit.info'
+    static jAdamsShelf  = jaString + '@shelfunit.info'
+    static jackShell    = joString + '@shelfunit.info'
+    static gwGroovy     = gwString + '@groovy-is-groovy.org'
+    static jaGroovy     = jaString + '@groovy-is-groovy.org'
+    static jackGroovy   = joString + '@groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
     static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
@@ -54,7 +59,7 @@ class RCPTCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ('george.washingtonrcpt', 'john.adams', 'oneill')"
+        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, joString ]
         sql.close()
     }   // run after the last feature method
    
@@ -62,13 +67,13 @@ class RCPTCommandSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ 'george.washingtonrcpt', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonrcpt', 'somePassword' ), 'George', 'Washington', 0 ]
+        def params = [ gwString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( gwString, 'somePassword' ), 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'john.adams', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adams', 'somePassword' ), 'John', 'Adams', 0 ]
+        params = [ jaString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( jaString, 'somePassword' ), 'John', 'Adams', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'oneill', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneill', 'somePassword' ), 'Jack', "O'Neill", 0 ]
+        params = [ joString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( joString, 'somePassword' ), 'Jack', "O'Neill", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }

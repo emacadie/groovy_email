@@ -8,14 +8,13 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 
-import groovy.sql.Sql
+// import groovy.sql.Sql
 
 class VRFYCommandSpec extends Specification {
     
-    def crlf = "\r\n"
-    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
-    static rcptCommand
+    // def crlf = "\r\n"
+    // static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    // static vrfyCommand
 
     @Rule 
     TestName name = new TestName()
@@ -26,12 +25,8 @@ class VRFYCommandSpec extends Specification {
     def cleanup() {}        // run after every feature method
     
     def setupSpec() {
-        MetaProgrammer.runMetaProgramming()
-        def db = [ url: "jdbc:postgresql://${System.properties[ 'host_and_port' ]}/${System.properties[ 'dbname' ]}",
-        user: System.properties[ 'dbuser' ], password: System.properties[ 'dbpassword' ], driver: 'org.postgresql.Driver' ]
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
-        // this.addUsers()
-        rcptCommand = new RCPTCommand( sql, domainList )
+        // MetaProgrammer.runMetaProgramming()
+        // vrfyCommand = new VRFYCommand( )
     }     // run before the first feature method
     
     def cleanupSpec() {

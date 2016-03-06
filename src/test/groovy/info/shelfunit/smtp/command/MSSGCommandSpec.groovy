@@ -14,6 +14,7 @@ import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import org.apache.shiro.crypto.hash.Sha512Hash
+import static info.shelfunit.mail.GETestUtils.getRandomString
 
 @Slf4j
 class MSSGCommandSpec extends Specification {
@@ -21,8 +22,12 @@ class MSSGCommandSpec extends Specification {
     def crlf = "\r\n"
     static sql
     static mssgCommand
+    static rString = getRandomString()
+    static georgeW = 'gw' + rString
+    static johnA   = 'ja' + rString
+    static jackO   = 'jo' + rString
     static domainList = [ 'shelfunit2.info', 'groovy-is-groovy2.org' ]
-    static hamilton = 'alexander2@shelfunit2.info'
+    static hamilton   = 'alexander2@shelfunit2.info'
     
     @Rule 
     TestName name = new TestName()
@@ -45,7 +50,7 @@ class MSSGCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ('george.columbia', 'john.quincy', 'oneillMSSG')"
+        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ georgeW, johnA, jackO ]
         sql.close()
     }   // run after the last feature method
    
@@ -53,19 +58,19 @@ class MSSGCommandSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512 = new Sha512Hash( 'somePassword', salt, numIterations  )
-        def params = [ 'george.columbia', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'George', 'somePassword' ), 'George', 'Washington', 0 ]
+        def params = [ georgeW, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'George', 'somePassword' ), 'George', 'Washington', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'john.quincy', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'John', 'somePassword' ), 'John', 'Adams', 0 ]
+        params = [ johnA, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'John', 'somePassword' ), 'John', 'Adams', 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'oneillMSSG', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'Jack', 'somePassword' ), 'Jack', "O'Neill", 0 ]
+        params = [ jackO, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'Jack', 'somePassword' ), 'Jack', "O'Neill", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
     
 	def "test handling wrong command"() {
-	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', 'george.columbia@shelfunit.info' ], reversePath: 'oneillMSSG@stargate.mil' ]
+	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: 'oneillMSSG@stargate.mil' ]
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
 	        def resultMap = mssgCommand.process( "The next meeting of the board of directors will be on Tuesday.\nJohn.", prevCommandSetArg, [ forwardPath:  [ hamilton ] ] )
@@ -77,7 +82,7 @@ class MSSGCommandSpec extends Specification {
 	
 	// @Ignore
 	def "test handling a message"() {
-	    def bufferMapArg = [ forwardPath:[ 'john.quincy@shelfunit.info', 'george.columbia@shelfunit.info' ], reversePath: 'oneillMSSG@stargate.mil' ]
+	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
@@ -104,7 +109,7 @@ class MSSGCommandSpec extends Specification {
 	
 	// @Ignore
 	def "test handling a BAD message"() {
-	    def bufferMapArg = [ forwardPath:[ 'john.quincy@shelfunit.info', 'george.columbia@shelfunit.info' , 'chumba-wumba@shelfunit.info' ], reversePath: 'oneillMSSG@stargate.mil' ]
+	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' , 'chumba-wumba@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
