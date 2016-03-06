@@ -75,7 +75,6 @@ class RCPTCommandSpec extends Specification {
         
         params = [ joString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( joString, 'somePassword' ), 'Jack', "O'Neill", 0 ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
-        // sql.commit()
     }
     
 	def "test handling wrong command"() {
