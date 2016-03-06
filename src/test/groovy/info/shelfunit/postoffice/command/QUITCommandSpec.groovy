@@ -70,14 +70,14 @@ class QUITCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwQUIT, ( new Sha512Hash( somePassword, gwQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwQUIT, ( new Sha512Hash( somePassword, gwQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jaQUIT, ( new Sha512Hash( somePassword, jaQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaQUIT, ( new Sha512Hash( somePassword, jaQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ joQUIT, ( new Sha512Hash( somePassword, joQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ joQUIT, ( new Sha512Hash( somePassword, joQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'Jack', "O'Neill", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
         this.addMessage( uuidA, gwQUIT, msgA )
         this.addMessage( uuidB, gwQUIT, msgB )

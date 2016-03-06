@@ -62,14 +62,14 @@ class STATCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwSTAT, ( new Sha512Hash( somePassword, gwSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwSTAT, ( new Sha512Hash( somePassword, gwSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jaSTAT, ( new Sha512Hash( somePassword, jaSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaSTAT, ( new Sha512Hash( somePassword, jaSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ joSTAT, ( new Sha512Hash( somePassword, joSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ joSTAT, ( new Sha512Hash( somePassword, joSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'Jack', "O'Neill", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
 

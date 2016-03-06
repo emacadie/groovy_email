@@ -63,16 +63,16 @@ class USERCommandSpec extends Specification {
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512
         atx512 = new Sha512Hash( 'somePassword', gwShelf, numIterations )
-        def params = [ gwShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonu', 'somePassword' ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonu', 'somePassword' ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
         atx512 = new Sha512Hash( 'somePassword', jAdamsShelf, numIterations )
-        params = [ jAdamsShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adamsu', 'somePassword' ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jAdamsShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adamsu', 'somePassword' ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
         atx512 = new Sha512Hash( 'somePassword', jackShelf, numIterations )
-        params = [ jackShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneillu', 'somePassword' ), 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jackShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneillu', 'somePassword' ), 'Jack', "O'Neill", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
 

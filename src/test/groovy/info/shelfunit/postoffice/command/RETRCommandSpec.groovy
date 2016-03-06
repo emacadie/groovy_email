@@ -70,14 +70,14 @@ class RETRCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwRETR, ( new Sha512Hash( somePassword, gwRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwRETR, ( new Sha512Hash( somePassword, gwRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jaRETR, ( new Sha512Hash( somePassword, jaRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaRETR, ( new Sha512Hash( somePassword, jaRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ joRETR, ( new Sha512Hash( somePassword, joRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ joRETR, ( new Sha512Hash( somePassword, joRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'Jack', "O'Neill", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
 
         this.addMessage( uuidA, gwRETR, msgA )
         this.addMessage( uuidB, gwRETR, msgB )

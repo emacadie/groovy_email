@@ -58,14 +58,14 @@ class MSSGCommandSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512 = new Sha512Hash( 'somePassword', salt, numIterations  )
-        def params = [ georgeW, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'George', 'somePassword' ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ georgeW, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'George', 'somePassword' ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ johnA, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'John', 'somePassword' ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ johnA, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'John', 'somePassword' ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jackO, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'Jack', 'somePassword' ), 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jackO, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'Jack', 'somePassword' ), 'Jack', "O'Neill", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
     

@@ -13,7 +13,9 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.getRandomString
 import info.shelfunit.smtp.command.EHLOCommand
+
 import org.apache.shiro.crypto.hash.Sha512Hash
 
 class ModularPostOfficeSocketWorkerSpec extends Specification {
@@ -22,6 +24,10 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     
     def crlf = "\r\n"
     static sql
+    static rString    = getRandomString()
+    static gwString   = 'gw' + rString
+    static jaString   = 'ja' + rString
+    static tjString   = 'tj' + rString
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     
     def setup() {
@@ -40,7 +46,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ('gwashmps', 'jadamsmps', 'tee-jaymps')"
+        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
         sql.close()
     }   // run after the last feature method
     
@@ -48,14 +54,14 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ 'gwashmps', ( new Sha512Hash( 'somePassword', 'gwashmps', numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'gwashmps', 'somePassword' ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwString, ( new Sha512Hash( 'somePassword', gwString, numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'gwashmps', 'somePassword' ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'jadamsmps', ( new Sha512Hash( 'somePassword', 'jadamsmps', numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'jadamsmps', 'somePassword' ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaString, ( new Sha512Hash( 'somePassword', jaString, numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'jadamsmps', 'somePassword' ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'tee-jaymps', ( new Sha512Hash( 'somePassword', 'tee-jaymps', numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'tee-jaymps', 'somePassword' ), 'Thomas', "Jefferson", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ tjString, ( new Sha512Hash( 'somePassword', tjString, numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'tee-jaymps', 'somePassword' ), 'Thomas', "Jefferson", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
     
@@ -68,7 +74,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     def "test basic session"() {
 	    when:
             def domain = "hot-groovy.com"
-            def bString = "USER gwashmps${crlf}" + 
+            def bString = "USER ${gwString}${crlf}" + 
             "PASS somePassword${crlf}" +
             "STAT${crlf}" +
             "QUIT${crlf}"
@@ -83,8 +89,8 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             
 	    then:
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
-                "+OK gwashmps is a valid mailbox\r\n" +
-                "+OK gwashmps authenticated\r\n" +
+                "+OK ${gwString} is a valid mailbox\r\n" +
+                "+OK ${gwString} authenticated\r\n" +
                 "+OK 0 null\r\n" +
                 "+OK shelfunit.info POP3 server signing off\r\n"
 	}
@@ -92,9 +98,9 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	 def "test one message"() {
 	    when:
 	        def theMess = "dkke" * 12
-	        this.addMessage( UUID.randomUUID(), 'jadamsmps', theMess )
+	        this.addMessage( UUID.randomUUID(), jaString, theMess )
             def domain = "hot-groovy.com"
-            def bString = "USER jadamsmps${crlf}" + 
+            def bString = "USER ${jaString}${crlf}" + 
             "PASS somePassword${crlf}" +
             "STAT${crlf}" +
             "RETR 1${crlf}" +
@@ -110,8 +116,8 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             
 	    then:
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
-                "+OK jadamsmps is a valid mailbox\r\n" +
-                "+OK jadamsmps authenticated\r\n" +
+                "+OK ${jaString} is a valid mailbox\r\n" +
+                "+OK ${jaString} authenticated\r\n" +
                 "+OK 1 ${theMess.size()}\r\n" +
                 "+OK ${theMess.size()} octets\r\n" +
                 "${theMess}\r\n" +
@@ -122,7 +128,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	def "test non-existent user"() {
 	    when:
 	        def theMess = "dkke" * 12
-	        this.addMessage( UUID.randomUUID(), 'jadamsmps', theMess )
+	        this.addMessage( UUID.randomUUID(), jaString, theMess )
             def domain = "hot-groovy.com"
             def bString = "USER erer${crlf}" + 
             "PASS somePassword${crlf}" +

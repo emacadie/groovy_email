@@ -1,21 +1,16 @@
 package info.shelfunit.postoffice.command
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import java.sql.Timestamp
 
 import org.apache.shiro.crypto.hash.Sha512Hash
 
-import visibility.Hidden
-
 @Slf4j
 class PASSCommand {
     
-    @Hidden Sql sql
-    PASSCommand( def argSql ) {
+    PASSCommand(  ) {
         log.info "Starting new PASSCommand"
-        this.sql = argSql
     }
 
     static regex = '''^(PASS )(.*)$(?x)'''

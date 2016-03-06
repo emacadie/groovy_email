@@ -70,14 +70,14 @@ class RSETCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwRSET, ( new Sha512Hash( somePassword, gwRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwRSET, ( new Sha512Hash( somePassword, gwRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jaRSET, ( new Sha512Hash( somePassword, jaRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaRSET, ( new Sha512Hash( somePassword, jaRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ joRSET, ( new Sha512Hash( somePassword, joRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ joRSET, ( new Sha512Hash( somePassword, joRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'Jack', "O'Neill", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
         this.addMessage( uuidA, gwRSET, msgA )
         this.addMessage( uuidB, gwRSET, msgB )

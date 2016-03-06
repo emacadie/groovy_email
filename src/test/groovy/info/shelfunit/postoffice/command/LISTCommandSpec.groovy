@@ -70,14 +70,14 @@ class LISTCommandSpec extends Specification {
     }   // run after the last feature method
 
     def addUsers() {
-        def params = [ gwLIST, ( new Sha512Hash( somePassword, gwLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwLIST, ( new Sha512Hash( somePassword, gwLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ jaLIST, ( new Sha512Hash( somePassword, jaLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaLIST, ( new Sha512Hash( somePassword, jaLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ joLIST, ( new Sha512Hash( somePassword, joLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'Jack', "O'Neill", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ joLIST, ( new Sha512Hash( somePassword, joLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'Jack', "O'Neill", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
         this.addMessage( uuidA, gwLIST, msgA )
         this.addMessage( uuidB, gwLIST, msgB )

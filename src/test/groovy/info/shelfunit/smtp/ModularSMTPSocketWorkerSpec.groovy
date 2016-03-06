@@ -12,6 +12,8 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.getRandomString
+
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.smtp.command.EHLOCommand
 import org.apache.shiro.crypto.hash.Sha512Hash
@@ -23,6 +25,10 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     def crlf = "\r\n"
     static sql
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    static rString    = getRandomString()
+    static gwString   = 'gw' + rString
+    static jaString   = 'ja' + rString
+    static tjString   = 'tj' + rString
     
     def setup() {
         println "\n--- Starting test ${name.methodName}"
@@ -40,7 +46,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ('gwash', 'jadams', 'tee-jay')"
+        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
         sql.close()
     }   // run after the last feature method
     
@@ -48,14 +54,14 @@ class ModularSMTPSocketWorkerSpec extends Specification {
         def numIterations = 10000
         def salt = 'you say your password tastes like chicken? Add salt!'
         def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ 'gwash', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'gwash', 'somePassword' ), 'George', 'Washington', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        def params = [ gwString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( gwString, 'somePassword' ), 'George', 'Washington', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'jadams', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'jadams', 'somePassword' ), 'John', 'Adams', 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ jaString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( jaString, 'somePassword' ), 'John', 'Adams', 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         
-        params = [ 'tee-jay', atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'tee-jay', 'somePassword' ), 'Thomas', "Jefferson", 0 ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+        params = [ tjString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( tjString, 'somePassword' ), 'Thomas', "Jefferson", 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
         // sql.commit()
     }
 
@@ -124,7 +130,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             def domain = "hot-groovy.com"
             def bString = "EHLO ${domain}${crlf}" + 
             "MAIL FROM:<aaa@showboat.com>${crlf}" +
-            "RCPT TO:<gwash@shelfunit.info>${crlf}" +
+            "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}JJJ${crlf}" +
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
             byte[] data = bString.getBytes()
@@ -183,7 +189,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             
             def dataString = "EHLO ${domain}${crlf}"  +
             "MAIL FROM:<aaa@showboat.com>${crlf}" +
-            "RCPT TO:<gwash@shelfunit.info>${crlf}" +
+            "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}"  +
             "JJJ${crlf}.${crlf}" +
             "QUIT${crlf}"
@@ -215,7 +221,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             def domain = "hot-groovy.com"
             def dataString = "EHLO ${domain}${crlf}" + 
             "MAIL FROM:<aaa@showboat.com>${crlf}" +
-            "RCPT TO:<gwash@shelfunit.info>${crlf}" +
+            "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}"
             byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
