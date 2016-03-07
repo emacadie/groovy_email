@@ -13,10 +13,10 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 
-import org.apache.shiro.crypto.hash.Sha512Hash
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.addUser
 
+import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -55,9 +55,13 @@ class DELECommandSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
         log.info "conf is a ${conf.class.name}"
-        sql = ConfigHolder.instance.getSqlObject()
+        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
+        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
+        log.info "db is a ${db.getClass().name}"
+        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
         this.addUsers()
         deleCommand = new DELECommand( sql )
+        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -66,15 +70,11 @@ class DELECommandSpec extends Specification {
     }   // run after the last feature method
     
     def addUsers() {
-        def params = [ gwDELE, ( new Sha512Hash( somePassword, gwDELE, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwDELE, somePassword ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+        addUser( sql, 'George', 'Washington', gwDELE, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaDELE, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", joDELE, 'somePassword' )
         
-        params = [ jaDELE, ( new Sha512Hash( somePassword, jaDELE, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwDELE, somePassword ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ joDELE, ( new Sha512Hash( somePassword, joDELE, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwDELE, somePassword ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-
+        // sql.commit()
         this.addMessage( uuidA, gwDELE, msgA )
         this.addMessage( uuidB, gwDELE, msgB )
         this.addMessage( uuidC, gwDELE, msgC )
@@ -190,5 +190,6 @@ class DELECommandSpec extends Specification {
             log.info "here is resultMap.resultString at end of test: ${resultMap.resultString}"
 	}
 
-}
+} // line 199
+
 

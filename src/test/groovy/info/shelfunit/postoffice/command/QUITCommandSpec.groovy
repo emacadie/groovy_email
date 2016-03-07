@@ -12,11 +12,9 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import org.apache.shiro.crypto.hash.Sha512Hash
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.addUser
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -26,10 +24,8 @@ class QUITCommandSpec extends Specification {
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
-    static iterations = 10000
     static quitCommand
-    static somePassword = 'somePassword'
-    static theTimestamp
+    // static theTimestamp
     static rString = getRandomString()
     static gwQUIT  = 'gw' + rString // @shelfunit.info'
     static jaQUIT  = 'ja' + rString // @shelfunit.info'
@@ -51,17 +47,11 @@ class QUITCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject()
         this.addUsers()
         quitCommand = new QUITCommand( sql, domainList[ 0 ] )
-        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -70,19 +60,14 @@ class QUITCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwQUIT, ( new Sha512Hash( somePassword, gwQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ jaQUIT, ( new Sha512Hash( somePassword, jaQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ joQUIT, ( new Sha512Hash( somePassword, joQUIT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwQUIT, somePassword ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+        addUser( sql, 'George', 'Washington', gwQUIT, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaQUIT, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", joQUIT, 'somePassword' )
         
         this.addMessage( uuidA, gwQUIT, msgA )
         this.addMessage( uuidB, gwQUIT, msgB )
         this.addMessage( uuidC, gwQUIT, msgC )
-        theTimestamp = Timestamp.create()
+        // theTimestamp = Timestamp.create()
     }
     
     def addMessage( uuid, userName, messageString ) {
@@ -99,7 +84,7 @@ class QUITCommandSpec extends Specification {
         def bufferInputMap = [:]
         def timestamp
         bufferInputMap.state = 'TRANSACTION'
-        bufferInputMap.timestamp = theTimestamp
+        bufferInputMap.timestamp = Timestamp.create()
         def userInfo = [:]
 	    userInfo.username = gwQUIT
         bufferInputMap.userInfo = userInfo

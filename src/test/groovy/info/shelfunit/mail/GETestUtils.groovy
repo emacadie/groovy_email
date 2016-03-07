@@ -3,6 +3,7 @@ package info.shelfunit.mail
 // import info.shelfunit.mail.ConfigHolder
 
 import groovy.sql.Sql
+import org.apache.shiro.crypto.hash.Sha512Hash
 
 class GETestUtils {
     
@@ -39,6 +40,13 @@ class GETestUtils {
                 alphabet[ nextInt( alphabet.length() ) ] 
             }.join()
         }
+    }
+    
+    static iterations = 10000
+    
+    static addUser( def sql, def firstName, def lastName, def userName, def password ) {
+        def params = [ userName, ( new Sha512Hash( password, userName, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( userName, password ), firstName, lastName, 0, false ]
+        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
     }
 }
 
