@@ -104,20 +104,34 @@ class QUITCommandSpec extends Specification {
 	    userInfo.username = gwQUIT
         bufferInputMap.userInfo = userInfo
         def deleteMap = [ 1: uuidA, 3: uuidC, 2: uuidB ]
+        def messageCount = 0
         bufferInputMap.deleteMap = deleteMap
         sleep( 2.seconds() )
+        when:
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+        then:
+            messageCount == 3 
+
         when:
             def resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
         then:
             resultMap.resultString == "+OK shelfunit.info POP3 server signing off"
-
+        when:
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+        then:
+            messageCount == 0
+            
         def messageStringB = 'aw' * 11
         def toAddress = "${gwQUIT}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwQUIT, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
+            
         
             sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
                 messageCount = nextRow.count

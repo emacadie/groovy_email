@@ -42,24 +42,14 @@ class QUITCommand {
             log.info "here is bufferMap in QUITCommand.process: ${bufferMap}"
             def idsToDelete = bufferMap.deleteMap?.values() as List
             resultMap.resultString = "+OK ${serverName} POP3 server signing off"
-            def qMarks = []
+            
             def result = '250 OK'
-            if ( idsToDelete ) {
-                ( 1..idsToDelete.size() ).each { qMarks << '?' } // Or: ( idsToDelete.size() ).times { qMarks << '?' }
-                try {
-                    log.info "here is idsToDelete: ${idsToDelete}"
-                    sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
-                    log.info "Called the delete command"
-                    bufferMap.clear()
-                    bufferMap.state = 'UPDATE'
-                } catch ( Exception e ) {
-                    result = '500 Something went wrong'
-                    SQLException ex = e.getNextException()
-                    log.info "Next exception message: ${ex.getMessage()}"
-                    // ex.printStrackTrace()
-                    log.error "something went wrong", ex 
-                    // log.error "Failed to format {}", result, ex
-                }
+            if ( ( this.changeLoggedInFlag( bufferMap.userInfo.userid ) == '250 OK' ) && 
+            ( this.deleteMessages( idsToDelete ) == '250 OK' ) ) {
+                bufferMap.clear()
+                bufferMap.state = 'UPDATE'
+            } else {
+                result = '500 Something went wrong'
             }
         }
         resultMap.bufferMap = bufferMap
@@ -67,6 +57,36 @@ class QUITCommand {
 
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap
+    }
+    
+    private changeLoggedInFlag( def argUserid ) {
+        def result = '250 OK'
+        try {
+            sql.executeUpdate "UPDATE email_user set logged_in = 'true' where userid = ?", [ argUserid ]
+        } catch ( SQLException ex ) {
+            result = '500 Something went wrong'
+        }
+        return result
+    }
+    
+    private deleteMessages( def idsToDelete ) {
+        def result = '250 OK'
+        if ( idsToDelete ) {
+            def qMarks = []
+            ( 1..idsToDelete.size() ).each { qMarks << '?' } // Or: ( idsToDelete.size() ).times { qMarks << '?' }
+            try {
+                log.info "here is idsToDelete: ${idsToDelete}"
+                sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
+                log.info "Called the delete command"
+            } catch ( Exception e ) {
+                result = '500 Something went wrong'
+                SQLException ex = e.getNextException()
+                log.info "Next exception message: ${ex.getMessage()}"
+                log.error "something went wrong", ex 
+                // log.error "Failed to format {}", result, ex
+            }
+        }
+        return result
     }
 }
 

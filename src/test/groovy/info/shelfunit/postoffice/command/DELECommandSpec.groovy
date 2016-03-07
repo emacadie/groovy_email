@@ -17,7 +17,6 @@ import org.apache.shiro.crypto.hash.Sha512Hash
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -56,13 +55,9 @@ class DELECommandSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
         log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject()
         this.addUsers()
         deleCommand = new DELECommand( sql )
-        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -79,8 +74,7 @@ class DELECommandSpec extends Specification {
         
         params = [ joDELE, ( new Sha512Hash( somePassword, joDELE, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwDELE, somePassword ), 'Jack', "O'Neill", 0, false ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        // sql.commit()
+
         this.addMessage( uuidA, gwDELE, msgA )
         this.addMessage( uuidB, gwDELE, msgB )
         this.addMessage( uuidC, gwDELE, msgC )

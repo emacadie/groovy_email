@@ -14,7 +14,7 @@ class MSSGCommand {
     static regex = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
 *+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)'''    
 
-    @Hidden Sql sql
+    final Sql sql
     @Hidden List domainList
     MSSGCommand( def argSql, def argDomainList ) {
         log.info "Starting new MSSGCommand"

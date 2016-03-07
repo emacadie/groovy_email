@@ -2,8 +2,6 @@ package info.shelfunit.smtp.command
 
 import groovy.util.logging.Slf4j 
 
-// import visibility.Hidden
-
 /**
 Per RFC 5321 Section 7.3 http://tools.ietf.org/html/rfc5321#section-7.3
 and DJBernstein http://cr.yp.to/smtp/vrfy.html, 
