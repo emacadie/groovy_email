@@ -16,7 +16,6 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -25,10 +24,9 @@ class DELECommandSpec extends Specification {
     
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
     static iterations = 10000
     static deleCommand
-    static somePassword = 'somePassword'
+    static sql
     static theTimestamp
     static rString = getRandomString()
     static gwDELE  = 'gw' + rString // 'gwdele' // @shelfunit.info'
@@ -51,17 +49,10 @@ class DELECommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() // Sql.newInstance( db.url, db.user, db.password, db.driver )
         this.addUsers()
         deleCommand = new DELECommand( sql )
-        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -74,7 +65,6 @@ class DELECommandSpec extends Specification {
         addUser( sql, 'John', 'Adams', jaDELE, 'somePassword' )
         addUser( sql, 'Jack', "O'Neill", joDELE, 'somePassword' )
         
-        // sql.commit()
         this.addMessage( uuidA, gwDELE, msgA )
         this.addMessage( uuidB, gwDELE, msgB )
         this.addMessage( uuidC, gwDELE, msgC )
