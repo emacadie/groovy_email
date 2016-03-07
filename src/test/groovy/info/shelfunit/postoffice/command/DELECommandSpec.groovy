@@ -50,7 +50,7 @@ class DELECommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() // Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         deleCommand = new DELECommand( sql )
     }     // run before the first feature method

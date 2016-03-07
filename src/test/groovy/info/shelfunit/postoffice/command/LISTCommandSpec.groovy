@@ -12,11 +12,9 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import org.apache.shiro.crypto.hash.Sha512Hash
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.addUser
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -25,10 +23,8 @@ class LISTCommandSpec extends Specification {
     
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
-    static iterations = 10000
     static listCommand
-    static somePassword = 'somePassword'
+    static sql
     static theTimestamp
     static rString = getRandomString()
     static gwLIST  = 'gw' + rString // @shelfunit.info'
@@ -51,17 +47,11 @@ class LISTCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         listCommand = new LISTCommand( sql )
-        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -70,14 +60,9 @@ class LISTCommandSpec extends Specification {
     }   // run after the last feature method
 
     def addUsers() {
-        def params = [ gwLIST, ( new Sha512Hash( somePassword, gwLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ jaLIST, ( new Sha512Hash( somePassword, jaLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ joLIST, ( new Sha512Hash( somePassword, joLIST, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwLIST, somePassword ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+        addUser( sql, 'George', 'Washington', gwLIST, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaLIST, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", joLIST, 'somePassword' )
         
         this.addMessage( uuidA, gwLIST, msgA )
         this.addMessage( uuidB, gwLIST, msgB )
