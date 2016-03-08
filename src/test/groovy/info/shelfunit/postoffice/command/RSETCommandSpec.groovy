@@ -12,11 +12,10 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import org.apache.shiro.crypto.hash.Sha512Hash
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.addUser
+import static info.shelfunit.mail.GETestUtils.addMessage
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -26,9 +25,7 @@ class RSETCommandSpec extends Specification {
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
-    static iterations = 10000
     static rsetCommand
-    static somePassword = 'somePassword'
     static theTimestamp
     static rString = getRandomString()
     static gwRSET  = 'gw' + rString // @shelfunit.info'
@@ -51,17 +48,10 @@ class RSETCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject()
         this.addUsers()
         rsetCommand = new RSETCommand( sql )
-        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -70,25 +60,14 @@ class RSETCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwRSET, ( new Sha512Hash( somePassword, gwRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+        addUser( sql, 'George', 'Washington', gwRSET, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaRSET, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", joRSET, 'somePassword' )
         
-        params = [ jaRSET, ( new Sha512Hash( somePassword, jaRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ joRSET, ( new Sha512Hash( somePassword, joRSET, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRSET, somePassword ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        this.addMessage( uuidA, gwRSET, msgA )
-        this.addMessage( uuidB, gwRSET, msgB )
-        this.addMessage( uuidC, gwRSET, msgC )
+        addMessage( sql, uuidA, gwRSET, msgA, domainList[ 0 ] )
+        addMessage( sql, uuidB, gwRSET, msgB, domainList[ 0 ] )
+        addMessage( sql, uuidC, gwRSET, msgC, domainList[ 0 ] )
         theTimestamp = Timestamp.create()
-    }
-    
-    def addMessage( uuid, userName, messageString ) {
-        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
     
     def createDeleteMap() {

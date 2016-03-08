@@ -8,13 +8,10 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
-
-import groovy.sql.Sql
-import groovy.util.logging.Slf4j 
-
-import org.apache.shiro.crypto.hash.Sha512Hash
+import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
+
+import groovy.util.logging.Slf4j 
 
 @Slf4j
 class MSSGCommandSpec extends Specification {
@@ -39,12 +36,8 @@ class MSSGCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        def db = ConfigHolder.instance.returnDbMap()         
-        
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         mssgCommand = new MSSGCommand( sql, domainList )
     }     // run before the first feature method
@@ -55,18 +48,9 @@ class MSSGCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def numIterations = 10000
-        def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'somePassword', salt, numIterations  )
-        def params = [ georgeW, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'George', 'somePassword' ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ johnA, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'John', 'somePassword' ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ jackO, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'Jack', 'somePassword' ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        // sql.commit()
+        addUser( sql, 'George', 'Washington', georgeW, 'somePassword' )
+        addUser( sql, 'John', 'Adams', johnA, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", jackO, 'somePassword' )
     }
     
 	def "test handling wrong command"() {
@@ -147,5 +131,5 @@ class MSSGCommandSpec extends Specification {
 	        5 == 5
 	}
 
-}
+} // line 150
 

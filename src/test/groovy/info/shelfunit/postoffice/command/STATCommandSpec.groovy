@@ -11,13 +11,10 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
-
-import org.apache.shiro.crypto.hash.Sha512Hash
 
 @Slf4j
 class STATCommandSpec extends Specification {
@@ -25,9 +22,7 @@ class STATCommandSpec extends Specification {
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
-    static iterations = 10000
     static statCommand
-    static somePassword = 'somePassword'
     static rString = getRandomString()
     static gwSTAT  = 'gwstat' + rString // @shelfunit.info'
     static jaSTAT  = 'jastat' + rString // @shelfunit.info'
@@ -43,17 +38,10 @@ class STATCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject()
         this.addUsers()
         statCommand = new STATCommand( sql )
-        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -62,15 +50,9 @@ class STATCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwSTAT, ( new Sha512Hash( somePassword, gwSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ jaSTAT, ( new Sha512Hash( somePassword, jaSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ joSTAT, ( new Sha512Hash( somePassword, joSTAT, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwSTAT, somePassword ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        // sql.commit()
+        addUser( sql, 'George', 'Washington', gwSTAT, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaSTAT, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", joSTAT, 'somePassword' )
     }
 
     def "test uuid list"() {
@@ -116,5 +98,5 @@ class STATCommandSpec extends Specification {
             resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
 	}
 
-} // line 126
+} // line 126, 119
 

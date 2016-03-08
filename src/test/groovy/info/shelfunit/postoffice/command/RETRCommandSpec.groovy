@@ -12,11 +12,10 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import org.apache.shiro.crypto.hash.Sha512Hash
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.addUser
+import static info.shelfunit.mail.GETestUtils.addMessage
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 @Slf4j
@@ -26,9 +25,7 @@ class RETRCommandSpec extends Specification {
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
-    static iterations = 10000
     static retrCommand
-    static somePassword = 'somePassword'
     static theTimestamp
     static rString = getRandomString()
     static gwRETR  = 'gw' + rString // @shelfunit.info'
@@ -51,17 +48,10 @@ class RETRCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject()
         this.addUsers()
         retrCommand = new RETRCommand( sql )
-        
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -70,25 +60,15 @@ class RETRCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def params = [ gwRETR, ( new Sha512Hash( somePassword, gwRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+        addUser( sql, 'George', 'Washington', gwRETR, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaRETR, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", joRETR, 'somePassword' )
         
-        params = [ jaRETR, ( new Sha512Hash( somePassword, jaRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+        addMessage( sql, uuidA, gwRETR, msgA, domainList[ 0 ] )
+        addMessage( sql, uuidB, gwRETR, msgB, domainList[ 0 ] )
+        addMessage( sql, uuidC, gwRETR, msgC, domainList[ 0 ] )
         
-        params = [ joRETR, ( new Sha512Hash( somePassword, joRETR, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( gwRETR, somePassword ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-
-        this.addMessage( uuidA, gwRETR, msgA )
-        this.addMessage( uuidB, gwRETR, msgB )
-        this.addMessage( uuidC, gwRETR, msgC )
         theTimestamp = Timestamp.create()
-    }
-    
-    def addMessage( uuid, userName, messageString ) {
-        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
 
     def "test uuid list"() {
@@ -188,5 +168,5 @@ class RETRCommandSpec extends Specification {
             resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." 
 	}
 
-}
+} // line 191
 

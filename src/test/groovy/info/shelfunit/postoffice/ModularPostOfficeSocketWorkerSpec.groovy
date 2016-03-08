@@ -5,18 +5,15 @@ import spock.lang.Specification
 import java.io.InputStream
 import java.io.OutputStream
 
-import groovy.sql.Sql
-
 import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.addUser
+import static info.shelfunit.mail.GETestUtils.addMessage
 import info.shelfunit.smtp.command.EHLOCommand
-
-import org.apache.shiro.crypto.hash.Sha512Hash
 
 class ModularPostOfficeSocketWorkerSpec extends Specification {
     @Rule 
@@ -39,9 +36,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        def db = ConfigHolder.instance.returnDbMap() 
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
     }     // run before the first feature method
     
@@ -51,24 +46,9 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     }   // run after the last feature method
     
     def addUsers() {
-        def numIterations = 10000
-        def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ gwString, ( new Sha512Hash( 'somePassword', gwString, numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'gwashmps', 'somePassword' ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ jaString, ( new Sha512Hash( 'somePassword', jaString, numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'jadamsmps', 'somePassword' ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ tjString, ( new Sha512Hash( 'somePassword', tjString, numIterations ).toBase64() ), 'SHA-512', numIterations, getBase64Hash( 'tee-jaymps', 'somePassword' ), 'Thomas', "Jefferson", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        // sql.commit()
-    }
-    
-    def addMessage( uuid, userName, messageString ) {
-        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
+        addUser( sql, 'George', 'Washington', gwString, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
     
     def "test basic session"() {
@@ -98,7 +78,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	 def "test one message"() {
 	    when:
 	        def theMess = "dkke" * 12
-	        this.addMessage( UUID.randomUUID(), jaString, theMess )
+	        addMessage( sql, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
             def domain = "hot-groovy.com"
             def bString = "USER ${jaString}${crlf}" + 
             "PASS somePassword${crlf}" +
@@ -128,7 +108,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	def "test non-existent user"() {
 	    when:
 	        def theMess = "dkke" * 12
-	        this.addMessage( UUID.randomUUID(), jaString, theMess )
+	        addMessage( sql, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
             def domain = "hot-groovy.com"
             def bString = "USER erer${crlf}" + 
             "PASS somePassword${crlf}" +
@@ -335,5 +315,5 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
                 "221 shelfunit.info Service closing transmission channel\r\n"
 	}
 	*/
-}
+} // line 338
 

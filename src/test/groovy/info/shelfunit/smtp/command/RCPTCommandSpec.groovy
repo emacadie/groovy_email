@@ -8,13 +8,10 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
-
-import org.apache.shiro.crypto.hash.Sha512Hash
 
 @Slf4j
 class RCPTCommandSpec extends Specification {
@@ -48,12 +45,7 @@ class RCPTCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         rcptCommand = new RCPTCommand( sql, domainList )
     }     // run before the first feature method
@@ -64,17 +56,9 @@ class RCPTCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def numIterations = 10000
-        def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ gwString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( gwString, 'somePassword' ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ jaString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( jaString, 'somePassword' ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ joString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( joString, 'somePassword' ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+        addUser( sql, 'George', 'Washington', gwString, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", joString, 'somePassword' )
     }
     
 	def "test handling wrong command"() {
@@ -233,28 +217,28 @@ class RCPTCommandSpec extends Specification {
             resultMap.bufferMap?.reversePath == resultAddress
             resultMap.prevCommandSet == resultSetEM
         where:
-            inputAddress                | value                             | resultAddress
-            'mkyong'                    | "501 Command not in proper form"  | null 
-            'mkyong@.com.my'            | "501 Command not in proper form"  | null 
-            'mkyong123@gmail.a'         | "501 Command not in proper form"  | null 
-            'mkyong123@.com'            | "501 Command not in proper form"  | null 
-            'mkyong123@.com.com'        | "501 Command not in proper form"  | null 
-            '.mkyong@mkyong.com'        | "501 Command not in proper form"  | null 
-            'mkyong()*@gmail.com'       | "501 Command not in proper form"  | null 
-            'mkyong@%*.com'             | "501 Command not in proper form"  | null 
-            'mkyong..2002@gmail.com'    | "501 Command not in proper form"  | null 
-            'mkyong.@gmail.com'         | "501 Command not in proper form"  | null 
-            'mkyong@mkyong@gmail.com'   | "501 Command not in proper form"  | null 
-            'mkyong@gmail.com.1a'       | "501 Command not in proper form"  | null 
-            '@yahoo.com'                | "501 Command not in proper form"  | null 
-            '.username@yahoo.com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.com.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            '.username@yahoo.com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.com.'       | "501 Command not in proper form"  | null 
-            'username@yahoo..com'       | "501 Command not in proper form"  | null 
-            'username@yahoo.c'          | "501 Command not in proper form"  | null 
-            'username@yahoo.corporate'  | "501 Command not in proper form"  | null 
+            inputAddress               | value                            | resultAddress
+            'mkyong'                   | "501 Command not in proper form" | null 
+            'mkyong@.com.my'           | "501 Command not in proper form" | null 
+            'mkyong123@gmail.a'        | "501 Command not in proper form" | null 
+            'mkyong123@.com'           | "501 Command not in proper form" | null 
+            'mkyong123@.com.com'       | "501 Command not in proper form" | null 
+            '.mkyong@mkyong.com'       | "501 Command not in proper form" | null 
+            'mkyong()*@gmail.com'      | "501 Command not in proper form" | null 
+            'mkyong@%*.com'            | "501 Command not in proper form" | null 
+            'mkyong..2002@gmail.com'   | "501 Command not in proper form" | null 
+            'mkyong.@gmail.com'        | "501 Command not in proper form" | null 
+            'mkyong@mkyong@gmail.com'  | "501 Command not in proper form" | null 
+            'mkyong@gmail.com.1a'      | "501 Command not in proper form" | null 
+            '@yahoo.com'               | "501 Command not in proper form" | null 
+            '.username@yahoo.com'      | "501 Command not in proper form" | null 
+            'username@yahoo.com.'      | "501 Command not in proper form" | null 
+            'username@yahoo..com'      | "501 Command not in proper form" | null 
+            '.username@yahoo.com'      | "501 Command not in proper form" | null 
+            'username@yahoo.com.'      | "501 Command not in proper form" | null 
+            'username@yahoo..com'      | "501 Command not in proper form" | null 
+            'username@yahoo.c'         | "501 Command not in proper form" | null 
+            'username@yahoo.corporate' | "501 Command not in proper form" | null 
 	}
 	
 	def "test happy path"() {
@@ -268,5 +252,5 @@ class RCPTCommandSpec extends Specification {
 	        bMap.forwardPath == [ hamilton, jackShell ]
 	}
 
-}
+} // line 271
 

@@ -5,18 +5,15 @@ import spock.lang.Specification
 import java.io.InputStream
 import java.io.OutputStream
 
-import groovy.sql.Sql
-
 import org.junit.Rule
 import org.junit.rules.TestName
 
 import info.shelfunit.mail.ConfigHolder
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.smtp.command.EHLOCommand
-import org.apache.shiro.crypto.hash.Sha512Hash
 
 class ModularSMTPSocketWorkerSpec extends Specification {
     @Rule 
@@ -39,9 +36,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        def db = ConfigHolder.instance.returnDbMap() 
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
     }     // run before the first feature method
     
@@ -51,18 +46,9 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     }   // run after the last feature method
     
     def addUsers() {
-        def numIterations = 10000
-        def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512 = new Sha512Hash( 'somePassword', salt, numIterations )
-        def params = [ gwString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( gwString, 'somePassword' ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ jaString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( jaString, 'somePassword' ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        params = [ tjString, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( tjString, 'somePassword' ), 'Thomas', "Jefferson", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        // sql.commit()
+        addUser( sql, 'George', 'Washington', gwString, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
 
 	def "test handling EHLO"() {
@@ -243,5 +229,5 @@ class ModularSMTPSocketWorkerSpec extends Specification {
                 "250 OK\r\n" +
                 "221 shelfunit.info Service closing transmission channel\r\n"
 	}
-}
+} // line 246
 

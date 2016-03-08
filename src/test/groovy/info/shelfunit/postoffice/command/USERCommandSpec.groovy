@@ -8,13 +8,10 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
-
-import org.apache.shiro.crypto.hash.Sha512Hash
 
 @Slf4j
 class USERCommandSpec extends Specification {
@@ -24,7 +21,7 @@ class USERCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
     static userCommand
-    static rString     = getRandomString()
+    static rString     = getRandomString( 12 )
     static gwShelf     = 'gw' + rString // @shelfunit.info'
     static jAdamsShelf = 'ja' + rString // @shelfunit.info'
     static jackShelf   = 'on' + rString // @shelfunit.info'
@@ -43,12 +40,7 @@ class USERCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        def db = [ url: "jdbc:postgresql://${conf.database.host_and_port}/${conf.database.dbname}",
-        user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
-        log.info "db is a ${db.getClass().name}"
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         userCommand = new USERCommand( sql )
     }     // run before the first feature method
@@ -59,21 +51,9 @@ class USERCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        def numIterations = 10000
-        def salt = 'you say your password tastes like chicken? Add salt!'
-        def atx512
-        atx512 = new Sha512Hash( 'somePassword', gwShelf, numIterations )
-        def params = [ gwShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'george.washingtonu', 'somePassword' ), 'George', 'Washington', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        atx512 = new Sha512Hash( 'somePassword', jAdamsShelf, numIterations )
-        params = [ jAdamsShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'john.adamsu', 'somePassword' ), 'John', 'Adams', 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        
-        atx512 = new Sha512Hash( 'somePassword', jackShelf, numIterations )
-        params = [ jackShelf, atx512.toBase64(), 'SHA-512', numIterations, getBase64Hash( 'oneillu', 'somePassword' ), 'Jack', "O'Neill", 0, false ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash,  first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
-        // sql.commit()
+        addUser( sql, 'George', 'Washington', gwShelf, 'somePassword' )
+        addUser( sql, 'John', 'Adams', jAdamsShelf, 'somePassword' )
+        addUser( sql, 'Jack', "O'Neill", jackShelf, 'somePassword' )
     }
 
 
@@ -145,5 +125,5 @@ class USERCommandSpec extends Specification {
             'grg.wshngtnuu' | "-ERR No such user grg.wshngtnuu" | 'AUTHORIZATION' 
 	}
 	
-} // line 152
+} // line 152, 148
 
