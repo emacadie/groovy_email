@@ -48,5 +48,11 @@ class GETestUtils {
         def params = [ userName, ( new Sha512Hash( password, userName, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( userName, password ), firstName, lastName, 0, false ]
         sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
     }
+    
+    static addMessage( def sql, def uuid, def userName, def messageString, def domain, def fromAddress = "hello@test.com" ) {
+        def toAddress = "${userName}@${domain}".toString()
+        def params = [ uuid, userName, fromAddress, toAddress, messageString ]
+        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
+    }
 }
 

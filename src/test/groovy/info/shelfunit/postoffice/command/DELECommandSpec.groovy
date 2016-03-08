@@ -15,6 +15,7 @@ import info.shelfunit.mail.ConfigHolder
 
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
+import static info.shelfunit.mail.GETestUtils.addMessage
 
 import groovy.util.logging.Slf4j 
 
@@ -65,16 +66,10 @@ class DELECommandSpec extends Specification {
         addUser( sql, 'John', 'Adams', jaDELE, 'somePassword' )
         addUser( sql, 'Jack', "O'Neill", joDELE, 'somePassword' )
         
-        this.addMessage( uuidA, gwDELE, msgA )
-        this.addMessage( uuidB, gwDELE, msgB )
-        this.addMessage( uuidC, gwDELE, msgC )
+        addMessage( sql, uuidA, gwDELE, msgA, domainList[ 0 ] )
+        addMessage( sql, uuidB, gwDELE, msgB, domainList[ 0 ] )
+        addMessage( sql, uuidC, gwDELE, msgC, domainList[ 0 ] )
         theTimestamp = Timestamp.create()
-    }
-    
-    def addMessage( uuid, userName, messageString ) {
-        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
     
     // @Ignore

@@ -14,6 +14,7 @@ import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
+import static info.shelfunit.mail.GETestUtils.addMessage
 
 import groovy.util.logging.Slf4j 
 
@@ -64,16 +65,10 @@ class LISTCommandSpec extends Specification {
         addUser( sql, 'John', 'Adams', jaLIST, 'somePassword' )
         addUser( sql, 'Jack', "O'Neill", joLIST, 'somePassword' )
         
-        this.addMessage( uuidA, gwLIST, msgA )
-        this.addMessage( uuidB, gwLIST, msgB )
-        this.addMessage( uuidC, gwLIST, msgC )
+        addMessage( sql, uuidA, gwLIST, msgA, domainList[ 0 ] )
+        addMessage( sql, uuidB, gwLIST, msgB, domainList[ 0 ] )
+        addMessage( sql, uuidC, gwLIST, msgC, domainList[ 0 ] )
         theTimestamp = Timestamp.create()
-    }
-    
-    def addMessage( uuid, userName, messageString ) {
-        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
 
     def "test uuid list"() {

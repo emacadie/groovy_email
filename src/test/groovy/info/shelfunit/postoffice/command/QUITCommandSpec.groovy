@@ -14,6 +14,7 @@ import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
+import static info.shelfunit.mail.GETestUtils.addMessage
 
 import groovy.util.logging.Slf4j 
 
@@ -25,7 +26,6 @@ class QUITCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static sql
     static quitCommand
-    // static theTimestamp
     static rString = getRandomString()
     static gwQUIT  = 'gw' + rString // @shelfunit.info'
     static jaQUIT  = 'ja' + rString // @shelfunit.info'
@@ -64,16 +64,10 @@ class QUITCommandSpec extends Specification {
         addUser( sql, 'John', 'Adams', jaQUIT, 'somePassword' )
         addUser( sql, 'Jack', "O'Neill", joQUIT, 'somePassword' )
         
-        this.addMessage( uuidA, gwQUIT, msgA )
-        this.addMessage( uuidB, gwQUIT, msgB )
-        this.addMessage( uuidC, gwQUIT, msgC )
+        addMessage( sql, uuidA, gwQUIT, msgA, domainList[ 0 ] )
+        addMessage( sql, uuidB, gwQUIT, msgB, domainList[ 0 ] )
+        addMessage( sql, uuidC, gwQUIT, msgC, domainList[ 0 ] )
         // theTimestamp = Timestamp.create()
-    }
-    
-    def addMessage( uuid, userName, messageString ) {
-        def toAddress = "${userName}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, userName, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
     
     // @Ignore
