@@ -42,6 +42,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
+        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'aaa@showboat.com' ]
         sql.close()
     }   // run after the last feature method
     

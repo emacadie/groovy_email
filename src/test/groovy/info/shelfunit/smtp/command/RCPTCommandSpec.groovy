@@ -47,7 +47,7 @@ class RCPTCommandSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        rcptCommand = new RCPTCommand( sql, domainList )
+        rcptCommand = new RCPTCommand( domainList )
     }     // run before the first feature method
     
     def cleanupSpec() {

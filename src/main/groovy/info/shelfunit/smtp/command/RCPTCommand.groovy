@@ -1,19 +1,13 @@
 package info.shelfunit.smtp.command
 
-import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
-
-import visibility.Hidden
 
 @Slf4j
 class RCPTCommand {
-    
-    @Hidden Sql sql
-    @Hidden List domainList
-    RCPTCommand( def argSql, def argDomainList ) {
-        log.info "Starting new RCPTCommand"
-        println "Here is argDomainList: ${argDomainList}"
-        this.sql = argSql
+
+    final domainList
+    RCPTCommand( def argDomainList ) {
+        log.info "Starting new RCPTCommand, here is argDomainList: ${argDomainList}"
         this.domainList = argDomainList
     }
     
@@ -40,8 +34,18 @@ class RCPTCommand {
         } else if ( !domainList.includes( q.extractDomainRCPT() ) ) {
             resultMap.resultString = "550 No such user" // make it case insensitive here
         } else {
-            
-            def userName = q.extractUserNameInRCPT() 
+            bufferMap.forwardPath << q.getEmailAddressInRCPT() 
+            resultMap.resultString = '250 OK'
+            prevCommandSet << 'RCPT'
+        }
+        resultMap.bufferMap = bufferMap
+        resultMap.prevCommandSet = prevCommandSet
+
+		log.info "here is resultMap: ${resultMap.toString()}"
+		resultMap
+    }
+}
+/* def userName = q.extractUserNameInRCPT() 
             // log.info "here is userName: ${userName}"
             def rows = sql.rows( 'select * from email_user where username=?', userName )
             // log.info "here is rows?.size() : ${rows?.size()} "
@@ -52,13 +56,5 @@ class RCPTCommand {
             } else {
                 resultMap.resultString = "550 No such user"
             }
-            
-        }
-        resultMap.bufferMap = bufferMap
-        resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
-    }
-}
+*/
 

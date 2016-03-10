@@ -11,6 +11,7 @@ CREATE TABLE email_user (
     version bigint NOT NULL
 );
 
+-- change this name later
 create table mail_store (
     id UUID PRIMARY KEY  NOT NULL unique,
     username character varying( 64 ) not null,
@@ -22,16 +23,26 @@ create table mail_store (
     FOREIGN KEY ( username ) REFERENCES email_user ( username ) on delete cascade
 );
 
-create table mail_spool (
+create table mail_spool_in (
     id UUID PRIMARY KEY  NOT NULL unique,
-    username character varying( 64 ) not null,
     from_address character varying( 255 ) not null,
     to_address_list text not null,
     message bytea,
     text_body text not null,
     from_user_logged_in boolean,
-    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null,
-    FOREIGN KEY ( username ) REFERENCES email_user ( username ) on delete cascade
+    status_string text,
+    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
+);
+
+create table mail_spool_out (
+    id UUID PRIMARY KEY  NOT NULL unique,
+    from_address character varying( 255 ) not null,
+    to_address_list text not null,
+    message bytea,
+    text_body text not null,
+    from_user_logged_in boolean,
+    status_string text,
+    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
 );
 
 

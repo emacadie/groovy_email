@@ -44,6 +44,12 @@ class MetaProgrammer {
         }
         java.util.List.metaClass.includes = { i -> i in delegate 
         }
+        java.util.List.metaClass.containsIgnoreCase = { arg ->
+            def result = delegate.any { it ->
+                it.toLowerCase() == arg.toLowerCase()
+            }
+            result
+        }
     }
     
     static runMapMetaProgramming() {

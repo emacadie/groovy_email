@@ -5,23 +5,19 @@ import groovy.util.logging.Slf4j
 
 import java.sql.SQLException
 
-import visibility.Hidden
-
 @Slf4j
 class MSSGCommand {
     
-    @Hidden def uuidSet
     static regex = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
 *+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)'''    
 
     final Sql sql
-    @Hidden List domainList
+    final List domainList
     MSSGCommand( def argSql, def argDomainList ) {
         log.info "Starting new MSSGCommand"
         println "Here is argDomainList: ${argDomainList}"
         this.sql = argSql
         this.domainList = argDomainList
-        uuidSet = [] as Set
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -29,15 +25,11 @@ class MSSGCommand {
         def resultString
         def resultMap = [:]
         resultMap.clear()
-        
-        bufferMap.forwardPath.size().times() {
-            uuidSet << UUID.randomUUID() 
-        }
 
         if ( !prevCommandSet.lastSMTPCommandPrecedesMSSG() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
-            resultMap.resultString =  this.addMessageToDatabase( theMessage, bufferMap, uuidSet )
+            resultMap.resultString =  this.addMessageToDatabase( theMessage, bufferMap )
         }
         if ( resultMap.resultString == '250 OK' ) {
             resultMap.bufferMap = [:]
@@ -48,13 +40,52 @@ class MSSGCommand {
 		resultMap
     } // process
     
-    def addMessageToDatabase( theMessage, bufferMap, uuidSet ) {
+    def addMessageToDatabase( theMessage, bufferMap ) {
         log.info "log is a ${log.class.name}"
         def result = '250 OK'
         def toAddresses = bufferMap.forwardPath
         def fromAddress = bufferMap.reversePath
         def insertCounts 
-        try {
+        def q = fromAddress =~ regex
+        def fromDomain = q.getFromDomainInMSSG ()
+        if ( domainList.containsIgnoreCase( fromDomain ) ) {
+            log.info "It is an outgoing message"
+        } else {
+        
+            try {
+                sql.withTransaction {
+                    def wholeFromAddress = q.getWholeFromAddressInMSSG()
+                    log.info "here are the args: wholeFromAddress: ${wholeFromAddress}, toAddresses: ${toAddresses}, theMessage: ${theMessage}"
+                    insertCounts = sql.withBatch( 'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string ) values (?, ?, ?, ?, ?)' ) { stmt ->
+                        log.info "stmt is a ${stmt.class.name}"
+                        stmt.addBatch( [ 
+                            UUID.randomUUID(), // id, 
+                            wholeFromAddress,  // from_address, 
+                            toAddresses.join( ',' ), // to_address_list, 
+                            theMessage,  // text_body, 
+                            "ENTERED"    // status_string
+                        ] )
+                    }
+                }
+            } catch ( Exception e ) {
+                log.info "Next exception message: ${e.getMessage()}"
+                log.error "something went wrong", e
+                result = '500 Something went wrong'
+                SQLException ex = e.getNextException()
+                log.info "Next exception message: ${ex.getMessage()}"
+                log.error "something went wrong", ex 
+            }
+        }
+        println "here is insertCounts: ${insertCounts}"
+        result
+    } // addMessageToDatabase
+}
+
+/*
+
+        bufferMap.forwardPath.size().times() {
+            uuidSet << UUID.randomUUID() 
+        }
             sql.withTransaction {
                 toAddresses.eachWithIndex { address, i ->
                     def q = address =~ regex
@@ -70,16 +101,5 @@ class MSSGCommand {
                     }
                 }
             }
-        } catch ( Exception e ) {
-            result = '500 Something went wrong'
-            SQLException ex = e.getNextException()
-            log.info "Next exception message: ${ex.getMessage()}"
-            // ex.printStrackTrace()
-            log.error "something went wrong", ex 
-            // log.error "Failed to format {}", result, ex
-        }
-        println "here is insertCounts: ${insertCounts}"
-        result
-    } // addMessageToDatabase
-}
+*/
 

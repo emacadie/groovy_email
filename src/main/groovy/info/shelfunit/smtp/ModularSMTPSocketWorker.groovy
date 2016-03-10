@@ -139,7 +139,7 @@ class ModularSMTPSocketWorker {
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
 			return new MAILCommand()
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
-			return new RCPTCommand( sql, serverList )
+			return new RCPTCommand( serverList )
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    return new RSETCommand()
 		} else if ( theMessage.startsWith( 'DATA' ) ) {

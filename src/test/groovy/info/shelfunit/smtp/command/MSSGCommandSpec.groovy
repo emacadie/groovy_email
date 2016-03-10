@@ -44,6 +44,7 @@ class MSSGCommandSpec extends Specification {
     
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ georgeW, johnA, jackO ]
+        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ ( jackO + '@stargate.mil' ) ]
         sql.close()
     }   // run after the last feature method
    
@@ -71,53 +72,49 @@ class MSSGCommandSpec extends Specification {
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
         }
-        def countResult
         def qList = []
         ( 1..uuidSet.size() ).each { qList << '?' }
         def qCString = qList.join( ',' )
-        def sqlString = 'select count(*) from mail_store where id in (' + qCString + ')'
-        when:
-            countResult = sql.firstRow( sqlString, uuidSet as List )
-        then:
-            countResult.count == 0
+        
+        def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
+        def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
+        def mssgCount = countResult.count 
             
         def theMessage = "The next meeting of the board of directors will be on Tuesday.\nJohn."
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
-	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg, uuidSet ) 
-	        countResult = sql.firstRow( sqlString, uuidSet as List )
+	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg ) 
+	        countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
 	    then:
 	        mailResponse == "250 OK"
-	        countResult.count == uuidSet.size()
+	        countResult.count == ( mssgCount + 1 )
 	}
 	
 	// @Ignore
-	def "test handling a BAD message"() {
+	def "test handling a non-existant inbound recipient"() {
 	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' , 'chumba-wumba@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
         }
-        def countResult
+        
         def qList = []
         ( 1..uuidSet.size() ).each { qList << '?' }
         def qCString = qList.join( ',' )
-        def sqlString = 'select count(*) from mail_store where id in (' + qCString + ')'
-        when:
-            countResult = sql.firstRow( sqlString, uuidSet as List )
-        then:
-            countResult.count == 0
-            
+        def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
+        def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
+        def mssgCount = countResult.count 
+     
         def theMessage = "The next meeting of the board of directors will be on Friday.\nStay Groovy\nJohn."
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
-	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg, uuidSet ) 
+	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg ) 
 	    then:
-	        mailResponse == "500 Something went wrong"
+	        mailResponse == "250 OK"
 	    when:
-	        countResult = sql.firstRow( sqlString, uuidSet as List )
+	        countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
 	    then:
-	        countResult.count == 0
+	        countResult.count == ( mssgCount + 1 )
 	}
 	
 	def "test getting the data"() {
