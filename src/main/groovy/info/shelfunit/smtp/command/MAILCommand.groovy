@@ -10,9 +10,19 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class MAILCommand {
     
+    final List domainList
+    MAILCommand( argDomainList ) {
+        log.info "Starting new MAILCommand"
+        println "Here is argDomainList: ${argDomainList}"
+        this.domainList = argDomainList
+    }
+    
     // http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
-    static regex = '''^(MAIL FROM):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6})>(\\s{0,}BODY=8BITMIME)?$(?x)'''
+    static mailFrom = '''^(MAIL FROM):<'''
+    static localPart = '''([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@'''
+    static domain = '''((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>'''
+    static eightBitRuntime = '''(\\s{0,}BODY=8BITMIME)?$(?x)'''
+    static regex = mailFrom + localPart + domain + eightBitRuntime
 
     static pattern = ~regex
     
@@ -36,6 +46,11 @@ class MAILCommand {
             bufferMap?.clear()
             bufferMap.forwardPath = [] // for RCPT command
             bufferMap.reversePath =  q.getEmailAddressInMAIL()
+            if ( domainList.containsIgnoreCase( q.getDomainInMAIL() ) ) {
+                bufferMap.messageDirection = "outbound"
+            } else {
+                bufferMap.messageDirection = "inbound"
+            }
             if ( q.handles8BitInMAIL() ) {
                 bufferMap.handles8bit = "true"
                 resultMap.resultString = "250 <${bufferMap.reversePath}> Sender and 8BITMIME OK"

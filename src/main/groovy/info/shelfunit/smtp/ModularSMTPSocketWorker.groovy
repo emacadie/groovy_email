@@ -28,19 +28,19 @@ class ModularSMTPSocketWorker {
 	@Hidden prevCommandSet 
 	@Hidden def bufferMap
 	@Hidden def sql
-	@Hidden def serverList
+	@Hidden def domainList
 	@Hidden def commandResultMap
 
-	ModularSMTPSocketWorker( argIn, argOut, argServerList ) {
+	ModularSMTPSocketWorker( argIn, argOut, argDomainList ) {
         input = argIn
         output = argOut
         
         def db = ConfigHolder.instance.returnDbMap()         
         sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
-        serverList = []
-        argServerList.collect{ serverList << it.toLowerCase() }
+        domainList = []
+        argDomainList.collect{ domainList << it.toLowerCase() }
         
-        serverName = serverList[ 0 ]
+        serverName = domainList[ 0 ]
         log.info "server name is ${serverName}"
         prevCommandSet = [] as Set
         commandResultMap = [:]
@@ -133,19 +133,19 @@ class ModularSMTPSocketWorker {
 	def returnCurrentCommand( theMessage, isActualMessage ) {
 	    log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
 		if ( isActualMessage ) {
-		    return new MSSGCommand( sql, serverList )
+		    return new MSSGCommand( sql, domainList )
 		} else if ( theMessage.isHelloCommand() ) {
 		    return new EHLOCommand()
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
-			return new MAILCommand()
+			return new MAILCommand( domainList )
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
-			return new RCPTCommand( serverList )
+			return new RCPTCommand( domainList )
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    return new RSETCommand()
 		} else if ( theMessage.startsWith( 'DATA' ) ) {
 		    return new DATACommand()
 		} else if ( theMessage.startsWith( 'QUIT' ) ) {
-		    return new QUITCommand( serverList )
+		    return new QUITCommand( domainList )
 		}
 	}
 

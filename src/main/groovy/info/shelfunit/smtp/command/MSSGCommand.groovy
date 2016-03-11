@@ -48,7 +48,7 @@ class MSSGCommand {
         def insertCounts 
         def q = fromAddress =~ regex
         def fromDomain = q.getFromDomainInMSSG ()
-        if ( domainList.containsIgnoreCase( fromDomain ) ) {
+        if ( bufferMap.messageDirection == 'outgoing' ) {
             log.info "It is an outgoing message"
         } else {
         

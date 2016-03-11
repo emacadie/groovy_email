@@ -18,8 +18,11 @@ class MatcherMetaProgrammer {
         java.util.regex.Matcher.metaClass.getEmailAddressInMAIL = { ->
             delegate[ 0 ][ 2 ]
         }
-        java.util.regex.Matcher.metaClass.handles8BitInMAIL = { ->
+        java.util.regex.Matcher.metaClass.getDomainInMAIL = { ->
             delegate[ 0 ][ 3 ]
+        }
+        java.util.regex.Matcher.metaClass.handles8BitInMAIL = { ->
+            delegate[ 0 ][ 4 ]
         }
         java.util.regex.Matcher.metaClass.getWholeFromAddressInMSSG = { ->
             delegate[ 0 ][ 1 ]
