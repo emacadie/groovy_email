@@ -4,8 +4,9 @@ package info.shelfunit.smtp.command
 import groovy.util.logging.Slf4j 
 // reg ex for email from http://www.mkyong.com/regular-expressions/how-to-validate-email-address-with-regular-expression/
 // look at http://www.ngdc.noaa.gov/wiki/index.php?title=Regular_Expressions_in_Groovy as well
-// RFC 5321 4.1.1 The reverse-path is the argument of the MAIL command, the forward-path is the argument of
-//   the RCPT command, and the mail data is the argument of the DATA command. 
+// RFC 5321 4.1.1 The reverse-path is the argument of the MAIL command (who it's from), 
+// the forward-path is the argument of the RCPT command (who it's to),
+// and the mail data is the argument of the DATA command. 
 
 @Slf4j
 class MAILCommand {
