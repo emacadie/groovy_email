@@ -174,23 +174,12 @@ class RCPTCommandSpec extends Specification {
 
 	}
 
-	@Unroll( "#inputAddress with wrong domain gives #value" )
-	def "#inputAddress with wrong domain gives #value"() {
+	@Unroll( "#inputAddress with wrong domain in inbound message gives #value" )
+	def "#inputAddress with wrong domain in inbound message gives #value"() {
 	    def resultMap
 	    def resultString
-	    /*
-	    def otherDomains = [ 'mkyong@yahoo.com', 'mkyong-100@yahoo.com',
-	    'mkyong.100@yahoo.com', 'mkyong111@mkyong.com', 'mkyong-100@mkyong.net', 'mkyong.100@mkyong.com.au',
-	    'mkyong@1.com', 'mkyong@gmail.com.com', 'mkyong+100@gmail.com', 'mkyong-100@yahoo-test.com',
-	    'howTuser@domain.com', 'user@domain.co.in', 'user1@domain.com', 'user.name@domain.com',
-	    'user_name@domain.co.in', 'user-name@domain.co.in', 'user@domain.com', 'user@domain.co.in',
-	    'user.name@domain.com', 'user@domain.com', 'user@domain.co.in', 'user.name@domain.com', 'user_name@domain.com',
-	    'username@yahoo.corporate.in', 'george.washingtonrcpt@mtvernon.co', 'john.adams@his-rotundity.org',
-	    'oneill@stargate.mil' ]
-	    */
 
         when:
-            
             resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: "${direction}" ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
@@ -226,6 +215,22 @@ class RCPTCommandSpec extends Specification {
             otherDomains[ 24 ] | 'inbound'  | response550 | [ hamilton ] 
             otherDomains[ 25 ] | 'inbound'  | response550 | [ hamilton ]
             otherDomains[ 26 ] | 'inbound'  | response550 | [ hamilton ]
+	}
+	
+	@Unroll( "#inputAddress with wrong domain in outbound message gives #value" )
+	def "#inputAddress with wrong domain in outbound message gives #value"() {
+	    def resultMap
+	    def resultString
+
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: "${direction}" ] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.prevCommandSet == resultSetEM
+            resultMap.bufferMap.forwardPath == forwardList
+        where:
+            inputAddress       | direction  | value       | forwardList
             otherDomains[ 0 ]  | 'outbound' | response250 | [ hamilton, otherDomains[ 0 ] ]
             otherDomains[ 1 ]  | 'outbound' | response250 | [ hamilton, otherDomains[ 1 ] ]
             otherDomains[ 2 ]  | 'outbound' | response250 | [ hamilton, otherDomains[ 2 ] ]
