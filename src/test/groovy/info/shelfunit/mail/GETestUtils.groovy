@@ -54,5 +54,11 @@ class GETestUtils {
         def params = [ uuid, userName, fromAddress, toAddress, messageString ]
         sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
+    
+    
+    static getUserId( sql, userName ) {
+        def userResult = sql.firstRow( 'select userid from email_user where username = ?', [ userName ] )
+        return userResult.userid
+    }
 }
 

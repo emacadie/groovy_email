@@ -15,6 +15,7 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
+import static info.shelfunit.mail.GETestUtils.getUserId
 
 import groovy.util.logging.Slf4j 
 
@@ -55,7 +56,7 @@ class QUITCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        // sql.execute "DELETE FROM email_user where username in ( ${gwQUIT}, ${jaQUIT}, ${joQUIT} )"
+        sql.execute "DELETE FROM email_user where username in ( ${gwQUIT}, ${jaQUIT}, ${joQUIT} )"
         sql.close()
     }   // run after the last feature method
    
@@ -70,23 +71,17 @@ class QUITCommandSpec extends Specification {
         // theTimestamp = Timestamp.create()
     }
     
-    def getUserId( userName ) {
-        def userResult = sql.firstRow( 'select userid from email_user where username = ?', [ userName ] )
-        return userResult.userid
-    }
-    
     // @Ignore
     def "test uuid list"() {
         def uuidList = []
         def uuid = UUID.randomUUID()
-        def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
         bufferInputMap.state = 'TRANSACTION'
         bufferInputMap.timestamp = Timestamp.create()
         def userInfo = [:]
 	    userInfo.username = gwQUIT
-	    userInfo.userid = this.getUserId( gwQUIT )
+	    userInfo.userid = getUserId( sql, gwQUIT )
         bufferInputMap.userInfo = userInfo
         def deleteMap = [ 1: uuidA, 3: uuidC, 2: uuidB ]
         def messageCount = 0
@@ -131,7 +126,7 @@ class QUITCommandSpec extends Specification {
             bufferInputMap.deleteMap = [ 1: newUUID ]
             bufferInputMap.state = 'TRANSACTION'
             userInfo.username = gwQUIT
-            userInfo.userid = this.getUserId( gwQUIT )
+            userInfo.userid = getUserId( sql, gwQUIT )
             bufferInputMap.userInfo = userInfo
             resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
             sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
@@ -142,6 +137,109 @@ class QUITCommandSpec extends Specification {
             messageCount == 0
             gwLoggedIn.logged_in == false
 	}
+	
+	def "sending wrong command"() {
+	    when:
+	        def resultMap = quitCommand.process( 'QUITT', [] as Set, [:] )
+	    then:
+	        resultMap.resultString == "-ERR Command not in proper form"
+	    
+	}
 
+    def "In AUTHORIZATION state"() {
+        when:
+	        def resultMap = quitCommand.process( 'QUIT', [] as Set, [ state: 'AUTHORIZATION' ] )
+	    then:
+	        resultMap.resultString == "+OK ${domainList[ 0 ]}  POP3 server signing off"
+    }
+
+    def "test John Adams"() {
+        def uuidList = []
+        def uuidJAA = UUID.randomUUID()
+        def uuidJAB = UUID.randomUUID()
+        addMessage( sql, uuidJAA, jaQUIT, msgA, domainList[ 0 ] )
+        addMessage( sql, uuidJAB, jaQUIT, msgB, domainList[ 0 ] )
+        def bufferInputMap = [:]
+        def timestamp
+        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.timestamp = Timestamp.create()
+        def userInfo = [:]
+	    userInfo.username = jaQUIT
+	    userInfo.userid = getUserId( sql, jaQUIT )
+        bufferInputMap.userInfo = userInfo
+        def deleteMap = [ 1: uuidJAA, 2: uuidJAB ]
+        def messageCount = 0
+        bufferInputMap.deleteMap = deleteMap
+        def jaLoggedIn
+        sleep( 2.seconds() )
+        when:
+            jaLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ jaQUIT ] )
+        then:
+            jaLoggedIn.logged_in == true
+        when:
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ jaQUIT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+        then:
+            messageCount == 2 
+
+        when:
+            def resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
+        then:
+            resultMap.resultString == "+OK ${domainList[ 0 ]} POP3 server signing off"
+        when:
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ jaQUIT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+            jaLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ jaQUIT ] )
+        then:
+            messageCount == 0
+            jaLoggedIn.logged_in == false
+	}
+	
+	def "test Colonel Jack O'Neill"() {
+        def uuidList = []
+        def uuidJOA = UUID.randomUUID()
+        def uuidJOB = UUID.randomUUID()
+        addMessage( sql, uuidJOA, joQUIT, msgA, domainList[ 0 ] )
+        addMessage( sql, uuidJOB, joQUIT, msgB, domainList[ 0 ] )
+        def bufferInputMap = [:]
+        // def timestamp
+        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.timestamp = Timestamp.create()
+        def userInfo = [:]
+	    userInfo.username = joQUIT
+	    userInfo.userid = getUserId( sql, joQUIT )
+        bufferInputMap.userInfo = userInfo
+        def deleteMap = [ 1: uuidJOA, 2: uuidJOB ]
+        def messageCount = 0
+        bufferInputMap.deleteMap = deleteMap
+        def joLoggedIn
+        sleep( 2.seconds() )
+        when:
+            joLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ joQUIT ] )
+        then:
+            joLoggedIn.logged_in == true
+        when:
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ joQUIT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+        then:
+            messageCount == 2 
+
+        when:
+            def resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
+        then:
+            resultMap.resultString == "+OK ${domainList[ 0 ]} POP3 server signing off"
+        when:
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ joQUIT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+            joLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ joQUIT ] )
+        then:
+            messageCount == 0
+            joLoggedIn.logged_in == false
+	}
+	
 }
 

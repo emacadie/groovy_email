@@ -120,7 +120,7 @@ class ModularPostOfficeSocketWorker {
 		} else if ( theMessage.startsWith( 'USER' ) ) {
 			return new USERCommand( sql )
 		} else if ( theMessage.startsWith( 'PASS' ) ) {
-			return new PASSCommand( )
+			return new PASSCommand( sql )
 		} else if ( theMessage.startsWith( 'RSET' ) ) {
 		    return new RSETCommand( sql )
 		} else if ( theMessage.startsWith( 'STAT' ) ) {

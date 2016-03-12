@@ -9,8 +9,11 @@ import org.apache.shiro.crypto.hash.Sha512Hash
 @Slf4j
 class PASSCommand {
     
-    PASSCommand(  ) {
+    final sql
+    
+    PASSCommand( argSql ) {
         log.info "Starting new PASSCommand"
+        this.sql = argSql
     }
 
     static regex = '''^(PASS )(.*)$(?x)'''

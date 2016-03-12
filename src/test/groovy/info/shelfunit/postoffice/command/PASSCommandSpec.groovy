@@ -20,6 +20,7 @@ class PASSCommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static iterations = 10000
     static passCommand
+    static sql
 
     @Rule 
     TestName name = new TestName()
@@ -31,12 +32,10 @@ class PASSCommandSpec extends Specification {
     
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
-        log.info "conf is a ${conf.class.name}"
-        passCommand = new PASSCommand(  )
-        
+        sql = ConfigHolder.instance.getSqlObject()
+        passCommand = new PASSCommand( sql )
     }     // run before the first feature method
     
     def cleanupSpec() { }   // run after the last feature method
