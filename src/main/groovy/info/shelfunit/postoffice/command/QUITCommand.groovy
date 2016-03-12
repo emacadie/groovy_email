@@ -3,15 +3,14 @@ package info.shelfunit.postoffice.command
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 import java.sql.SQLException
-import visibility.Hidden
 
 @Slf4j
 class QUITCommand {
     
-    @Hidden def regex = "RETR\\s\\d+"
+    final def regex = "RETR\\s\\d+"
     
-    @Hidden Sql sql
-    @Hidden serverName
+    final Sql sql
+    final serverName
     
     QUITCommand( def argSql, def argServerName ) {
         log.info "Starting new QUITCommand"
@@ -27,7 +26,6 @@ class QUITCommand {
         resultMap.clear()
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
-        
         
         if ( theMessage != 'QUIT' ) {
             resultMap.resultString = "-ERR Command not in proper form"
@@ -61,11 +59,13 @@ class QUITCommand {
     
     private changeLoggedInFlag( def argUserid ) {
         def result = '250 OK'
+        log.info "in changedLoggedInFlag with arg ${argUserid}"
         try {
-            sql.executeUpdate "UPDATE email_user set logged_in = 'true' where userid = ?", [ argUserid ]
+            sql.executeUpdate "UPDATE email_user set logged_in = ? where userid = ?", [ false, argUserid ]
         } catch ( SQLException ex ) {
             result = '500 Something went wrong'
         }
+        
         return result
     }
     
@@ -83,7 +83,6 @@ class QUITCommand {
                 SQLException ex = e.getNextException()
                 log.info "Next exception message: ${ex.getMessage()}"
                 log.error "something went wrong", ex 
-                // log.error "Failed to format {}", result, ex
             }
         }
         return result

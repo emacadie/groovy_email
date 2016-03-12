@@ -2,12 +2,10 @@ package info.shelfunit.smtp.command
 
 import groovy.util.logging.Slf4j 
 
-import visibility.Hidden
-
 @Slf4j
 class QUITCommand {
 
-    @Hidden List domainList
+    final List domainList
     QUITCommand( def argDomainList ) {
         log.info "Starting new QUITCommand"
         println "Here is argDomainList: ${argDomainList}"

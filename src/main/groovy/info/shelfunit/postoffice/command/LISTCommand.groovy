@@ -3,12 +3,10 @@ package info.shelfunit.postoffice.command
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
-import visibility.Hidden
-
 @Slf4j
 class LISTCommand {
     
-    @Hidden Sql sql
+    final Sql sql
     LISTCommand( def argSql ) {
         log.info "Starting new LISTCommand"
         this.sql = argSql

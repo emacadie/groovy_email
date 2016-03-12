@@ -55,19 +55,24 @@ class QUITCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ${gwQUIT}, ${jaQUIT}, ${joQUIT} )"
+        // sql.execute "DELETE FROM email_user where username in ( ${gwQUIT}, ${jaQUIT}, ${joQUIT} )"
         sql.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwQUIT, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaQUIT, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", joQUIT, 'somePassword' )
+        addUser( sql, 'George', 'Washington', gwQUIT, 'somePassword', true )
+        addUser( sql, 'John', 'Adams', jaQUIT, 'somePassword', true )
+        addUser( sql, 'Jack', "O'Neill", joQUIT, 'somePassword', true )
         
         addMessage( sql, uuidA, gwQUIT, msgA, domainList[ 0 ] )
         addMessage( sql, uuidB, gwQUIT, msgB, domainList[ 0 ] )
         addMessage( sql, uuidC, gwQUIT, msgC, domainList[ 0 ] )
         // theTimestamp = Timestamp.create()
+    }
+    
+    def getUserId( userName ) {
+        def userResult = sql.firstRow( 'select userid from email_user where username = ?', [ userName ] )
+        return userResult.userid
     }
     
     // @Ignore
@@ -81,6 +86,7 @@ class QUITCommandSpec extends Specification {
         bufferInputMap.timestamp = Timestamp.create()
         def userInfo = [:]
 	    userInfo.username = gwQUIT
+	    userInfo.userid = this.getUserId( gwQUIT )
         bufferInputMap.userInfo = userInfo
         def deleteMap = [ 1: uuidA, 3: uuidC, 2: uuidB ]
         def messageCount = 0
@@ -101,22 +107,40 @@ class QUITCommandSpec extends Specification {
             sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
                 messageCount = nextRow.count
             }
+            def gwLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ gwQUIT ] )
         then:
             messageCount == 0
+            gwLoggedIn.logged_in == false
             
         def messageStringB = 'aw' * 11
         def toAddress = "${gwQUIT}@${domainList[ 0 ]}".toString()
+        sql.executeUpdate "UPDATE email_user set logged_in = ? where userid = ?", [ true, userInfo.userid ]
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwQUIT, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            
-        
+            def newUUID = UUID.randomUUID()  
+            addMessage( sql, newUUID, gwQUIT, messageStringB, domainList[ 0 ] )
             sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
                 messageCount = nextRow.count
             }
+            gwLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ gwQUIT ] )
         then:
             messageCount == 1
+            gwLoggedIn.logged_in == true
+            
+         when:
+            bufferInputMap.deleteMap = [ 1: newUUID ]
+            bufferInputMap.state = 'TRANSACTION'
+            userInfo.username = gwQUIT
+            userInfo.userid = this.getUserId( gwQUIT )
+            bufferInputMap.userInfo = userInfo
+            resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
+            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
+                messageCount = nextRow.count
+            }
+            gwLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ gwQUIT ] )
+         then:
+            messageCount == 0
+            gwLoggedIn.logged_in == false
 	}
 
 }

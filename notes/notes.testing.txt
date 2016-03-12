@@ -14,6 +14,7 @@ This works: gradle test --tests *MSSGCommandSpec test -info
 No good: gradle test --tests 'info.shelfunit.socket.command.RCPTCommandSpec' -info
 This works: gradle test --tests *RCPTCommandSpec
 this works: gradle test --tests *.RCPTCommandSpec
+gradle test --tests *QUITCommandSpec
 
 gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info

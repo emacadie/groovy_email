@@ -3,14 +3,12 @@ package info.shelfunit.postoffice.command
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
-import visibility.Hidden
-
 @Slf4j
 class RETRCommand {
     
-    @Hidden def regex = "RETR\\s\\d+"
+    final def regex = "RETR\\s\\d+"
+    final Sql sql
     
-    @Hidden Sql sql
     RETRCommand( def argSql ) {
         log.info "Starting new RETRCommand"
         this.sql = argSql
