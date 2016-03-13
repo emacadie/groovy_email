@@ -52,6 +52,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     }
     
     def "test basic session"() {
+        
 	    when:
             def domain = "hot-groovy.com"
             def bString = "USER ${gwString}${crlf}" + 

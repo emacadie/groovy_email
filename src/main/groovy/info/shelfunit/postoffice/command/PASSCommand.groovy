@@ -2,6 +2,7 @@ package info.shelfunit.postoffice.command
 
 import groovy.util.logging.Slf4j 
 
+import java.sql.SQLException
 import java.sql.Timestamp
 
 import org.apache.shiro.crypto.hash.Sha512Hash
@@ -45,8 +46,9 @@ class PASSCommand {
             def password = q.getPasswordInPASS()
             def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations.toInteger() ) 
             def finalHash = rawHash.toBase64()
-            
-            if ( userInfo.password_hash == finalHash ) { 
+            log.info "here is bufferMap.userInfo.userid: ${bufferMap.userInfo.userid} and it's a ${bufferMap.userInfo.userid.getClass().name}"
+            if ( ( userInfo.password_hash == finalHash ) && 
+            ( this.changeLoggedInFlag( bufferMap.userInfo.userid ) == '250 OK' ) ) { 
                 resultMap.resultString = "+OK ${userInfo.username} authenticated"
                 bufferMap.state = 'TRANSACTION'
                 bufferMap.timestamp = Timestamp.create()
@@ -60,6 +62,18 @@ class PASSCommand {
 
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap
+    }
+    
+    private changeLoggedInFlag( def argUserid ) {
+        def result = '250 OK'
+        log.info "in changedLoggedInFlag with arg ${argUserid}"
+        try {
+            sql.executeUpdate "UPDATE email_user set logged_in = ? where userid = ?", [ true, argUserid ]
+        } catch ( SQLException ex ) {
+            result = '500 Something went wrong'
+        }
+        
+        return result
     }
 }
 

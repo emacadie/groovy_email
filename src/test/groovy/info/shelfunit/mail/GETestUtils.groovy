@@ -60,5 +60,10 @@ class GETestUtils {
         def userResult = sql.firstRow( 'select userid from email_user where username = ?', [ userName ] )
         return userResult.userid
     }
+    
+    static getUserInfo( sql, userName ) {
+        return sql.firstRow( 'select * from email_user where username=?', userName )
+    }
+
 }
 

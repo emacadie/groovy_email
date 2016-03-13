@@ -42,6 +42,7 @@ class QUITCommand {
             resultMap.resultString = "+OK ${serverName} POP3 server signing off"
             
             def result = '250 OK'
+            log.info "here is bufferMap.userInfo.userid: ${bufferMap.userInfo.userid} and it's a ${bufferMap.userInfo.userid.getClass().name}"
             if ( ( this.changeLoggedInFlag( bufferMap.userInfo.userid ) == '250 OK' ) && 
             ( this.deleteMessages( idsToDelete ) == '250 OK' ) ) {
                 bufferMap.clear()
