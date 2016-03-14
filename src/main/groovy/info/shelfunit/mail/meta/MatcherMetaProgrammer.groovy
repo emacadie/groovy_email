@@ -36,6 +36,9 @@ class MatcherMetaProgrammer {
         java.util.regex.Matcher.metaClass.getPasswordInPASS = { ->
             delegate[ 0 ][ 2 ]
         }
+        java.util.regex.Matcher.metaClass.getBase64InAuth = { ->
+            delegate[ 0 ][ 2 ]
+        }
         
     }
 }

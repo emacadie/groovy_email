@@ -39,6 +39,7 @@ class EHLOCommandSpec extends Specification {
 	    then:
 	        ehloResponse == "250-Hello ${domain}\r\n" +
 	        "250-8BITMIME\r\n" +
+	        "250-AUTH PLAIN\r\n" + 
 	        "250 HELP\r\n"
 	        println "here is resultMap.prevCommandSet[0]: ${resultMap.prevCommandSet[0]} and it's a ${resultMap.prevCommandSet[0].class.name}"
 	        resultMap.prevCommandSet == ["EHLO"] as Set
@@ -84,6 +85,7 @@ class EHLOCommandSpec extends Specification {
 	    then:
 	        ehloResponse == "250-Hello ${domain}\r\n" +
 	        "250-8BITMIME\r\n" + 
+	        "250-AUTH PLAIN\r\n" + 
 	        "250 HELP\r\n"
 	        newList.size() == 1
 	        newList[ 0 ] == "EHLO"

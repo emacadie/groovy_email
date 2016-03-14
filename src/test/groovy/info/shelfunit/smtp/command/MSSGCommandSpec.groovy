@@ -72,9 +72,6 @@ class MSSGCommandSpec extends Specification {
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
         }
-        def qList = []
-        ( 1..uuidSet.size() ).each { qList << '?' }
-        def qCString = qList.join( ',' )
         
         def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
         def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
@@ -98,9 +95,6 @@ class MSSGCommandSpec extends Specification {
             uuidSet << UUID.randomUUID() 
         }
         
-        def qList = []
-        ( 1..uuidSet.size() ).each { qList << '?' }
-        def qCString = qList.join( ',' )
         def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
         def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
         def mssgCount = countResult.count 

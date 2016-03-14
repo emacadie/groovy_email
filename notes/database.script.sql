@@ -1,3 +1,10 @@
+-- to drop tables
+drop table mail_store;
+drop table email_user;
+drop table mail_spool_in;
+drop table mail_spool_out;   
+
+-- to create tables
 CREATE TABLE email_user (
     userid serial primary key NOT NULL,
     username character varying( 64 ) not null unique,
@@ -10,6 +17,7 @@ CREATE TABLE email_user (
     logged_in boolean not null,
     version bigint NOT NULL
 );
+CREATE INDEX user_base_64_hash ON email_user ( base_64_hash );
 
 -- change this name later
 create table mail_store (
@@ -30,6 +38,7 @@ create table mail_spool_in (
     message bytea,
     text_body text not null,
     from_user_logged_in boolean,
+    base_64_hash character varying( 150 ) not null,
     status_string text,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
 );
@@ -41,6 +50,7 @@ create table mail_spool_out (
     message bytea,
     text_body text not null,
     from_user_logged_in boolean,
+    base_64_hash character varying( 150 ) not null,
     status_string text,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
 );

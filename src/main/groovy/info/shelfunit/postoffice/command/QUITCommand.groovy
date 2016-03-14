@@ -66,21 +66,19 @@ class QUITCommand {
         } catch ( SQLException ex ) {
             result = '500 Something went wrong'
         }
-        
         return result
     }
     
     private deleteMessages( def idsToDelete ) {
         def result = '250 OK'
         if ( idsToDelete ) {
-            def qMarks = []
-            ( 1..idsToDelete.size() ).each { qMarks << '?' } // Or: ( idsToDelete.size() ).times { qMarks << '?' }
             try {
                 log.info "here is idsToDelete: ${idsToDelete}"
-                sql.execute "DELETE from mail_store where id in (${qMarks.join(',')})", idsToDelete
+                sql.execute "DELETE from mail_store where id in (${ idsToDelete.getQMarkString() })", idsToDelete
                 log.info "Called the delete command"
             } catch ( Exception e ) {
                 result = '500 Something went wrong'
+                log.error "Here is exception: ", e
                 SQLException ex = e.getNextException()
                 log.info "Next exception message: ${ex.getMessage()}"
                 log.error "something went wrong", ex 

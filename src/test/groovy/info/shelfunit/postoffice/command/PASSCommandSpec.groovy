@@ -174,7 +174,6 @@ class PASSCommandSpec extends Specification {
             bufferMap.userInfo.logged_in == true
 	}
 	
-	
 	def "test created user with incorrect and correct password"() {
 	    def userInfo = [:]
 	    userInfo.username = onPASS

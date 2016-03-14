@@ -49,6 +49,7 @@ class PASSCommand {
             log.info "here is bufferMap.userInfo.userid: ${bufferMap.userInfo.userid} and it's a ${bufferMap.userInfo.userid.getClass().name}"
             if ( ( userInfo.password_hash == finalHash ) && 
             ( this.changeLoggedInFlag( bufferMap.userInfo.userid ) == '250 OK' ) ) { 
+                bufferMap.userInfo.logged_in = true
                 resultMap.resultString = "+OK ${userInfo.username} authenticated"
                 bufferMap.state = 'TRANSACTION'
                 bufferMap.timestamp = Timestamp.create()

@@ -67,6 +67,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    then:
 	        ehloResponse == "250-Hello ${domain}\r\n" +
 	        "250-8BITMIME\r\n" + 
+	        "250-AUTH PLAIN\r\n" + 
 	        "250 HELP\r\n"
 	        resultMap.prevCommandSet == ["EHLO"]
 	}
@@ -133,6 +134,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	        output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\r\n" +
                 "250-8BITMIME\r\n" +
+                "250-AUTH PLAIN\r\n" + 
                 "250 HELP\r\n" +
                 "250 OK\r\n" +
                 "250 OK\r\n" +
@@ -160,6 +162,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" + // opening
                 "250-Hello hot-groovy.com\r\n" +
                 "250-8BITMIME\r\n" +
+                "250-AUTH PLAIN\r\n" + 
                 "250 HELP\r\n" + // DATA
                 "502 Command not implemented\r\n" + // SAML
                 "502 Command not implemented\r\n" + // SEND
@@ -194,7 +197,8 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\r\n" +
                 "250-8BITMIME\r\n" + 
-                "250 HELP\r\n" +
+                "250-AUTH PLAIN\r\n" +
+                "250 HELP\r\n" + 
                 "250 OK\r\n" +
                 "250 OK\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
@@ -223,6 +227,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\r\n" +
                 "250-8BITMIME\r\n" +
+                "250-AUTH PLAIN\r\n" + 
                 "250 HELP\r\n" +
                 "250 OK\r\n" +
                 "250 OK\r\n" +

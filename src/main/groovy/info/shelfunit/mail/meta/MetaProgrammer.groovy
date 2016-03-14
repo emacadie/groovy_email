@@ -50,6 +50,11 @@ class MetaProgrammer {
             }
             result
         }
+        java.util.List.metaClass.getQMarkString = { arg ->
+            def qMarks = []
+            ( delegate.size() ).times { qMarks << '?' }
+            return qMarks.join( ',' )
+        }
     }
     
     static runMapMetaProgramming() {
@@ -104,6 +109,11 @@ class MetaProgrammer {
             ( !delegate.isEmpty() ) &&  ( delegate.last().matches( 'DATA' ) ) 
         }
         java.util.Set.metaClass.includes = { i -> i in delegate 
+        }
+        java.util.Set.metaClass.getQMarkString = { arg ->
+            def qMarks = []
+            ( delegate.size() ).times { qMarks << '?' }
+            return qMarks.join( ',' )
         }
         
     }

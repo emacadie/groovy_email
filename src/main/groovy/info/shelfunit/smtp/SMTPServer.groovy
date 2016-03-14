@@ -26,6 +26,7 @@ class SMTPServer {
                 socket.setSoTimeout( 10.minutes() ) // RFC 5321 states timeouts should be 2-10 minutes
                 socket.withStreams { input, output ->
                     log.info "input is a ${input.class.name}, output is a ${output.class.name}, the server is ${serverList}"
+                    log.info "socket address is ${socket.getInetAddress().toString}, its name is  ${socket.getInetAddress().getCanonicalHostName()}"
                     ModularSMTPSocketWorker sSockW
                     try {
                         sSockW = new ModularSMTPSocketWorker( input, output, serverList )

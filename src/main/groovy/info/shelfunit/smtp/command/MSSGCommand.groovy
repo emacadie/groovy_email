@@ -5,6 +5,11 @@ import groovy.util.logging.Slf4j
 
 import java.sql.SQLException
 
+/**
+There is no MSSG command in RFC 5321. But I needed something to handle the actual message after the DATA command, so here we are.
+*/
+
+
 @Slf4j
 class MSSGCommand {
     
@@ -41,41 +46,47 @@ class MSSGCommand {
     } // process
     
     def addMessageToDatabase( theMessage, bufferMap ) {
-        log.info "log is a ${log.class.name}"
+        log.info "in addMessageToDatabase, here is bufferMap: ${bufferMap}"
         def result = '250 OK'
         def toAddresses = bufferMap.forwardPath
         def fromAddress = bufferMap.reversePath
         def insertCounts 
         def q = fromAddress =~ regex
         def fromDomain = q.getFromDomainInMSSG ()
+        def sqlString
         if ( bufferMap.messageDirection == 'outgoing' ) {
             log.info "It is an outgoing message"
+            sqlString = 'insert into mail_spool_out( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)'
         } else {
-        
-            try {
-                sql.withTransaction {
-                    def wholeFromAddress = q.getWholeFromAddressInMSSG()
-                    log.info "here are the args: wholeFromAddress: ${wholeFromAddress}, toAddresses: ${toAddresses}, theMessage: ${theMessage}"
-                    insertCounts = sql.withBatch( 'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string ) values (?, ?, ?, ?, ?)' ) { stmt ->
-                        log.info "stmt is a ${stmt.class.name}"
-                        stmt.addBatch( [ 
-                            UUID.randomUUID(), // id, 
-                            wholeFromAddress,  // from_address, 
-                            toAddresses.join( ',' ), // to_address_list, 
-                            theMessage,  // text_body, 
-                            "ENTERED"    // status_string
-                        ] )
-                    }
-                }
-            } catch ( Exception e ) {
-                log.info "Next exception message: ${e.getMessage()}"
-                log.error "something went wrong", e
-                result = '500 Something went wrong'
-                SQLException ex = e.getNextException()
-                log.info "Next exception message: ${ex.getMessage()}"
-                log.error "something went wrong", ex 
-            }
+            sqlString = 'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)'
         }
+        try {
+            sql.withTransaction {
+                def wholeFromAddress = q.getWholeFromAddressInMSSG()
+                log.info "here are the args: wholeFromAddress: ${wholeFromAddress}, toAddresses: ${toAddresses}, theMessage: ${theMessage}"
+                log.info "About to call sql to enter message"
+                insertCounts = sql.withBatch( sqlString ) { stmt ->
+                    log.info "stmt is a ${stmt.class.name}"
+                    stmt.addBatch( [ 
+                        UUID.randomUUID(), // id, 
+                        wholeFromAddress,  // from_address, 
+                        toAddresses.join( ',' ), // to_address_list, 
+                        theMessage,  // text_body, 
+                        "ENTERED",    // status_string
+                        bufferMap.userInfo?.base_64_hash ?: "" // base_64_hash
+                    ] )
+                }
+            }
+            log.info "Message delivered with no issues"
+        } catch ( Exception e ) {
+            log.info "Next exception message: ${e.getMessage()}"
+            log.error "something went wrong", e
+            result = '500 Something went wrong'
+            SQLException ex = e.getNextException()
+            log.info "Next exception message: ${ex.getMessage()}"
+            log.error "something went wrong", ex 
+        }
+        
         println "here is insertCounts: ${insertCounts}"
         result
     } // addMessageToDatabase
