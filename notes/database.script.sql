@@ -14,7 +14,7 @@ CREATE TABLE email_user (
     base_64_hash character varying( 150 ) not null,
     first_name character varying( 30 ) not null,
     last_name character varying( 30 ) not null,
-    logged_in boolean not null,
+    logged_in boolean not null default false,
     version bigint NOT NULL
 );
 CREATE INDEX user_base_64_hash ON email_user ( base_64_hash );

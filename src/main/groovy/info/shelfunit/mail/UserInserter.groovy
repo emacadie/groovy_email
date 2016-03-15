@@ -54,7 +54,7 @@ class UserInserter {
             def base64Hash = "${Character.MIN_VALUE}${userMap.user}${Character.MIN_VALUE}${userMap.pass}".bytes.encodeBase64().toString()
             def params = [ userMap.user, hashedPass.toBase64(), 'SHA-512', numIterations, base64Hash, userMap.fName, userMap.lName, 0 ]
             log.info "params: ${params}"
-            sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+            sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
            
         } catch ( Exception pe ) {
             pe.printStackTrace()

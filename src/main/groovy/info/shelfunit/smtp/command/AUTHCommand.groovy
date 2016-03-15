@@ -41,8 +41,6 @@ class AUTHCommand {
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "501 Command not in proper form"
         } else {
-            
-            
             def q = theMessage =~ pattern
             def base64Part = q.getBase64InAuth()
             def userInfoFrombase64 = sql.firstRow( 'select * from email_user where base_64_hash=?', base64Part )
@@ -52,25 +50,12 @@ class AUTHCommand {
             } else {
                 resultMap.resultString = "535 5.7.8  Authentication credentials invalid"
             }
-    
             
-            bufferMap.reversePath =  q.getEmailAddressInMAIL()
-            if ( domainList.containsIgnoreCase( q.getDomainInMAIL() ) ) {
-                bufferMap.messageDirection = "outbound"
-            } else {
-                bufferMap.messageDirection = "inbound"
-            }
-            if ( q.handles8BitInMAIL() ) {
-                bufferMap.handles8bit = "true"
-                resultMap.resultString = "250 <${bufferMap.reversePath}> Sender and 8BITMIME OK"
-            } else {
-                resultMap.resultString = '250 OK'
-            }
-            log.info "here is reverse path: ${bufferMap.reversePath}"
             log.info "here is q: ${q}"
-            resultMap.bufferMap = bufferMap
+            
         }
         resultMap.prevCommandSet = prevCommandSet
+        resultMap.bufferMap = bufferMap
 
 		log.info "here is resultMap: ${resultMap.toString()}"
 		resultMap

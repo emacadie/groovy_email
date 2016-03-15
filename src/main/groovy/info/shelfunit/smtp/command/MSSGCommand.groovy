@@ -54,8 +54,8 @@ class MSSGCommand {
         def q = fromAddress =~ regex
         def fromDomain = q.getFromDomainInMSSG ()
         def sqlString
-        if ( bufferMap.messageDirection == 'outgoing' ) {
-            log.info "It is an outgoing message"
+        if ( bufferMap.messageDirection == 'outbound' ) {
+            log.info "It is an outbound message"
             sqlString = 'insert into mail_spool_out( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)'
         } else {
             sqlString = 'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)'

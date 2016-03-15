@@ -37,7 +37,7 @@ class MetaProgrammer {
             }
         }
         java.util.List.metaClass.lastSMTPCommandPrecedesMail = { ->
-            delegate.last().matches( 'EHLO|HELO|RSET' )
+            delegate.last().matches( 'EHLO|HELO|RSET|AUTH' )
         }
         java.util.List.metaClass.lastSMTPCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
@@ -97,7 +97,7 @@ class MetaProgrammer {
         }
         
         java.util.Set.metaClass.lastSMTPCommandPrecedesMail = { ->
-            ( !delegate.isEmpty() ) && ( delegate.last().matches( 'EHLO|HELO|RSET' ) )
+            ( !delegate.isEmpty() ) && ( delegate.last().matches( 'EHLO|HELO|RSET|AUTH' ) )
         }
         java.util.Set.metaClass.lastSMTPCommandPrecedesRCPT = { ->
             ( !delegate.isEmpty() ) &&  ( delegate.last().matches( 'MAIL|RCPT' ) ) 
