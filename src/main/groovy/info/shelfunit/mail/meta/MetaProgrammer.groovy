@@ -147,6 +147,15 @@ class MetaProgrammer {
         String.metaClass.firstFour = { ->
             return delegate.substring( 0, 4 )
         }
+        // sometimes we need to pass the string, but not the WHOLE string
+        String.metaClass.firstTen = { ->
+            if ( delegate.length() < 10 ) {
+                return delegate
+            } else {
+                return delegate.substring( 0, 10 )
+            }
+        }
+        
         String.metaClass.allButFirstFour = { ->
             return delegate.substring( 4, delegate.length() )
         }
@@ -168,7 +177,7 @@ class MetaProgrammer {
         }
 
         String.metaClass.static.getCommandList = { -> 
-            return [ 'DATA',  'MAIL', // smtp
+            return [ 'AUTH', 'DATA',  'MAIL', // smtp
             'DELE', 'LIST', 'RCPT', 'PASS', 'RETR', 'STAT', 'USER', // pop3  
             'RSET', 'QUIT' // both  
             ]

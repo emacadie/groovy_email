@@ -7,6 +7,7 @@ import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import info.shelfunit.mail.ConfigHolder
+import info.shelfunit.smtp.command.AUTHCommand
 import info.shelfunit.smtp.command.DATACommand
 import info.shelfunit.smtp.command.EHLOCommand
 import info.shelfunit.smtp.command.MAILCommand
@@ -106,7 +107,7 @@ class ModularSMTPSocketWorker {
 		theResponse = ""
 		log.info "Incoming message: ${theMessage}"
 		if ( theMessage.isEncapsulated( ) || isActualMessage ) {
-		    def commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
+		    def commandObject = this.returnCurrentCommand( theMessage.firstTen(), isActualMessage )
 		    log.info "returned a command object that is a ${commandObject.class.name}"
 		    commandResultMap.clear()
 		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
@@ -146,6 +147,8 @@ class ModularSMTPSocketWorker {
 		    return new DATACommand()
 		} else if ( theMessage.startsWith( 'QUIT' ) ) {
 		    return new QUITCommand( domainList )
+		} else if ( theMessage.startsWith( 'AUTH' ) ) {
+		    return new AUTHCommand( sql, domainList )
 		}
 	}
 
