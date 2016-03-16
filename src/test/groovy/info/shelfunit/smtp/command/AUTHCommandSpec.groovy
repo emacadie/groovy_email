@@ -1,6 +1,6 @@
 package info.shelfunit.smtp.command
 
-import spock.lang.Ignore
+// import spock.lang.Ignore
 import spock.lang.Specification
 
 import org.junit.Rule
@@ -9,7 +9,7 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
 import static info.shelfunit.mail.GETestUtils.addUser
-// import static info.shelfunit.mail.GETestUtils.getBase64Hash
+import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
 
 import groovy.util.logging.Slf4j 
@@ -55,75 +55,68 @@ class AUTHCommandSpec extends Specification {
         addUser( sql, 'Jack', "O'Neill", jackO, 'somePassword' )
     }
     
-    @Ignore
-	def "test handling wrong command"() {
-	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: 'oneillMSSG@stargate.mil' ]
-        def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
+	def "test handling with AUTH in previous command set"() {
+        def prevCommandSetArg = [ 'AAAA', 'AUTH', 'BBBB', 'CCCC' ] as Set
 	    when:
-	        def resultMap = authCommand.process( "The next meeting of the board of directors will be on Tuesday.\nJohn.", prevCommandSetArg, [ forwardPath:  [ hamilton ] ] )
+	        def resultMap = authCommand.process( "The next meeting of the board of directors will be on Tuesday.\nJohn.", prevCommandSetArg, [ : ] )
 	        def mailResponse = resultMap.resultString + crlf 
 	    then:
 	        mailResponse == "503 Bad sequence of commands\r\n"
 	        resultMap.prevCommandSet == prevCommandSetArg
 	}
-	
-	@Ignore
-	def "test handling a message"() {
-	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
-	    def uuidSet = [] as Set
-	    bufferMapArg.forwardPath.size().times() {
-            uuidSet << UUID.randomUUID() 
-        }
-        
-        def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
-        def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
-        def mssgCount = countResult.count 
-            
-        def theMessage = "The next meeting of the board of directors will be on Tuesday.\nJohn."
-        def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-	    when:
-	        def mailResponse = authCommand.addMessageToDatabase( theMessage, bufferMapArg ) 
-	        countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
-	    then:
-	        mailResponse == "250 OK"
-	        countResult.count == ( mssgCount + 1 )
-	}
-	
-	@Ignore
-	def "test handling a non-existant inbound recipient"() {
-	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' , 'chumba-wumba@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
-	    def uuidSet = [] as Set
-	    bufferMapArg.forwardPath.size().times() {
-            uuidSet << UUID.randomUUID() 
-        }
-        
-        def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
-        def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
-        def mssgCount = countResult.count 
-     
-        def theMessage = "The next meeting of the board of directors will be on Friday.\nStay Groovy\nJohn."
-        def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
-	    when:
-	        def mailResponse = authCommand.addMessageToDatabase( theMessage, bufferMapArg ) 
-	    then:
-	        mailResponse == "250 OK"
-	    when:
-	        countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
-	    then:
-	        countResult.count == ( mssgCount + 1 )
-	}
-	
-	@Ignore
-	def "test getting the data"() {
-	    sql.eachRow( 'select * from mail_store' ) { mailItem ->
-	        println mailItem.id.toString()
-            println "mailItem.text_body is a ${mailItem.text_body.getClass().getName()}"
-            println "mailItem.text_body: ${mailItem.text_body}"
-            println "mailItem.username: ${mailItem.username}\n-------------------------------------------------"
-        }
-	    expect:
-	        5 == 5
-	}
 
+	def "test handling with AUTH only in command"() {
+        def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
+	    when:
+	        def resultMap = authCommand.process( "AUTH", prevCommandSetArg, [ : ] )
+	        def mailResponse = resultMap.resultString + crlf 
+	    then:
+	        mailResponse == "501 Command not in proper form\r\n"
+	        resultMap.prevCommandSet == prevCommandSetArg
+	}
+	
+	def "test handling with AUTH and something after it besides PLAIN"() {
+        def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
+	    when:
+	        def resultMap = authCommand.process( "AUTH PLANE", prevCommandSetArg, [ : ] )
+	        def mailResponse = resultMap.resultString + crlf 
+	    then:
+	        mailResponse == "501 Command not in proper form\r\n"
+	        resultMap.prevCommandSet == prevCommandSetArg
+	}
+	
+	def "test handling with AUTH PLAIN with no string afterward"() {
+        def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
+	    when:
+	        def resultMap = authCommand.process( "AUTH PLAIN", prevCommandSetArg, [ : ] )
+	        def mailResponse = resultMap.resultString + crlf 
+	    then:
+	        mailResponse == "501 Command not in proper form\r\n"
+	        resultMap.prevCommandSet == prevCommandSetArg
+	}
+	
+	
+	def "test handling with AUTH PLAIN and with good string afterward"() {
+        def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
+        def hashString = getBase64Hash( georgeW, 'somePassword' )
+	    when:
+	        def resultMap = authCommand.process( "AUTH PLAIN ${hashString}", prevCommandSetArg, [ : ] )
+	        def mailResponse = resultMap.resultString + crlf 
+	    then:
+	        mailResponse == "235 2.7.0 Authentication successful\r\n"
+	        resultMap.prevCommandSet == prevCommandSetArg
+	}
+	
+	def "test handling with AUTH PLAIN and with badd string afterward"() {
+        def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
+        def hashString = getBase64Hash( georgeW, 'somePasswore' )
+	    when:
+	        def resultMap = authCommand.process( "AUTH PLAIN ${hashString}", prevCommandSetArg, [ : ] )
+	        def mailResponse = resultMap.resultString + crlf 
+	    then:
+	        mailResponse == "535 5.7.8  Authentication credentials invalid\r\n"
+	        resultMap.prevCommandSet == prevCommandSetArg
+	}
+	
 } // line 150
 
