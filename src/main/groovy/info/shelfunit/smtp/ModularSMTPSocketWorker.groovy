@@ -138,7 +138,7 @@ class ModularSMTPSocketWorker {
 		} else if ( theMessage.isHelloCommand() ) {
 		    return new EHLOCommand()
 		} else if ( theMessage.startsWith( 'MAIL' ) ) {
-			return new MAILCommand( domainList )
+			return new MAILCommand( sql, domainList )
 		} else if ( theMessage.startsWith( 'RCPT' ) ) {
 			return new RCPTCommand( domainList )
 		} else if ( theMessage.startsWith( 'RSET' ) ) {

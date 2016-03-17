@@ -45,8 +45,10 @@ class AUTHCommand {
             def base64Part = q.getBase64InAuth()
             def userInfoFrombase64 = sql.firstRow( 'select * from email_user where base_64_hash=?', base64Part )
             if ( userInfoFrombase64 ) {
+                
                 bufferMap.userInfo = userInfoFrombase64
                 resultMap.resultString = "235 2.7.0 Authentication successful"
+                log.info "Here is bufferMap in AUTHCommand: ${bufferMap}"
                 prevCommandSet << 'AUTH'
             } else {
                 resultMap.resultString = "535 5.7.8  Authentication credentials invalid"

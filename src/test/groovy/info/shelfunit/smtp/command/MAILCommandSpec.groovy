@@ -7,6 +7,7 @@ import spock.lang.Unroll
 import org.junit.Rule
 import org.junit.rules.TestName
 
+import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
 
 class MAILCommandSpec extends Specification {
@@ -17,6 +18,7 @@ class MAILCommandSpec extends Specification {
     static response501 = "501 Command not in proper form"
     static domainList = [ 'shelfunit2.info', 'groovy-is-groovy2.org' ]
     static mailCommand
+    static sql
     static resultMap = [:]
     def crlf = "\r\n"
 
@@ -30,7 +32,10 @@ class MAILCommandSpec extends Specification {
     def cleanup() {}        // run after every feature method
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        mailCommand = new MAILCommand( domainList )
+        MetaProgrammer.runMetaProgramming()
+        ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
+        // sql = ConfigHolder.instance.getSqlObject()
+        mailCommand = new MAILCommand( ConfigHolder.instance.getSqlObject(), domainList )
     }     // run before the first feature method
     
     def cleanupSpec() {}   // run after the last feature method

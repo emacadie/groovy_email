@@ -54,7 +54,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) // , Mock( Sql ) )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) 
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
@@ -73,7 +73,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) //, Mock( Sql ) )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) 
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
@@ -89,7 +89,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	}
 	
 	def "test handling old commands"() {
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) // , Mock( Sql ) )
+	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) 
 	    
 	    expect:
 	        ssWorker.serverName == "shelfunit.info"
@@ -126,7 +126,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList ) // , sql )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList )
             ssWorker.doWork()
             ssWorker.cleanup()
             

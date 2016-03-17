@@ -12,9 +12,11 @@ import groovy.util.logging.Slf4j
 class MAILCommand {
     
     final List domainList
-    MAILCommand( argDomainList ) {
+    final sql
+    MAILCommand( argSql, argDomainList ) {
         log.info "Starting new MAILCommand"
         println "Here is argDomainList: ${argDomainList}"
+        this.sql = argSql
         this.domainList = argDomainList
     }
     
@@ -48,10 +50,15 @@ class MAILCommand {
             prevCommandSet << 'MAIL'
             
             def q = theMessage =~ pattern
-            bufferMap?.clear()
+            // bufferMap?.clear()
             bufferMap.forwardPath = [] // for RCPT command
             bufferMap.reversePath =  q.getEmailAddressInMAIL()
             if ( domainList.containsIgnoreCase( q.getDomainInMAIL() ) ) {
+                // get user info here
+                if ( !prevCommandSet.contains( 'AUTH' ) ) {
+                    bufferMap.userInfo = 
+                        sql.firstRow( 'select * from email_user where base_64_hash=?', q.getUsernameInMAIL() )
+                }
                 bufferMap.messageDirection = "outbound"
             } else {
                 bufferMap.messageDirection = "inbound"

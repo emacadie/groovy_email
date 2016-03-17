@@ -21,6 +21,9 @@ class MatcherMetaProgrammer {
         java.util.regex.Matcher.metaClass.getDomainInMAIL = { ->
             delegate[ 0 ][ 3 ]
         }
+        java.util.regex.Matcher.metaClass.getUsernameInMAIL = { ->
+            delegate.getEmailAddressInMAIL() - ( "@" + delegate.getDomainInMAIL() )
+        }
         java.util.regex.Matcher.metaClass.handles8BitInMAIL = { ->
             delegate[ 0 ][ 4 ]
         }
