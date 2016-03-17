@@ -37,7 +37,7 @@ create table mail_spool_in (
     to_address_list text not null,
     message bytea,
     text_body text not null,
-    from_user_logged_in boolean,
+    from_user_logged_in boolean default false,
     base_64_hash character varying( 150 ) not null,
     status_string text,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
@@ -49,7 +49,7 @@ create table mail_spool_out (
     to_address_list text not null,
     message bytea,
     text_body text not null,
-    from_user_logged_in boolean,
+    from_user_logged_in boolean default false,
     base_64_hash character varying( 150 ) not null,
     status_string text,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null

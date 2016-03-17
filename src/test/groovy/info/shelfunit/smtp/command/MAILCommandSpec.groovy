@@ -1,5 +1,6 @@
 package info.shelfunit.smtp.command
 
+import spock.lang.Ignore
 import spock.lang.Specification
 import spock.lang.Unroll
 
@@ -189,6 +190,23 @@ class MAILCommandSpec extends Specification {
 	def "test happy path"() {
 	    when:
 	        resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil>", ['EHLO'] as Set, [:] )
+	        def mailResponse = resultMap.resultString + crlf 
+	        def bMap = resultMap.bufferMap
+	    then:
+	        mailResponse == "250 OK\r\n"
+	        resultMap.prevCommandSet == [ "EHLO", "MAIL" ] as Set
+	        bMap.reversePath == 'oneill@stargate.mil'
+	        resultMap.bufferMap.messageDirection == 'inbound'
+	}
+	
+	@Ignore
+	def "always ignore"() {
+	}
+	
+	@Ignore
+	def "ad-hoc test"() {
+	    when:
+	        resultMap = mailCommand.process( "", ['HELO'] as Set, [:] )
 	        def mailResponse = resultMap.resultString + crlf 
 	        def bMap = resultMap.bufferMap
 	    then:

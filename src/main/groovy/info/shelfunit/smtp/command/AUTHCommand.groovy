@@ -45,6 +45,7 @@ class AUTHCommand {
             def base64Part = q.getBase64InAuth()
             def userInfoFrombase64 = sql.firstRow( 'select * from email_user where base_64_hash=?', base64Part )
             if ( userInfoFrombase64 ) {
+                bufferMap.userInfo = userInfoFrombase64
                 resultMap.resultString = "235 2.7.0 Authentication successful"
                 prevCommandSet << 'AUTH'
             } else {

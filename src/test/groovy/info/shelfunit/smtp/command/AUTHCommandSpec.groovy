@@ -50,7 +50,7 @@ class AUTHCommandSpec extends Specification {
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', georgeW, 'somePassword' )
+        addUser( sql, 'George', 'Washington', georgeW, 'somePassword', true )
         addUser( sql, 'John', 'Adams', johnA, 'somePassword' )
         addUser( sql, 'Jack', "O'Neill", jackO, 'somePassword' )
     }
@@ -95,6 +95,16 @@ class AUTHCommandSpec extends Specification {
 	        resultMap.prevCommandSet == prevCommandSetArg
 	}
 	
+		def "test handling with AUTH PLAIN and with bad string afterward"() {
+        def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
+        def hashString = getBase64Hash( georgeW, 'somePasswore' )
+	    when:
+	        def resultMap = authCommand.process( "AUTH PLAIN ${hashString}", prevCommandSetArg, [ : ] )
+	        def mailResponse = resultMap.resultString + crlf 
+	    then:
+	        mailResponse == "535 5.7.8  Authentication credentials invalid\r\n"
+	        resultMap.prevCommandSet == prevCommandSetArg
+	}
 	
 	def "test handling with AUTH PLAIN and with good string afterward"() {
         def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
@@ -105,18 +115,10 @@ class AUTHCommandSpec extends Specification {
 	    then:
 	        mailResponse == "235 2.7.0 Authentication successful\r\n"
 	        resultMap.prevCommandSet == prevCommandSetArg
+	        resultMap.bufferMap.userInfo.logged_in == true
 	}
 	
-	def "test handling with AUTH PLAIN and with badd string afterward"() {
-        def prevCommandSetArg = [ 'AAAA', 'BBBB', 'CCCC' ] as Set
-        def hashString = getBase64Hash( georgeW, 'somePasswore' )
-	    when:
-	        def resultMap = authCommand.process( "AUTH PLAIN ${hashString}", prevCommandSetArg, [ : ] )
-	        def mailResponse = resultMap.resultString + crlf 
-	    then:
-	        mailResponse == "535 5.7.8  Authentication credentials invalid\r\n"
-	        resultMap.prevCommandSet == prevCommandSetArg
-	}
+
 	
 } // line 150
 

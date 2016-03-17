@@ -36,9 +36,13 @@ class MAILCommand {
             resultMap.resultString = "503 Bad sequence of commands"
         } else if ( !theMessage.startsWith( 'MAIL FROM:' ) ) {
             resultMap.resultString = "501 Command not in proper form"
+        /*
         } else if ( !regexResult ) {
+            log.info "not regexResult"
             resultMap.resultString = "501 Command not in proper form"
+        */
         } else if ( !( theMessage ==~ pattern ) ) {
+            log.info "The message is not equal to the pattern"
             resultMap.resultString = "501 Command not in proper form"
         } else {
             prevCommandSet << 'MAIL'

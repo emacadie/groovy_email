@@ -6,9 +6,9 @@ https://docs.gradle.org/current/userguide/java_plugin.html#testFiltering
 gradle test --tests info.shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.ModularSMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.socket.SMTPSocketWorkerSpec -info
-gradle test --tests info.shelfunit.socket.command.EHLOCommandSpec -info
-gradle test --tests info.shelfunit.socket.command.MAILCommandSpec -info
-gradle test --tests info.shelfunit.socket.command.MSSGCommandSpec test -info
+gradle test --tests info.shelfunit.smtp.command.EHLOCommandSpec -info
+gradle test --tests info.shelfunit.smtp.command.MAILCommandSpec."ad-hoc test" -info
+gradle test --tests info.shelfunit.smtp.command.MSSGCommandSpec test -info
 This works: gradle test -Dtest.single=MSSGCommandSpec
 This works: gradle test --tests *MSSGCommandSpec test -info
 No good: gradle test --tests 'info.shelfunit.socket.command.RCPTCommandSpec' -info
@@ -16,7 +16,12 @@ This works: gradle test --tests *RCPTCommandSpec
 this works: gradle test --tests *.RCPTCommandSpec
 gradle test --tests *QUITCommandSpec
 gradle test --tests *postoffice*QUITCommandSpec
+gradle test --tests info.shelfunit.postoffice.command.QUITCommandSpec
+gradle test --tests info.shelfunit.smtp.ModularSMTPSocketWorkerAuthSpec."test with a line containing two periods"
 
+
+
+gradle test --tests "info.shelfunit.smtp.command.AUTHCommandSpec"
 
 gradle test --tests shelfunit.socket.BinarySMTPSocketWorkerSpec -info
 gradle test --tests shelfunit.socket.SMTPSocketWorkerSpec -info
