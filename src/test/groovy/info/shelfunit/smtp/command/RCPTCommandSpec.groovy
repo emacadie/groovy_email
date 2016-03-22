@@ -309,6 +309,45 @@ class RCPTCommandSpec extends Specification {
 	        resultMap.prevCommandSet == resultSetEMR
 	        bMap.forwardPath == [ hamilton, jackShell ]
 	}
+	
+	def "test upper and lower mized case inbound"() {
+	    
+	    when:
+	        def resultMap = rcptCommand.process( "RCPT TO:<${gwString}@shelfunit.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        def mailResponse = resultMap.resultString + crlf 
+	        def bMap = resultMap.bufferMap
+	    then:
+	        mailResponse == "250 OK\r\n"
+	        resultMap.prevCommandSet == resultSetEMR
+	        bMap.forwardPath == [ hamilton, ( gwString + '@shelfunit.info' ) ]
+	        
+	    when:
+	        resultMap = rcptCommand.process( "RCPT TO:<${gwString}@ShelfUnit.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        mailResponse = resultMap.resultString + crlf 
+	        bMap = resultMap.bufferMap
+	    then:
+	        mailResponse == "250 OK\r\n"
+	        resultMap.prevCommandSet == resultSetEMR
+	        bMap.forwardPath == [ hamilton, ( gwString + '@ShelfUnit.info' ) ]
+	        
+	    when:
+	        resultMap = rcptCommand.process( "RCPT TO:<${gwString}@SHELFUNITA.INFO>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        mailResponse = resultMap.resultString + crlf 
+	        bMap = resultMap.bufferMap
+	    then:
+	        mailResponse == "550 No such user\r\n"
+	        resultMap.prevCommandSet == resultSetEMR
+	        bMap.forwardPath == [ hamilton ]
+	        
+	    when:
+	        resultMap = rcptCommand.process( "RCPT TO:<${gwString}@ShelfUnitA.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        mailResponse = resultMap.resultString + crlf 
+	        bMap = resultMap.bufferMap
+	    then:
+	        mailResponse == "550 No such user\r\n"
+	        resultMap.prevCommandSet == resultSetEMR
+	        bMap.forwardPath == [ hamilton ]
+	}
 
 } // line 271
 

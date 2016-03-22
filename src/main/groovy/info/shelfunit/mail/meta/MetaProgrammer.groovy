@@ -42,8 +42,10 @@ class MetaProgrammer {
         java.util.List.metaClass.lastSMTPCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
         }
+        
         java.util.List.metaClass.includes = { i -> i in delegate 
         }
+        
         java.util.List.metaClass.containsIgnoreCase = { arg ->
             def result = delegate.any { it ->
                 it.toLowerCase() == arg.toLowerCase()

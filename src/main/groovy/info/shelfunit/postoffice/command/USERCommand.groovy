@@ -35,8 +35,8 @@ class USERCommand {
             resultMap.resultString = "-ERR Command not in proper form"
         } else {
             
-            def userName = theMessage.substring( 5 ) 
-            def rows = sql.rows( 'select * from email_user where username=?', userName )
+            def userName = theMessage.substring( 5 ) // convert to regex?
+            def rows = sql.rows( 'select * from email_user where lower( username )=?', userName.toLowerCase() )
             log.info "Here is rows, it's a : ${rows.class.name}"
             if ( rows.size() != 0 ) { 
                 bufferMap.userInfo = rows[ 0 ]

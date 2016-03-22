@@ -1,0 +1,6 @@
+keytool -genkey -keystore yourKEYSTORE -keyalg RSA
+They make it look so simple: http://www.java2s.com/Tutorial/Java/0490__Security/SSLSocketServer.htm
+http://www.java2s.com/Tutorial/Java/0490__Security/SSLServerSession.htm
+http://www.fehcom.de/qmail/smtptls.html
+
+

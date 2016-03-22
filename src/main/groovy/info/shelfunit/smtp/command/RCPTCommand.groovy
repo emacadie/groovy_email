@@ -31,7 +31,7 @@ class RCPTCommand {
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "501 Command not in proper form"
-        } else if ( !domainList.includes( q.extractDomainRCPT() ) && ( bufferMap.messageDirection == 'inbound' ) ) {
+        } else if ( !domainList.containsIgnoreCase( q.extractDomainRCPT() ) && ( bufferMap.messageDirection == 'inbound' ) ) {
             resultMap.resultString = "550 No such user" // make it case insensitive here
         } else {
             bufferMap.forwardPath << q.getEmailAddressInRCPT() 

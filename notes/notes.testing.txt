@@ -9,6 +9,7 @@ gradle test --tests info.shelfunit.socket.SMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.smtp.command.EHLOCommandSpec -info
 gradle test --tests info.shelfunit.smtp.command.MAILCommandSpec."ad-hoc test" -info
 gradle test --tests info.shelfunit.smtp.command.MSSGCommandSpec test -info
+gradle test --tests info.shelfunit.smtp.command.RCPTCommandSpec test 
 This works: gradle test -Dtest.single=MSSGCommandSpec
 This works: gradle test --tests *MSSGCommandSpec test -info
 No good: gradle test --tests 'info.shelfunit.socket.command.RCPTCommandSpec' -info
