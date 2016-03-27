@@ -18,3 +18,13 @@ See YCombinator story [Don't test with SQLite when you use Postgres in Productio
 
 Uses dnsjava: http://www.dnsjava.org/  
 
+Uses clamav: On Ubuntu: apt-get install clamav-daemon    
+https://help.ubuntu.com/community/ClamAV    
+Setting up clamav-daemon (0.98.7+dfsg-0ubuntu0.14.04.1) ...
+ * Clamav signatures not found in /var/lib/clamav
+ * Please retrieve them using freshclam
+ * Then run '/etc/init.d/clamav-daemon start'
+
+
+
+

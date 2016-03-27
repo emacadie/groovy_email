@@ -19,7 +19,8 @@ gradle test --tests *QUITCommandSpec
 gradle test --tests *postoffice*QUITCommandSpec
 gradle test --tests info.shelfunit.postoffice.command.QUITCommandSpec
 gradle test --tests info.shelfunit.smtp.ModularSMTPSocketWorkerAuthSpec."test with a line containing two periods"
-
+gradle test --tests info.shelfunit.spool.InboundSpoolWorkerSpec
+gradle test --tests *InboundSpoolWorkerSpec
 
 
 gradle test --tests "info.shelfunit.smtp.command.AUTHCommandSpec"

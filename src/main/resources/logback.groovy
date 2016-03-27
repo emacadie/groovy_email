@@ -42,3 +42,18 @@ appender( "FILE-postoffice", RollingFileAppender ) {
 }
 logger( "info.shelfunit.postoffice", INFO, [ "FILE-postoffice" ] )
 
+
+appender( "FILE-spool", RollingFileAppender ) {
+  rollingPolicy( TimeBasedRollingPolicy ) {
+    fileNamePattern = "log/spool.%d{yyyy-MM-dd}.log"
+    maxHistory = 7
+  }
+  encoder( PatternLayoutEncoder ) {
+    pattern = "%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+  }
+}
+logger( "info.shelfunit.spool", INFO, [ "FILE-spool" ] )
+
+
+
+

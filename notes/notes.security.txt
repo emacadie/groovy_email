@@ -2,5 +2,12 @@ keytool -genkey -keystore yourKEYSTORE -keyalg RSA
 They make it look so simple: http://www.java2s.com/Tutorial/Java/0490__Security/SSLSocketServer.htm
 http://www.java2s.com/Tutorial/Java/0490__Security/SSLServerSession.htm
 http://www.fehcom.de/qmail/smtptls.html
+http://www.postfix.org/TLS_README.html
+http://www.exim.org/exim-html-current/doc/html/spec_html/ch-encrypted_smtp_connections_using_tlsssl.html
+http://www.exim.org/exim-html-current/doc/html/spec_html/ch-encrypted_smtp_connections_using_tlsssl.html#SECTcerandall
+http://www.modssl.org/docs/2.7/ssl_faq.html#ToC24
+http://stackoverflow.com/questions/6786945/how-to-do-ssl-socket-programming
+http://james.apache.org/server/3/config-ssl-tls.html
 
+I think RSA is preferred algo for keystore
 
