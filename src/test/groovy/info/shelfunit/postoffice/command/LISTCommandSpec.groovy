@@ -12,9 +12,10 @@ import org.junit.rules.TestName
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
-import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
+import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import groovy.util.logging.Slf4j 
 
@@ -99,11 +100,7 @@ class LISTCommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwLIST, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwLIST ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwLIST ] )
         then:
             messageCount == 4
         when:
@@ -154,11 +151,7 @@ class LISTCommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwLIST, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwLIST ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwLIST ] )
         then:
             messageCount == 5
         
@@ -179,5 +172,5 @@ class LISTCommandSpec extends Specification {
             "."
 	}
 
-}
+} // line 182
 

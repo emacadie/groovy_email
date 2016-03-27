@@ -10,6 +10,7 @@ import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import groovy.util.logging.Slf4j 
 
@@ -72,19 +73,16 @@ class MSSGCommandSpec extends Specification {
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
         }
-        
-        def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
-        def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
-        def mssgCount = countResult.count 
+        def mssgCount = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
             
         def theMessage = "The next meeting of the board of directors will be on Tuesday.\nJohn."
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
 	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg ) 
-	        countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
+	        def countResult = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
 	    then:
 	        mailResponse == "250 OK"
-	        countResult.count == ( mssgCount + 1 )
+	        countResult == ( mssgCount + 1 )
 	}
 	
 	// @Ignore
@@ -94,10 +92,7 @@ class MSSGCommandSpec extends Specification {
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
         }
-        
-        def sqlString = 'select count(*) from mail_spool_in where from_address = ?' 
-        def countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
-        def mssgCount = countResult.count 
+        def mssgCount = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
      
         def theMessage = "The next meeting of the board of directors will be on Friday.\nStay Groovy\nJohn."
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
@@ -106,9 +101,9 @@ class MSSGCommandSpec extends Specification {
 	    then:
 	        mailResponse == "250 OK"
 	    when:
-	        countResult = sql.firstRow( sqlString, ( jackO + '@stargate.mil' ) )
+	        def countResult = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
 	    then:
-	        countResult.count == ( mssgCount + 1 )
+	        countResult == ( mssgCount + 1 )
 	}
 	
 	def "test getting the data"() {
@@ -122,5 +117,5 @@ class MSSGCommandSpec extends Specification {
 	        5 == 5
 	}
 
-} // line 150
+} // line 125
 

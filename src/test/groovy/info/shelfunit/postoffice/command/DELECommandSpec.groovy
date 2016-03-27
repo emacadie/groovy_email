@@ -16,6 +16,7 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import groovy.util.logging.Slf4j 
 
@@ -96,11 +97,7 @@ class DELECommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwDELE, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwDELE ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwDELE ] )
         then:
             messageCount == 4
         when:
@@ -153,11 +150,7 @@ class DELECommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwDELE, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwDELE ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwDELE ] )
         then:
             messageCount == 5
         
@@ -175,6 +168,6 @@ class DELECommandSpec extends Specification {
             log.info "here is resultMap.resultString at end of test: ${resultMap.resultString}"
 	}
 
-} // line 199
+} // line 178
 
 

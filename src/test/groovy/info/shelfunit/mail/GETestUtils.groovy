@@ -55,7 +55,6 @@ class GETestUtils {
         sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
     }
     
-    
     static getUserId( sql, userName ) {
         def userResult = sql.firstRow( 'select userid from email_user where username = ?', [ userName ] )
         return userResult.userid
@@ -63,6 +62,17 @@ class GETestUtils {
     
     static getUserInfo( sql, userName ) {
         return sql.firstRow( 'select * from email_user where username=?', userName )
+    }
+    
+    static getTableCount( sql, statement, params ) {
+        def result = sql.firstRow( statement, params )
+        return result.count
+        /*
+        def result
+        sql.eachRow( statememt, params ) { nextRow ->
+            result = nextRow.count
+        }
+        */
     }
 
 }

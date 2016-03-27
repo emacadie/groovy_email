@@ -15,6 +15,7 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import groovy.util.logging.Slf4j 
 
@@ -95,11 +96,7 @@ class RETRCommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwRETR, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwRETR ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRETR ] )
         then:
             messageCount == 4
         when:
@@ -147,11 +144,7 @@ class RETRCommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwRETR, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwRETR ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount= getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRETR ] )
         then:
             messageCount == 5
         
@@ -168,5 +161,5 @@ class RETRCommandSpec extends Specification {
             resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." 
 	}
 
-} // line 191
+} // line 171
 

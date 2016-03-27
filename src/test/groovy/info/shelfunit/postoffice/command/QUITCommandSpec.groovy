@@ -15,6 +15,7 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
+import static info.shelfunit.mail.GETestUtils.getTableCount
 import static info.shelfunit.mail.GETestUtils.getUserId
 
 import groovy.util.logging.Slf4j 
@@ -87,10 +88,9 @@ class QUITCommandSpec extends Specification {
         def messageCount = 0
         bufferInputMap.deleteMap = deleteMap
         sleep( 2.seconds() )
+        
         when:
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwQUIT ] )
         then:
             messageCount == 3 
 
@@ -99,9 +99,7 @@ class QUITCommandSpec extends Specification {
         then:
             resultMap.resultString == "+OK shelfunit.info POP3 server signing off"
         when:
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwQUIT ] )
             def gwLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ gwQUIT ] )
         then:
             messageCount == 0
@@ -114,9 +112,7 @@ class QUITCommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def newUUID = UUID.randomUUID()  
             addMessage( sql, newUUID, gwQUIT, messageStringB, domainList[ 0 ] )
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwQUIT ] )
             gwLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ gwQUIT ] )
         then:
             messageCount == 1
@@ -129,9 +125,7 @@ class QUITCommandSpec extends Specification {
             userInfo.userid = getUserId( sql, gwQUIT )
             bufferInputMap.userInfo = userInfo
             resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwQUIT ] ) 
             gwLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ gwQUIT ] )
          then:
             messageCount == 0
@@ -177,9 +171,7 @@ class QUITCommandSpec extends Specification {
         then:
             jaLoggedIn.logged_in == true
         when:
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ jaQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ jaQUIT ] ) 
         then:
             messageCount == 2 
 
@@ -188,9 +180,7 @@ class QUITCommandSpec extends Specification {
         then:
             resultMap.resultString == "+OK ${domainList[ 0 ]} POP3 server signing off"
         when:
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ jaQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ jaQUIT ] ) 
             jaLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ jaQUIT ] )
         then:
             messageCount == 0
@@ -221,9 +211,7 @@ class QUITCommandSpec extends Specification {
         then:
             joLoggedIn.logged_in == true
         when:
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ joQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ joQUIT ] ) 
         then:
             messageCount == 2 
 
@@ -232,14 +220,12 @@ class QUITCommandSpec extends Specification {
         then:
             resultMap.resultString == "+OK ${domainList[ 0 ]} POP3 server signing off"
         when:
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ joQUIT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ joQUIT ] ) 
             joLoggedIn = sql.firstRow( 'select logged_in from email_user where username = ?', [ joQUIT ] )
         then:
             messageCount == 0
             joLoggedIn.logged_in == false
 	}
 	
-}
+} // line 244
 

@@ -12,6 +12,7 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.smtp.command.EHLOCommand
@@ -90,19 +91,17 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	        println "Here is the map: ${resultMap.prevCommandSet}"
 	}
 	
-
 	
 	def "test with a line containing two periods"() {
-	    def sqlString = 'select count(*) from mail_spool_out where to_address_list = ?' 
-        def countResult = sql.firstRow( sqlString, ( "${gwString}QQQ@shelfunit.info".toString() ) )
-        def mssgCount = countResult.count 
+	    def fakeUser = "${gwString}QQQ@shelfunit.info".toString()
+        def mssgCount = getTableCount( sql, 'select count(*) from mail_spool_out where to_address_list = ?' , fakeUser )
 	    when:
 	        def hashString = getBase64Hash( gwString, 'somePassword' )
             def domain = "hot-groovy.com"
             def bString = "EHLO ${domain}${crlf}" +
             "AUTH PLAIN ${hashString}${crlf}" +
             "MAIL FROM:<${gwString}@shelfunit.info>${crlf}" +
-            "RCPT TO:<${gwString}QQQ@shelfunit.info>${crlf}" +
+            "RCPT TO:<${fakeUser}>${crlf}" +
             "DATA${crlf}JJJ${crlf}" +
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
             byte[] data = bString.getBytes()
@@ -127,11 +126,9 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
                 "250 OK\r\n" +
                 "221 shelfunit.info Service closing transmission channel\r\n"
           when:
-              countResult = sql.firstRow( sqlString, ( gwString + 'QQQ@shelfunit.info' ) )
+              def countResult = getTableCount( sql, 'select count(*) from mail_spool_out where to_address_list = ?' , fakeUser )
           then:
-              countResult.count == ( mssgCount + 1 )
-            
-	    
+              countResult == ( mssgCount + 1 )
 	}
 	
 
@@ -199,5 +196,5 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
                 "250 OK\r\n" +
                 "221 shelfunit.info Service closing transmission channel\r\n"
 	}
-} // line 246
+} // line 202
 

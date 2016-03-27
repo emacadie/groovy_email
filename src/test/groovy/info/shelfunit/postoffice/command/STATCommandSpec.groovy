@@ -13,6 +13,7 @@ import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import groovy.util.logging.Slf4j 
 
@@ -84,11 +85,7 @@ class STATCommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             params = [ UUID.randomUUID(), gwSTAT, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwSTAT ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwSTAT ] )
         then:
             messageCount == 2
         when:
@@ -98,5 +95,5 @@ class STATCommandSpec extends Specification {
             resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
 	}
 
-} // line 126, 119
+} // line 101
 

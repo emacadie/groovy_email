@@ -15,6 +15,7 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import groovy.util.logging.Slf4j 
 
@@ -109,11 +110,7 @@ class RSETCommandSpec extends Specification {
         when:
             def params = [ UUID.randomUUID(), gwRSET, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwRSET ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRSET ] )
         then:
             messageCount == 4
         when:
@@ -168,11 +165,7 @@ class RSETCommandSpec extends Specification {
             bufferInputMap = resultMap.bufferMap
             def params = [ UUID.randomUUID(), gwRSET, 'hello@test.com', toAddress, messageStringB ]
             sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount
-        
-            sql.eachRow( 'select count(*) from mail_store where username = ?', [ gwRSET ] ) { nextRow ->
-                messageCount = nextRow.count
-            }
+            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRSET ] )
         then:
             messageCount == 5
         
@@ -190,5 +183,5 @@ class RSETCommandSpec extends Specification {
             log.info "here is resultMap.resultString at end of test: ${resultMap.resultString}"
 	}
 
-}
+} // line 193
 
