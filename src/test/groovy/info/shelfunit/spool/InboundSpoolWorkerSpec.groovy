@@ -1,7 +1,7 @@
 package info.shelfunit.spool
 
 import spock.lang.Specification
-// import spock.lang.Ignore
+import spock.lang.Ignore
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -15,6 +15,8 @@ import static info.shelfunit.mail.GETestUtils.getRandomString
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.smtp.command.EHLOCommand
 
+import fi.solita.clamav.ClamAVClient
+
 class InboundSpoolWorkerSpec extends Specification {
     @Rule 
     TestName name = new TestName()
@@ -27,6 +29,8 @@ class InboundSpoolWorkerSpec extends Specification {
     static jaString   = 'ja' + rString
     static tjString   = 'tj' + rString
     static InboundSpoolWorker isw
+    static config
+    static realClamAVClient
     
     def setup() {
         println "\n--- Starting test ${name.methodName}"
@@ -39,6 +43,11 @@ class InboundSpoolWorkerSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
+        config = ConfigHolder.instance.getConfObject()
+        def host = config.clamav.hostname
+        def port = config.clamav.port
+        realClamAVClient = this.createClamAVClient()
+
         isw = new InboundSpoolWorker()
         
     }     // run before the first feature method
@@ -54,11 +63,18 @@ class InboundSpoolWorkerSpec extends Specification {
         addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
         addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
+    
+    def createClamAVClient() {
+        def host = config.clamav.hostname
+        def port = config.clamav.port
+        println "About to return new client"
+        return new ClamAVClient( host, port.toInt() )
+    }
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    try {
-	        isw.doWork()
+	        isw.runClam( sql, realClamAVClient )
 	    } catch ( Exception e ) {
             println "Exception: ${e}"
             println "${e.getStackTrace()}"
@@ -79,7 +95,30 @@ class InboundSpoolWorkerSpec extends Specification {
 	        resultMap.prevCommandSet == ["EHLO"]
 	        */
 	}
+	
+	def "more test"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    def clamavMock = Mock( ClamAVClient )
+	    def inputStreamMock = Mock( InputStream )
+	    def outputStreamMock = Mock( OutputStream )
+	    // def outputMock = Mock( Object )
+	    byte[] outputMock = "OK".getBytes()
+	    when:
+	        // subscriber.isAlive() >> true
+	        clamavMock.scan( _ ) >> outputMock
+	        outputMock.toString() >> "Hello"
+	        // theater.hasSeatsAvailable(_, _) >> false 
+	        isw.runClam( sql, clamavMock )
+	    then:
+	        _ * ClamAVClient.isCleanReply( outputMock ) // subscriber.receive("hello")
+	        1 == 1
+	}
 
+	@Ignore
+	def "always ignore"() {
+	    expect:
+	        1 == 1
+	}
 	
 } // line 246
 

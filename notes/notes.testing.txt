@@ -46,3 +46,6 @@ https://github.com/jamescarr/h2-gradle-plugin
 I got this message when I imported the wrong package in the test:
 No tests found for given includes: [info.shelfunit.socket.command.RCPTCommandSpec]
 
+https://github.com/Dierk/GroovyInAction/blob/master/listings/chap17/Listing_17_16_SpockMockClosureChecks.groovy
+https://github.com/Dierk/GroovyInAction/blob/master/listings/chap17/Listing_17_15_SpockMockWildcards.groovy
+
