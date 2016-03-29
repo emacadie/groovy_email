@@ -42,35 +42,23 @@ class InboundSpoolWorker{
     def updateStoreAfterClam( sql, UUIDs, status ) {
         try {
             log.info "here is idsToDelete: ${UUIDs} and it is a ${UUIDs.getClass().name}"
-            log.info "Here is the q mark string: ${ UUIDs.getQMarkString() }"
-            // sql.executeUpdate "UPDATE mail_spool_in set status_string = ? where id in (${ UUIDs.getQMarkString() })", status, UUIDs
-            
-            
+            /* // keep around for a bit
             UUIDs.each{ uuid ->
                 sql.executeUpdate "UPDATE mail_spool_in set status_string = ? where id = ? ", [ status, uuid ]
                 log.info "Called the update command for ${uuid}"   
             }
-            /*
-            
+            */
+            def insertCounts 
             sql.withTransaction {
-                def wholeFromAddress = q.getWholeFromAddressInMSSG()
-                log.info "here are the args: wholeFromAddress: ${wholeFromAddress}, toAddresses: ${toAddresses}, theMessage: ${theMessage}"
-                log.info "About to call sql to enter message"
-                insertCounts = sql.withBatch( sqlString ) { stmt ->
-                    log.info "stmt is a ${stmt.class.name}"
-                    stmt.addBatch( [ 
-                        UUID.randomUUID(), // id, 
-                        wholeFromAddress,  // from_address, 
-                        toAddresses.join( ',' ), // to_address_list, 
-                        theMessage,  // text_body, 
-                        "ENTERED",    // status_string
-                        bufferMap.userInfo?.base_64_hash ?: "" // base_64_hash
-                    ] )
+                insertCounts = sql.withBatch( "UPDATE mail_spool_in set status_string = ? where id = ? " ) { stmt ->
+                    UUIDs.each{ uuid ->
+                        stmt.addBatch( [ status, uuid ] )
+                        log.info "Called the update command for ${uuid}"   
+                    }
                 }
             }
-            */
+           
         } catch ( Exception e ) {
-            
             log.error "Here is exception: ", e
             SQLException ex = e.getNextException()
             log.info "Next exception message: ${ex.getMessage()}"
