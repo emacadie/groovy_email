@@ -92,25 +92,5 @@ class MSSGCommand {
     } // addMessageToDatabase
 }
 
-/*
 
-        bufferMap.forwardPath.size().times() {
-            uuidSet << UUID.randomUUID() 
-        }
-            sql.withTransaction {
-                toAddresses.eachWithIndex { address, i ->
-                    def q = address =~ regex
-                    def wholeAddress = q.getWholeAddressInMSSG()
-                    def userName = q.getUserNameInMSSG()
-                    log.info "here are the args: [ uuidSet[ i ]: ${uuidSet[ i ]}, userName: ${userName}, fromAddress: ${fromAddress}, wholeAddress: ${wholeAddress}, theMessage: ${theMessage}"
-                    insertCounts = sql.withBatch( 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)' ) { stmt ->
-                        log.info "uuidSet[ i ] is a ${uuidSet[ i ].class.name}"
-                        log.info "stmt is a ${stmt.class.name}"
-                        // stmt.setObject( 1, uuidSet[ i ] )
-                        // stmt.setBlob( 5, theMessage )
-                        stmt.addBatch( [ uuidSet[ i ], userName, fromAddress, wholeAddress, theMessage ] )
-                    }
-                }
-            }
-*/
 

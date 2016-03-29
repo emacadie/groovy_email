@@ -73,7 +73,7 @@ class QUITCommand {
         def result = '250 OK'
         if ( idsToDelete ) {
             try {
-                log.info "here is idsToDelete: ${idsToDelete}"
+                log.info "here is idsToDelete: ${idsToDelete} and it is a ${idsToDelete.getClass().name}"
                 sql.execute "DELETE from mail_store where id in (${ idsToDelete.getQMarkString() })", idsToDelete
                 log.info "Called the delete command"
             } catch ( Exception e ) {

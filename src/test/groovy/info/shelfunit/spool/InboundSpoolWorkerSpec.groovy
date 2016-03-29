@@ -96,6 +96,7 @@ class InboundSpoolWorkerSpec extends Specification {
 	        */
 	}
 	
+	@Ignore
 	def "more test"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def clamavMock = Mock( ClamAVClient )
