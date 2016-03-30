@@ -1,7 +1,9 @@
 package info.shelfunit.spool
 
-import spock.lang.Specification
 import spock.lang.Ignore
+import spock.lang.Specification
+import spock.lang.Stepwise
+
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -11,12 +13,14 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getRandomString
+import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import info.shelfunit.mail.meta.MetaProgrammer
 import info.shelfunit.smtp.command.EHLOCommand
 
 import fi.solita.clamav.ClamAVClient
 
+@Stepwise
 class InboundSpoolWorkerSpec extends Specification {
     @Rule 
     TestName name = new TestName()
@@ -31,6 +35,11 @@ class InboundSpoolWorkerSpec extends Specification {
     static InboundSpoolWorker isw
     static config
     static realClamAVClient
+    static uuidList = []
+    static fromString
+    static params = []
+    static sqlCountString = 'select count(*) from mail_spool_in where status_string = ? and from_address = ?'
+    
     
     def setup() {
         println "\n--- Starting test ${name.methodName}"
@@ -47,14 +56,14 @@ class InboundSpoolWorkerSpec extends Specification {
         def host = config.clamav.hostname
         def port = config.clamav.port
         realClamAVClient = this.createClamAVClient()
-
+        fromString = getRandomString() + "@" + getRandomString() + ".com"
         isw = new InboundSpoolWorker()
         
     }     // run before the first feature method
     
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'aaa@showboat.com' ]
+        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
         sql.close()
     }   // run after the last feature method
     
@@ -70,49 +79,70 @@ class InboundSpoolWorkerSpec extends Specification {
         println "About to return new client"
         return new ClamAVClient( host, port.toInt() )
     }
-
-	def "test handling EHLO"() {
+    
+    def insertIntoMailSpoolIn( status, toAddress = gwString + '@' + domainList[ 0 ]  ) {
+        params.clear()
+        def uuid = UUID.randomUUID()
+        params << uuid
+        params << fromString
+        params << toAddress
+        params << getRandomString( 500 )
+        params << status
+        params << ""
+        sql.execute'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+        println "Entered ${uuid} with ${fromString}"
+    }
+    
+    @Ignore
+	def "test with actual clam client running - default to ignore"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    try {
-	        isw.runClam( sql, realClamAVClient )
-	    } catch ( Exception e ) {
-            println "Exception: ${e}"
-            println "${e.getStackTrace()}"
-        }
-
-	    expect:
-	        1 == 1
-	    /*
-	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${domain}", [], [:] )
-	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
+	        5.times { insertIntoMailSpoolIn( 'ENTERED' ) }
+	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
+	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
-	        ehloResponse == "250-Hello ${domain}\r\n" +
-	        "250-8BITMIME\r\n" + 
-	        "250-AUTH PLAIN\r\n" + 
-	        "250 HELP\r\n"
-	        resultMap.prevCommandSet == ["EHLO"]
-	        */
+	        enteredCount == 5
+	        cleanCount == 0
+
+	    when:
+	        isw.runClam( sql, realClamAVClient )
+	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
+	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	    then:
+	        1 == 1
+	        enteredCount == 0
+	        cleanCount == 5
 	}
 	
-	@Ignore
-	def "more test"() {
+	
+	def "test cleaning messages"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def clamavMock = Mock( ClamAVClient )
 	    def inputStreamMock = Mock( InputStream )
 	    def outputStreamMock = Mock( OutputStream )
 	    // def outputMock = Mock( Object )
 	    byte[] outputMock = "OK".getBytes()
+	    def numTimes = 6
+	    when:
+	        numTimes.times { insertIntoMailSpoolIn( 'ENTERED' ) }
+	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
+	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	    then:
+	        enteredCount == numTimes
+	        cleanCount == 0
 	    when:
 	        // subscriber.isAlive() >> true
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
 	        // theater.hasSeatsAvailable(_, _) >> false 
 	        isw.runClam( sql, clamavMock )
+	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
+	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
 	        _ * ClamAVClient.isCleanReply( outputMock ) // subscriber.receive("hello")
 	        1 == 1
+	        enteredCount == 0
+	        cleanCount == numTimes
 	}
 
 	@Ignore

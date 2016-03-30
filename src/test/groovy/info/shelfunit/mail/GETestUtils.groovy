@@ -67,12 +67,6 @@ class GETestUtils {
     static getTableCount( sql, statement, params ) {
         def result = sql.firstRow( statement, params )
         return result.count
-        /*
-        def result
-        sql.eachRow( statememt, params ) { nextRow ->
-            result = nextRow.count
-        }
-        */
     }
 
 }

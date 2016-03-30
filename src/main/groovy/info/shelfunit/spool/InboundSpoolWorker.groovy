@@ -9,7 +9,7 @@ import fi.solita.clamav.ClamAVClient
 @Slf4j
 class InboundSpoolWorker{
     
-    // states of message: ENTERED
+    // states of message: ENTERED, CLEAN or UNCLEAN
     
     final config
     final sql
