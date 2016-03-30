@@ -115,12 +115,10 @@ class InboundSpoolWorkerSpec extends Specification {
 	}
 	
 	
-	def "test cleaning messages"() {
+	def "test cleaning messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def clamavMock = Mock( ClamAVClient )
 	    def inputStreamMock = Mock( InputStream )
-	    def outputStreamMock = Mock( OutputStream )
-	    // def outputMock = Mock( Object )
 	    byte[] outputMock = "OK".getBytes()
 	    def numTimes = 6
 	    when:
@@ -131,10 +129,8 @@ class InboundSpoolWorkerSpec extends Specification {
 	        enteredCount == numTimes
 	        cleanCount == 0
 	    when:
-	        // subscriber.isAlive() >> true
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
-	        // theater.hasSeatsAvailable(_, _) >> false 
 	        isw.runClam( sql, clamavMock )
 	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
@@ -143,6 +139,32 @@ class InboundSpoolWorkerSpec extends Specification {
 	        1 == 1
 	        enteredCount == 0
 	        cleanCount == numTimes
+	}
+	
+	def "test unclean messages with mocks"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    def clamavMock = Mock( ClamAVClient )
+	    def inputStreamMock = Mock( InputStream )
+	    byte[] outputMock = "FOUND".getBytes()
+	    def numTimes = 6
+	    when:
+	        numTimes.times { insertIntoMailSpoolIn( 'ENTERED' ) }
+	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
+	        def uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	    then:
+	        enteredCount == numTimes
+	        uncleanCount == 0
+	    when:
+	        clamavMock.scan( _ ) >> outputMock
+	        outputMock.toString() >> "Hello"
+	        isw.runClam( sql, clamavMock )
+	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
+	        uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	    then:
+	        _ * ClamAVClient.isCleanReply( outputMock ) 
+	        1 == 1
+	        enteredCount == 0
+	        uncleanCount == numTimes
 	}
 
 	@Ignore
