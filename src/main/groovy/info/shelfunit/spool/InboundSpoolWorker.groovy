@@ -26,7 +26,7 @@ class InboundSpoolWorker{
         def cleanUUIDs = []
         def uncleanUUIDs = []
         sql.eachRow( QUERY_STATUS_STRING, [ 'ENTERED' ] ) { row ->
-            println "first 100 chars: ${row['text_body'].substring( 0, 100 )} "
+            // println "first 100 chars: ${row['text_body'].substring( 0, 100 )} "
             println "---------------------------------------------------------------------------------------\n\n"
             println "row['text_body'] is a ${row['text_body'].getClass().name}"
             byte[] data = row[ 'text_body' ].getBytes()

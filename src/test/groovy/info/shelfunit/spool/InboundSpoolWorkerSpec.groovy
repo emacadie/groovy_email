@@ -119,55 +119,13 @@ class InboundSpoolWorkerSpec extends Specification {
 	        cleanCount == 7
 	}
 	
-	@Requires({ properties[ 'clam.live.daemon' ] == 'true' })
-	def "test transferring clean messages"() {
-	    when:
-	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        transferredCount == 0
-	        cleanCount == 7
-	        storeCount == 0
-
-	    when:
-	        isw.moveCleanMessages( sql )
-	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        1 == 1
-	        transferredCount == 7
-	        cleanCount == 0
-	        storeCount == 8
-	}
-	
-	@Requires({ properties[ 'clam.live.daemon' ] == 'true' })
-	def "test deleting transferred messages"() {
-	    when:
-	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        transferredCount == 7
-	        storeCount == 8
-
-	    when:
-	        isw.deleteTransferredMessages( sql )
-	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        1 == 1
-	        transferredCount == 0
-	        storeCount == 8
-	}
-	
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test cleaning messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def clamavMock = Mock( ClamAVClient )
 	    def inputStreamMock = Mock( InputStream )
 	    byte[] outputMock = "OK".getBytes()
-	    def numTimes = 6
+	    def numTimes = 5
 	    when:
 	        numTimes.times { insertIntoMailSpoolIn( 'ENTERED' ) }
 	        insertIntoMailSpoolIn( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' + jaString + '@' + domainList[ 0 ] )
@@ -216,6 +174,46 @@ class InboundSpoolWorkerSpec extends Specification {
 	        1 == 1
 	        enteredCount == 0
 	        uncleanCount == numTimes
+	}
+	
+	def "test transferring clean messages"() {
+	    when:
+	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        transferredCount == 0
+	        cleanCount == 7
+	        storeCount == 0
+
+	    when:
+	        isw.moveCleanMessages( sql )
+	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        1 == 1
+	        transferredCount == 7
+	        cleanCount == 0
+	        storeCount == 8
+	}
+	
+	def "test deleting transferred messages"() {
+	    when:
+	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        transferredCount == 7
+	        storeCount == 8
+
+	    when:
+	        isw.deleteTransferredMessages( sql )
+	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        1 == 1
+	        transferredCount == 0
+	        storeCount == 8
 	}
 
 	@Ignore
