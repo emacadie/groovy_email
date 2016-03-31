@@ -1,6 +1,7 @@
 package info.shelfunit.spool
 
 import spock.lang.Ignore
+import spock.lang.Requires
 import spock.lang.Specification
 import spock.lang.Stepwise
 
@@ -89,19 +90,22 @@ class InboundSpoolWorkerSpec extends Specification {
         params << getRandomString( 500 )
         params << status
         params << ""
-        sql.execute'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+        sql.execute 'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
         println "Entered ${uuid} with ${fromString}"
     }
     
-    @Ignore
+    // in the closure for Requires, you can use "properties" instead of "System.properties"
+    // -Dclam.live.daemon=true
+    @Requires({ properties[ 'clam.live.daemon' ] == 'true' })
 	def "test with actual clam client running - default to ignore"() {
-	    println "\n--- Starting test ${name.methodName}"
 	    when:
 	        5.times { insertIntoMailSpoolIn( 'ENTERED' ) }
+	        insertIntoMailSpoolIn( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' + jaString + '@' + domainList[0 ] )
+	        insertIntoMailSpoolIn( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' +  getRandomString() + '@' + domainList[0 ] )
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
-	        enteredCount == 5
+	        enteredCount == 7
 	        cleanCount == 0
 
 	    when:
@@ -111,10 +115,29 @@ class InboundSpoolWorkerSpec extends Specification {
 	    then:
 	        1 == 1
 	        enteredCount == 0
-	        cleanCount == 5
+	        cleanCount == 7
 	}
 	
+	@Requires({ properties[ 'clam.live.daemon' ] == 'true' })
+	def "test transferring clean messages"() {
+	    when:
+	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	    then:
+	        transferredCount == 0
+	        cleanCount == 7
+
+	    when:
+	        isw.moveCleanMessages( sql )
+	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	    then:
+	        1 == 1
+	        transferredCount == 7
+	        cleanCount == 0
+	}
 	
+	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test cleaning messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def clamavMock = Mock( ClamAVClient )
@@ -141,6 +164,7 @@ class InboundSpoolWorkerSpec extends Specification {
 	        cleanCount == numTimes
 	}
 	
+	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test unclean messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def clamavMock = Mock( ClamAVClient )

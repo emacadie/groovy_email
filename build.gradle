@@ -77,6 +77,7 @@ test {
     systemProperties[ 'foo' ] = 'bar'
     doFirst {
         println "Hello +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++"
+        println "System.properties[ 'clam.live.daemon' ]: ${System.properties[ 'clam.live.daemon' ]}"
         // if ( systemProperties[ 'database.prep' ] == 'true' || systemProperties['database.teardown'] == 'true' ) {
             systemProperties[ 'dbname' ]        = 'gemail_test_db'
             systemProperties[ 'host_and_port' ] = 'localhost:5432'
