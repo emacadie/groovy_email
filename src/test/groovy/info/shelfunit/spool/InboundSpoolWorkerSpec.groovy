@@ -143,7 +143,7 @@ class InboundSpoolWorkerSpec extends Specification {
 	}
 	
 	@Requires({ properties[ 'clam.live.daemon' ] == 'true' })
-	def "test transferring messages to mail_store"() {
+	def "test deleting transferred messages"() {
 	    when:
 	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
 	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
@@ -170,6 +170,9 @@ class InboundSpoolWorkerSpec extends Specification {
 	    def numTimes = 6
 	    when:
 	        numTimes.times { insertIntoMailSpoolIn( 'ENTERED' ) }
+	        insertIntoMailSpoolIn( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' + jaString + '@' + domainList[ 0 ] )
+	        insertIntoMailSpoolIn( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' +  getRandomString() + '@' + domainList[ 0 ] )
+	        numTimes += 2
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
