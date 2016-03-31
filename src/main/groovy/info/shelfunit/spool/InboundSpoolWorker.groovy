@@ -129,7 +129,7 @@ class InboundSpoolWorker{
         this.updateMessageStatus( sql, uuidsToDelete, 'TRANSFERRED' )
     }
     
-    def removeTransferredMessages( sql ) {
+    def deleteTransferredMessages( sql ) {
         def uuidsToDelete = []
         sql.eachRow( QUERY_STATUS_STRING, [ 'TRANSFERRED' ] ) { row ->
             uuidsToDelete << row[ 'id' ]

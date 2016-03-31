@@ -40,6 +40,7 @@ class InboundSpoolWorkerSpec extends Specification {
     static fromString
     static params = []
     static sqlCountString = 'select count(*) from mail_spool_in where status_string = ? and from_address = ?'
+    static sqlCountStoreString = 'select count(*) from mail_store where from_address = ?'
     
     
     def setup() {
@@ -123,18 +124,41 @@ class InboundSpoolWorkerSpec extends Specification {
 	    when:
 	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
 	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
 	    then:
 	        transferredCount == 0
 	        cleanCount == 7
+	        storeCount == 0
 
 	    when:
 	        isw.moveCleanMessages( sql )
 	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
 	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
 	    then:
 	        1 == 1
 	        transferredCount == 7
 	        cleanCount == 0
+	        storeCount == 8
+	}
+	
+	@Requires({ properties[ 'clam.live.daemon' ] == 'true' })
+	def "test transferring messages to mail_store"() {
+	    when:
+	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        transferredCount == 7
+	        storeCount == 8
+
+	    when:
+	        isw.deleteTransferredMessages( sql )
+	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        1 == 1
+	        transferredCount == 0
+	        storeCount == 8
 	}
 	
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
