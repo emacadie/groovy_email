@@ -10,26 +10,26 @@ class RCPTCommand {
         log.info "Starting new RCPTCommand, here is argDomainList: ${argDomainList}"
         this.domainList = argDomainList
     }
-    
-    static regex = '''^(RCPT TO):<([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>$(?x)'''
 
-    static pattern = ~regex
-    
+    static rcptTo     = '''^(RCPT TO):<'''
+    static localPart  = '''([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@'''
+    static domainName = '''((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>$(?x)'''
+    static regex = rcptTo + localPart + domainName 
+
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "In RCPTCommand"
         def resultMap = [:]
         resultMap.clear()
         
-        def regexResult = ( theMessage ==~ pattern )
-        def q = theMessage =~ pattern
+        def regexResult = ( theMessage ==~ regex ) 
+        def q = theMessage =~ regex 
         if ( !prevCommandSet.lastSMTPCommandPrecedesRCPT() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else if ( !theMessage.startsWith( 'RCPT TO:' ) ) {
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !regexResult ) {
             resultMap.resultString = "501 Command not in proper form"
-        } else if ( !( theMessage ==~ pattern ) ) {
+        } else if ( !( theMessage ==~ regex ) ) {
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !domainList.containsIgnoreCase( q.extractDomainRCPT() ) && ( bufferMap.messageDirection == 'inbound' ) ) {
             resultMap.resultString = "550 No such user" // make it case insensitive here

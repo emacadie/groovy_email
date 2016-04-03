@@ -21,9 +21,9 @@ class MAILCommand {
     }
     
     // http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
-    static mailFrom = '''^(MAIL FROM):<'''
-    static localPart = '''([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@'''
-    static domain = '''((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>'''
+    static mailFrom  = '''^(MAIL FROM):<'''
+    static localPart = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*)@'''
+    static domain    = '''((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>'''
     static eightBitRuntime = '''(\\s{0,}BODY=8BITMIME)?$(?x)'''
     static regex = mailFrom + localPart + domain + eightBitRuntime
 
@@ -33,16 +33,10 @@ class MAILCommand {
         def resultString
         def resultMap = [:]
         resultMap.clear()
-        def regexResult = ( theMessage ==~ pattern )
         if ( !prevCommandSet.lastSMTPCommandPrecedesMail() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else if ( !theMessage.startsWith( 'MAIL FROM:' ) ) {
             resultMap.resultString = "501 Command not in proper form"
-        /*
-        } else if ( !regexResult ) {
-            log.info "not regexResult"
-            resultMap.resultString = "501 Command not in proper form"
-        */
         } else if ( !( theMessage ==~ pattern ) ) {
             log.info "The message is not equal to the pattern"
             resultMap.resultString = "501 Command not in proper form"
@@ -50,6 +44,13 @@ class MAILCommand {
             prevCommandSet << 'MAIL'
             
             def q = theMessage =~ pattern
+            
+            q.each { match ->
+                match.eachWithIndex { group, n ->
+                    log.info "${n}, <$group>"
+                }
+            }
+            
             // bufferMap?.clear()
             bufferMap.forwardPath = [] // for RCPT command
             bufferMap.reversePath =  q.getEmailAddressInMAIL()

@@ -7,7 +7,7 @@ import java.sql.SQLException
 import fi.solita.clamav.ClamAVClient
 
 @Slf4j
-class InboundSpoolWorker{
+class OutboundSpoolWorker{
     
     // states of message: ENTERED, CLEAN (clean CalmAV scan) or UNCLEAN (unclean ClamAV scan)
     // TRANSFERRED: a clean message has been copied to mail_store for each user listed in the message
@@ -15,11 +15,11 @@ class InboundSpoolWorker{
     final config
     final sql
     ClamAVClient clamavj
-    static QUERY_STATUS_STRING = 'select * from mail_spool_in where status_string = ?'
+    static QUERY_STATUS_STRING = 'select * from mail_spool_out where status_string = ?'
     static INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
     static SELECT_USER_STRING = 'select username from email_user where lower( username )=?'
     
-    InboundSpoolWorker( ) {
+    OutboundSpoolWorker( ) {
     }
     
     def runClam( sql, clamavj ) {
@@ -109,6 +109,7 @@ class InboundSpoolWorker{
         } // sql.eachRow
         this.updateMessageStatus( sql, uuidsToDelete, 'TRANSFERRED' )
     }
+    
     
     def deleteTransferredMessages( sql ) {
         def uuidsToDelete = []
