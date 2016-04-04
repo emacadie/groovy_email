@@ -115,8 +115,10 @@ class InboundSpoolWorker{
         sql.eachRow( QUERY_STATUS_STRING, [ 'TRANSFERRED' ] ) { row ->
             uuidsToDelete << row[ 'id' ]
         }
-        sql.withTransaction {
-            sql.execute "DELETE from mail_spool_in where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
+        if ( !uuidsToDelete.isEmpty() ) {
+            sql.withTransaction {
+                sql.execute "DELETE from mail_spool_in where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
+            }
         }
 
     }
