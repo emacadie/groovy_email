@@ -215,6 +215,24 @@ class InboundSpoolWorkerSpec extends Specification {
 	        transferredCount == 0
 	        storeCount == 8
 	}
+	
+	def "test deleting transferred messages if it is empty"() {
+	    when:
+	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        transferredCount == 0
+	        storeCount == 8
+
+	    when:
+	        isw.deleteTransferredMessages( sql )
+	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
+	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
+	    then:
+	        1 == 1
+	        transferredCount == 0
+	        storeCount == 8
+	}
 
 	@Ignore
 	def "always ignore"() {
