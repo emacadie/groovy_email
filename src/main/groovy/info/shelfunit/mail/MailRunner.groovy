@@ -1,5 +1,6 @@
 package info.shelfunit.mail
 
+import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
 import info.shelfunit.mail.meta.MetaProgrammer
@@ -8,9 +9,15 @@ import info.shelfunit.postoffice.PostOfficeActor
 import info.shelfunit.postoffice.PostOfficeRunnerMessage
 import info.shelfunit.postoffice.PostOfficeServer
 
+import info.shelfunit.spool.SpoolActor
+import info.shelfunit.spool.SpoolRunnerMessage
+
 import info.shelfunit.smtp.SMTPActor
 import info.shelfunit.smtp.SMTPRunnerMessage
 import info.shelfunit.smtp.SMTPServer
+
+import info.shelfunit.spool.ClamAvClientHolder
+import info.shelfunit.spool.InboundSpoolWorker
 
 @Slf4j
 class MailRunner {
@@ -31,16 +38,30 @@ class MailRunner {
         def smtpActor = new SMTPActor().start()
         // sendAndPromise later?
         def smtpPromise = smtpActor.sendAndPromise( new SMTPRunnerMessage( serverList, config.smtp.server.port.toInteger()  ) )
+        def spoolActor = new SpoolActor().start()
+        def spoolPromise = spoolActor.sendAndPromise( new SpoolRunnerMessage() )
         
         def poActor = new PostOfficeActor().start()
-        poActor.send( new PostOfficeRunnerMessage( serverList ) )
+        def poPromise = poActor.sendAndPromise( new PostOfficeRunnerMessage( serverList ) )
         
         def keepGoing = true
         sleep( 4.seconds() )
         DirectoryWatcher.watch()
         while ( keepGoing ) {
-            sleep( 4.seconds() )
+            sleep( 60.seconds() )
             log.info "still going in runWithActors"
+            def db = ConfigHolder.instance.returnDbMap()         
+            def sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+            log.info "Starting clamAV"
+            def clamAV = ClamAvClientHolder.getClamAvClient()
+            log.info "Starting InboundSpoolWorker"
+            def isw = new InboundSpoolWorker()
+            log.info "About to run CLAM"
+            isw.runClam( sql, clamAV )
+            log.info "About to call moveCleanMessage"
+            isw.moveCleanMessages( sql )
+            log.info "about to call deleteTransferredMessages"
+            isw.deleteTransferredMessages( sql )
         }
     }
     

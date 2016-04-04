@@ -42,6 +42,12 @@ class MatcherMetaProgrammer {
         java.util.regex.Matcher.metaClass.getBase64InAuth = { ->
             delegate[ 0 ][ 2 ]
         }
+        java.util.regex.Matcher.metaClass.getDomainInOutboundSpool = { ->
+            delegate[ 0 ][ 3 ]
+        }
+        java.util.regex.Matcher.metaClass.getUserInOutboundSpool = { ->
+            delegate[ 0 ][ 2 ]
+        }
         
     }
 }

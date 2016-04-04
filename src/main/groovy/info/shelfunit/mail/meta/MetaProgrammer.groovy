@@ -89,6 +89,13 @@ class MetaProgrammer {
             uuidList = sql.rows( 'select id from mail_store where username = ? and msg_timestamp < ?', [ userName, delegate.timestamp ] )
             delegate.uuidList = uuidList
         }
+        
+        java.util.Map.metaClass.addDomainToOutboundMap = { String domain ->
+            if ( !delegate.containsKey( domain ) ) {
+                delegate[ domain ] = [ ] 
+            }
+        }
+        
     }
     
     static runSetMetaProgramming() {

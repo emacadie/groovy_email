@@ -120,7 +120,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        enteredCount == 0
 	        cleanCount == 7
 	}
-	
+	/*
 	@Ignore
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test cleaning messages with mocks"() {
@@ -130,7 +130,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    byte[] outputMock = "OK".getBytes()
 	    def numTimes = 5
 	    when:
-	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED' ) }
+	        // numTimes.times { insertIntoMailSpoolOut( 'ENTERED' ) }
 	        // insertIntoMailSpoolOut( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' + jaString + '@' + domainList[ 0 ] )
 	        // insertIntoMailSpoolOut( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' +  getRandomString() + '@' + domainList[ 0 ] )
 	        numTimes += 2
@@ -151,7 +151,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        enteredCount == 0
 	        cleanCount == numTimes
 	}
-	
+	*/
+	/*
 	@Ignore
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test unclean messages with mocks"() {
@@ -179,7 +180,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        enteredCount == 0
 	        uncleanCount == numTimes
 	}
-	
+	*/
 	@Ignore
 	def "test transferring clean messages"() {
 	    when:
