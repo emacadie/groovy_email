@@ -130,20 +130,15 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        enteredCount == 0
 	        cleanCount == 7
 	}
-	/*
-	@Ignore
+	
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test cleaning messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def clamavMock = Mock( ClamAVClient )
 	    def inputStreamMock = Mock( InputStream )
 	    byte[] outputMock = "OK".getBytes()
-	    def numTimes = 5
+	    def numTimes = 7
 	    when:
-	        // numTimes.times { insertIntoMailSpoolOut( 'ENTERED' ) }
-	        // insertIntoMailSpoolOut( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' + jaString + '@' + domainList[ 0 ] )
-	        // insertIntoMailSpoolOut( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' +  getRandomString() + '@' + domainList[ 0 ] )
-	        numTimes += 2
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
@@ -161,7 +156,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        enteredCount == 0
 	        cleanCount == numTimes
 	}
-	*/
+	
 	/*
 	@Ignore
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
