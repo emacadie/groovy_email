@@ -157,8 +157,6 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        cleanCount == numTimes
 	}
 	
-	/*
-	@Ignore
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test unclean messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
@@ -167,7 +165,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    byte[] outputMock = "FOUND".getBytes()
 	    def numTimes = 6
 	    when:
-	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED' ) }
+	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' ) }
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        def uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
 	    then:
@@ -184,48 +182,6 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        1 == 1
 	        enteredCount == 0
 	        uncleanCount == numTimes
-	}
-	*/
-	@Ignore
-	def "test transferring clean messages"() {
-	    when:
-	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        transferredCount == 0
-	        cleanCount == 7
-	        storeCount == 0
-
-	    when:
-	        osw.moveCleanMessages( sql )
-	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        1 == 1
-	        transferredCount == 7
-	        cleanCount == 0
-	        storeCount == 8
-	}
-	
-	@Ignore
-	def "test deleting transferred messages"() {
-	    when:
-	        def transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        def storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        transferredCount == 7
-	        storeCount == 8
-
-	    when:
-	        osw.deleteTransferredMessages( sql )
-	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
-	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
-	    then:
-	        1 == 1
-	        transferredCount == 0
-	        storeCount == 8
 	}
 
 	@Ignore
