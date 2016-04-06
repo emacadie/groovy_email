@@ -37,9 +37,9 @@ class MailRunner {
         
         def smtpActor = new SMTPActor().start()
         // sendAndPromise later?
-        def smtpPromise = smtpActor.sendAndPromise( new SMTPRunnerMessage( serverList, config.smtp.server.port.toInteger()  ) )
+        def smtpPromise = smtpActor.sendAndPromise( new SMTPRunnerMessage( serverList, config.smtp.server.port.toInteger() ) )
         def spoolActor = new SpoolActor().start()
-        def spoolPromise = spoolActor.sendAndPromise( new SpoolRunnerMessage() )
+        def spoolPromise = spoolActor.sendAndPromise( new SpoolRunnerMessage( serverList, config.smtp.server.port.toInteger() ) )
         
         def poActor = new PostOfficeActor().start()
         def poPromise = poActor.sendAndPromise( new PostOfficeRunnerMessage( serverList ) )

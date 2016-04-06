@@ -34,8 +34,9 @@ class OutboundSpoolWorkerSpec extends Specification {
     static gwString   = 'gw' + rString
     static jaString   = 'ja' + rString
     static tjString   = 'tj' + rString
+    static fromString = gwString + '@' + domainList[ 0 ]
     static gwBase64Hash = getBase64Hash( gwString, 'somePassword' )
-    static OutboundSpoolWorker isw
+    static OutboundSpoolWorker osw
     static config
     static realClamAVClient
     static uuidList = []
@@ -60,7 +61,9 @@ class OutboundSpoolWorkerSpec extends Specification {
         def port = config.clamav.port
         realClamAVClient = this.createClamAVClient()
         
-        isw = new OutboundSpoolWorker()
+        osw = new OutboundSpoolWorker()
+        
+        this.enterOutgoingMessages()
         
     }     // run before the first feature method
     
@@ -92,19 +95,26 @@ class OutboundSpoolWorkerSpec extends Specification {
         params << getRandomString( 500 )
         params << 'ENTERED'
         params << gwBase64Hash
-        sql.execute 'insert into mail_spool_out( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
-        println "Entered ${uuid} with ${fromString}"
+        sql.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+    }
+    
+    def enterOutgoingMessages() {
+        insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 0 ] )
+        insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil' )
+        insertIntoMailSpoolOut( 'ENTERED', 'smtp@averagesmtp.com,oneill@stargate.mil' )
+        insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 0 ] + ',jack9@gmail.com,jack@yahoo.com' )
+        insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil,scarter@stargate.mil,weir@atlantis.mil,mckay@atlantis.mil' )
+        insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' )
+        insertIntoMailSpoolOut( 'ENTERED', 'rush@destiny.ancients.com,young@destiny.ancients.com' )
     }
     
     // in the closure for Requires, you can use "properties" instead of "System.properties"
     // -Dclam.live.daemon=true
-    @Ignore
+
     @Requires({ properties[ 'clam.live.daemon' ] == 'true' })
 	def "test with actual clam client running - default to ignore"() {
 	    when:
-	        5.times { insertIntoMailSpoolOut( 'ENTERED' ) }
-	        insertIntoMailSpoolOut( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' + jaString + '@' + domainList[0 ] )
-	        insertIntoMailSpoolOut( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' +  getRandomString() + '@' + domainList[0 ] )
+	        
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
@@ -112,7 +122,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        cleanCount == 0
 
 	    when:
-	        isw.runClam( sql, realClamAVClient )
+	        osw.runClam( sql, realClamAVClient )
 	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
@@ -142,7 +152,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    when:
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
-	        isw.runClam( sql, clamavMock )
+	        osw.runClam( sql, clamavMock )
 	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
@@ -171,7 +181,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    when:
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
-	        isw.runClam( sql, clamavMock )
+	        osw.runClam( sql, clamavMock )
 	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
 	    then:
@@ -193,7 +203,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        storeCount == 0
 
 	    when:
-	        isw.moveCleanMessages( sql )
+	        osw.moveCleanMessages( sql )
 	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
 	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
@@ -214,7 +224,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        storeCount == 8
 
 	    when:
-	        isw.deleteTransferredMessages( sql )
+	        osw.deleteTransferredMessages( sql )
 	        transferredCount = getTableCount( sql, sqlCountString, [ 'TRANSFERRED', fromString ] )
 	        storeCount = getTableCount( sql, sqlCountStoreString, [ fromString ] )
 	    then:

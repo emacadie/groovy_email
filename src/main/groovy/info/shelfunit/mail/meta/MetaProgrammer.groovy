@@ -19,6 +19,7 @@ class MetaProgrammer {
         java.sql.Timestamp.metaClass.static.create = {
             return new java.sql.Timestamp( new java.util.Date().getTime() )
         }
+        runJavaObjectMetaProgramming()
     }
     
     static runNumberMetaProgramming() {
@@ -244,6 +245,32 @@ class MetaProgrammer {
         String.metaClass.getIntInPOP3Command { ->
             Integer.parseInt( delegate.allButFirstFour().trim() )
         }
+    }
+    
+    static runJavaObjectMetaProgramming() {
+
+        java.lang.Object.metaClass.static.isNot = { boolean arg ->
+            if ( arg == true ) { 
+                return false 
+            } else { 
+                return true 
+            }
+        }
+        java.lang.Object.metaClass.static.doesNot = { boolean arg ->
+            if ( arg == true ) { 
+                return false 
+            } else { 
+                return true 
+            }
+        }
+        java.lang.Object.metaClass.static.doNot = { boolean arg ->
+            if ( arg == true ) { 
+                return false 
+            } else { 
+                return true 
+            }
+        }
+        
     }
 } // line 231
 

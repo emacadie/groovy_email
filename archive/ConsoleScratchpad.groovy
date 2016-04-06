@@ -29,7 +29,7 @@ def toListString = 'eeeeG@gmail.com,eeeeY@yahoo.com,ddddG@gmail.com,ddddY@yahoo.
 def toAddressList = toListString.split( ',' )
 def outgoingMap = [:]
 toAddressList.each { address ->
-    println "Here is addr: ${addr}"
+    println "Here is address: ${address}"
     def q = address =~ regex
     println "here is q[ 0 ][ 0 ]: ${q[ 0 ][ 0 ]}"
     println "here is q[ 0 ][ 1 ]: ${q[ 0 ][ 1 ]}"

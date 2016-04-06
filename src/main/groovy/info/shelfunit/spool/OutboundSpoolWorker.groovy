@@ -41,23 +41,24 @@ class OutboundSpoolWorker {
             }
         } // sql.eachRow
        this.updateMessageStatus( sql, cleanUUIDs, 'CLEAN' )
-       if ( !uncleanUUIDs.isEmpty() ) { 
+       if ( isNot( uncleanUUIDs.isEmpty() ) ) { 
            this.updateMessageStatus( sql, uncleanUUIDs, 'UNCLEAN' ) 
        }
     } // runClam
     
     def updateMessageStatus( sql, UUIDs, status ) {
         try {
-            log.info "here is idsToDelete: ${UUIDs} and it is a ${UUIDs.getClass().name}"
+            log.info "here is uuid list: ${UUIDs} and it is a ${UUIDs.getClass().name} status is ${status}"
             def insertCounts 
             def params = []
             def newObject = UUIDs.plus( 0, status )
             log.info "newObject is a ${newObject.getClass().name}, here it is: ${newObject}"
-            if ( !UUIDs.isEmpty() ){ 
+            if ( isNot( UUIDs.isEmpty() ) ) { 
+                
                 sql.withTransaction {
                     params << status
                     params += UUIDs // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
-                    sql.execute( "UPDATE mail_spool_in set status_string = ? where id in (${UUIDs.getQMarkString()}) ", UUIDs.plus( 0, status ) )
+                    sql.execute( "UPDATE mail_spool_out set status_string = ? where id in (${UUIDs.getQMarkString()}) ", UUIDs.plus( 0, status ) )
                 }
             }
             
@@ -80,7 +81,7 @@ class OutboundSpoolWorker {
             throw new RuntimeException( "Could not scan the input", e )
         }
         log.info "ClamAVClient.isCleanReply( reply ) : ${ClamAVClient.isCleanReply( reply ) }"
-        if ( !ClamAVClient.isCleanReply( reply ) ) {
+        if ( isNot( ClamAVClient.isCleanReply( reply ) ) ) {
             log.info "aaargh. Something was found"
             messageIsClean = false
         }
@@ -88,27 +89,29 @@ class OutboundSpoolWorker {
     }
     
     def deliverMessages( sql, domainList, outgoingPort ) {
+        log.info "starting deliverMessages"
         def nameToCheck
         def rows
         def uuidsToDelete = []
         def toAddressList
+        log.info "About to call query ${QUERY_STATUS_STRING}"
         sql.eachRow( QUERY_STATUS_STRING, [ 'CLEAN' ] ) { row ->
-            sql.withTransaction {
-                println "---------------------------------------------------------------------------------------\n\n"
-                println "row['text_body'] is a ${row['text_body'].getClass().name}"
+            // sql.withTransaction {
+                log.info "---------------------------------------------------------------------------------------\n\n"
+                log.info "row['text_body'] is a ${row['text_body'].getClass().name}"
                 // in the database, the "list" is one field, so it's not quite a groovy list
                 toAddressList = row[ 'to_address_list' ].split( ',' )
                 def outgoingMap = [:]
                 toAddressList.each { address ->
-                    println "Here is addr: ${addr}"
+                    log.info "Here is addr: ${addr}"
                     def q = address =~ regex
-                    println "here is q[ 0 ][ 0 ]: ${q[ 0 ][ 0 ]}"
-                    println "here is q[ 0 ][ 1 ]: ${q[ 0 ][ 1 ]}"
-                    println "here is q[ 0 ][ 2 ]: ${q[ 0 ][ 2 ]}"
-                    println "here is q[ 0 ][ 3 ]: ${q[ 0 ][ 3 ]}"
+                    log.info "here is q[ 0 ][ 0 ]: ${q[ 0 ][ 0 ]}"
+                    log.info "here is q[ 0 ][ 1 ]: ${q[ 0 ][ 1 ]}"
+                    log.info "here is q[ 0 ][ 2 ]: ${q[ 0 ][ 2 ]}"
+                    log.info "here is q[ 0 ][ 3 ]: ${q[ 0 ][ 3 ]}"
                     q.each { match ->
                         match.eachWithIndex { group, n ->
-                            println "${n}, <$group>"
+                            log.info "${n}, <$group>"
                         }
                     }
                     outgoingMap.addDomainToOutboundMap( q.getDomainInOutboundSpool() )
@@ -125,15 +128,15 @@ class OutboundSpoolWorker {
                             }
                         }
                     }
-                    println "++++"
-                    println "Key ${k} has value ${v}"
+                    log.info "++++"
+                    log.info "Key ${k} has value ${v}"
                     outgoingMap.remove( k )
                 }
                 
                 // go through, see if any messages are to anyone in this domain
                 outgoingMap.each { otherDomain, otherUserList ->
-                    
-                    if ( !domainList.contains( otherDomain ) ) {
+                    log.info "Looking at otherDomain ${otherDomain} with list ${otherUserList}"
+                    if ( doesNot( domainList.contains( otherDomain ) ) ) {
                         def socket = new Socket( otherDomain, String.toInt( outgoingPort ) )
                         socket.setSoTimeout( 10.minutes() )
                         socket.withStreams { input, output ->
@@ -148,13 +151,13 @@ class OutboundSpoolWorker {
                     nameToCheck = address.replaceFirst( '@.*', '' )
                     rows = sql.rows( SELECT_USER_STRING, nameToCheck.toLowerCase() )
                     def newUUID = UUID.randomUUID()
-                    if ( !rows.isEmpty() ) {
+                    if ( isNot( rows.isEmpty() ) ) {
                         sql.execute( INSERT_STRING, [ newUUID, nameToCheck, row[ 'from_address' ], address, row[ 'text_body' ], row[ 'msg_timestamp' ] ] )
-                        log.info "Entered ${newUUID} into mail_store from ${row[ 'id' ]} in mail_spool_in"
+                        log.info "Entered ${newUUID} into mail_store from ${row[ 'id' ]} in mail_spool_out"
                     }
                 }
                 */
-            }
+            // } // sql.withTransaction
             uuidsToDelete << row[ 'id' ]
         } // sql.eachRow
         this.updateMessageStatus( sql, uuidsToDelete, 'TRANSFERRED' )
@@ -166,8 +169,10 @@ class OutboundSpoolWorker {
         sql.eachRow( QUERY_STATUS_STRING, [ 'TRANSFERRED' ] ) { row ->
             uuidsToDelete << row[ 'id' ]
         }
-        sql.withTransaction {
-            sql.execute "DELETE from mail_spool_in where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
+        if ( isNot( uuidsToDelete.isEmpty() ) ) {
+            sql.withTransaction {
+                sql.execute "DELETE from mail_spool_out where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
+            }
         }
 
     }

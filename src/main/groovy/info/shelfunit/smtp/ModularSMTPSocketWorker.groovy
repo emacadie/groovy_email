@@ -59,7 +59,7 @@ class ModularSMTPSocketWorker {
         output << "220 ${serverName} Simple Mail Transfer Service Ready\r\n"
 
         def responseString
-        while ( !gotQuitCommand ) {
+        while ( doNot( gotQuitCommand ) ) {
 	        responseString = ''
 	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
 	        log.info "Got the reader, and it's a ${reader.getClass().getName()}"
@@ -74,7 +74,7 @@ class ModularSMTPSocketWorker {
 
 	        } else if ( prevCommandSet?.lastItem() == 'DATA' ) {
 		        def sBuffer = new StringBuffer()
-		        while ( !newString.equals( "." ) ) {
+		        while ( doesNot( newString.equals( "." ) ) ) {
 		            sBuffer << newString 
 		            sBuffer << "\r\n"
 			        try {

@@ -28,7 +28,7 @@ class InboundSpoolWorker{
         sql.eachRow( QUERY_STATUS_STRING, [ 'ENTERED' ] ) { row ->
             byte[] data = row[ 'text_body' ].getBytes()
             InputStream input = new ByteArrayInputStream( data )
-            println "input is a ${input.getClass().name}"
+            log.info "input is a ${input.getClass().name}"
             def isClean = this.runClamOnMessage( input, clamavj )
             if ( isClean ) {
                 cleanUUIDs << row[ 'id' ]
@@ -37,7 +37,7 @@ class InboundSpoolWorker{
             }
         } // sql.eachRow
        this.updateMessageStatus( sql, cleanUUIDs, 'CLEAN' )
-       if ( !uncleanUUIDs.isEmpty() ) { 
+       if ( isNot( uncleanUUIDs.isEmpty() ) ) { 
            this.updateMessageStatus( sql, uncleanUUIDs, 'UNCLEAN' ) 
        }
     } // runClam
@@ -49,7 +49,7 @@ class InboundSpoolWorker{
             def params = []
             def newObject = UUIDs.plus( 0, status )
             log.info "newObject is a ${newObject.getClass().name}, here it is: ${newObject}"
-            if ( !UUIDs.isEmpty() ){ 
+            if ( isNot( UUIDs.isEmpty() ) ) { 
                 sql.withTransaction {
                     params << status
                     params += UUIDs // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
@@ -76,7 +76,7 @@ class InboundSpoolWorker{
             throw new RuntimeException( "Could not scan the input", e )
         }
         log.info "ClamAVClient.isCleanReply( reply ) : ${ClamAVClient.isCleanReply( reply ) }"
-        if ( !ClamAVClient.isCleanReply( reply ) ) {
+        if ( isNot( ClamAVClient.isCleanReply( reply ) ) ) {
             log.info "aaargh. Something was found"
             messageIsClean = false
         }
@@ -90,8 +90,8 @@ class InboundSpoolWorker{
         def toAddressList
         sql.eachRow( QUERY_STATUS_STRING, [ 'CLEAN' ] ) { row ->
             sql.withTransaction {
-                println "---------------------------------------------------------------------------------------\n\n"
-                println "row['text_body'] is a ${row['text_body'].getClass().name}"
+                log.info "---------------------------------------------------------------------------------------\n\n"
+                log.info "row['text_body'] is a ${row['text_body'].getClass().name}"
                 // in the database, the "list" is one field, so it's not quite a groovy list
                 toAddressList = row[ 'to_address_list' ].split( ',' )
                 
@@ -99,7 +99,7 @@ class InboundSpoolWorker{
                     nameToCheck = address.replaceFirst( '@.*', '' )
                     rows = sql.rows( SELECT_USER_STRING, nameToCheck.toLowerCase() )
                     def newUUID = UUID.randomUUID()
-                    if ( !rows.isEmpty() ) {
+                    if ( isNot( rows.isEmpty() ) ) {
                         sql.execute( INSERT_STRING, [ newUUID, nameToCheck, row[ 'from_address' ], address, row[ 'text_body' ], row[ 'msg_timestamp' ] ] )
                         log.info "Entered ${newUUID} into mail_store from ${row[ 'id' ]} in mail_spool_in"
                     }
@@ -115,7 +115,7 @@ class InboundSpoolWorker{
         sql.eachRow( QUERY_STATUS_STRING, [ 'TRANSFERRED' ] ) { row ->
             uuidsToDelete << row[ 'id' ]
         }
-        if ( !uuidsToDelete.isEmpty() ) {
+        if ( isNot( uuidsToDelete.isEmpty() ) ) {
             sql.withTransaction {
                 sql.execute "DELETE from mail_spool_in where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
             }
