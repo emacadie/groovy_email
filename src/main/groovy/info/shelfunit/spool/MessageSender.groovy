@@ -16,12 +16,17 @@ class MessageSender {
         log.info "In doWork"
         def areWeDone = false
         def inputLine
+        def reader = input.newReader()
         log.info "About to read input line"
-        inputLine = input.read()
-        log.info "Here are keys in row: ${row.keySet()}"
-        log.info "Here is inputLine: ${inputLine}"
+        // inputLine = input.read()
+        def newString =  reader.readLine() 
+        log.info "Here is newString: ${newString}"
+        log.info "Here is row: it's a ${row.getClass().name}"
+        // log.info "Here is inputLine: ${inputLine}"
+        /*
         while ( !areWeDone ) {
         }
+        */
     }
 }
 

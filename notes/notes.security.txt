@@ -7,7 +7,12 @@ http://www.exim.org/exim-html-current/doc/html/spec_html/ch-encrypted_smtp_conne
 http://www.exim.org/exim-html-current/doc/html/spec_html/ch-encrypted_smtp_connections_using_tlsssl.html#SECTcerandall
 http://www.modssl.org/docs/2.7/ssl_faq.html#ToC24
 http://stackoverflow.com/questions/6786945/how-to-do-ssl-socket-programming
+http://stackoverflow.com/questions/6559859/is-it-possible-to-change-plain-socket-to-sslsocket
+http://stackoverflow.com/questions/25637039/detecting-ssl-connection-and-converting-socket-to-sslsocket
 http://james.apache.org/server/3/config-ssl-tls.html
 
 I think RSA is preferred algo for keystore
+
+http://www.javaworld.com/article/2075188/learn-java/construct-secure-networked-applications-with-certificates--part-4.html
+
 

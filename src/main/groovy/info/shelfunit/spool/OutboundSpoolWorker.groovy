@@ -4,6 +4,7 @@ import groovy.util.logging.Slf4j
 import info.shelfunit.mail.ConfigHolder
 import java.io.IOException
 import java.sql.SQLException
+// import java.util.concurrent.ConcurrentHashMap
 import fi.solita.clamav.ClamAVClient
 
 @Slf4j
@@ -89,6 +90,7 @@ class OutboundSpoolWorker {
     }
     
     def deliverMessages( sql, domainList, outgoingPort ) {
+        try {
         log.info "starting deliverMessages"
         def nameToCheck
         def rows
@@ -103,7 +105,7 @@ class OutboundSpoolWorker {
                 toAddressList = row[ 'to_address_list' ].split( ',' )
                 def outgoingMap = [:]
                 toAddressList.each { address ->
-                    log.info "Here is addr: ${addr}"
+                    log.info "Here is addr: ${address}"
                     def q = address =~ regex
                     log.info "here is q[ 0 ][ 0 ]: ${q[ 0 ][ 0 ]}"
                     log.info "here is q[ 0 ][ 1 ]: ${q[ 0 ][ 1 ]}"
@@ -118,6 +120,8 @@ class OutboundSpoolWorker {
                     outgoingMap[ q.getDomainInOutboundSpool() ] << q.getUserInOutboundSpool()
                     println "------"
                 }
+                log.info "Here is outgoingMap: ${outgoingMap.toString()}"
+                log.info "About to check internal domains"
                 // go through, see if any messages are to anyone in this domain
                 outgoingMap.each { k, v ->
                     if ( domainList.contains( k ) ) {
@@ -127,17 +131,19 @@ class OutboundSpoolWorker {
                                 sql.execute "insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )", [ UUID.randomUUID(), user, row[ 'from_address' ], user + '@' + k , row[ 'text_body' ], row[ 'msg_timestamp' ] ]
                             }
                         }
+                        outgoingMap.remove( k )
+                        log.info "Key ${k} has value ${v}"
                     }
                     log.info "++++"
-                    log.info "Key ${k} has value ${v}"
-                    outgoingMap.remove( k )
+                    
                 }
-                
-                // go through, see if any messages are to anyone in this domain
+                log.info "About to check external domains, Here is outgoingMap: ${outgoingMap.toString()}"
+                // go through, see if any messages are to anyone not in this domain
                 outgoingMap.each { otherDomain, otherUserList ->
                     log.info "Looking at otherDomain ${otherDomain} with list ${otherUserList}"
                     if ( doesNot( domainList.contains( otherDomain ) ) ) {
-                        def socket = new Socket( otherDomain, String.toInt( outgoingPort ) )
+                        // def socket = new Socket( otherDomain, String.toInt( outgoingPort ) )
+                        def socket = new Socket( otherDomain, outgoingPort )
                         socket.setSoTimeout( 10.minutes() )
                         socket.withStreams { input, output ->
                             def mSender = new MessageSender()
@@ -146,6 +152,7 @@ class OutboundSpoolWorker {
                         }
                     }
                 }
+                outgoingMap.clear()
                 /*
                 toAddressList.each { address ->
                     nameToCheck = address.replaceFirst( '@.*', '' )
@@ -160,7 +167,11 @@ class OutboundSpoolWorker {
             // } // sql.withTransaction
             uuidsToDelete << row[ 'id' ]
         } // sql.eachRow
+        
         this.updateMessageStatus( sql, uuidsToDelete, 'TRANSFERRED' )
+        } catch ( Exception e ) {
+            log.error "Exception ${e.getClass().name}", e
+        }
     }
     
     

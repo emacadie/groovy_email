@@ -157,6 +157,12 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        cleanCount == numTimes
 	}
 	
+	@Ignore
+	def "Test deliverMessages( sql, domainList, outgoingPort )"() {
+	    println "\n--- Starting test ${name.methodName}"
+	    def mockSender = Mock( MessageSender )
+	}
+	
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test unclean messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"

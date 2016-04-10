@@ -3,9 +3,7 @@ Mocking of non-interface types requires the CGLIB library. Please put cglib-node
 I had to add testCompile 'cglib:cglib-nodep:3.1' to build.gradle
 
 https://docs.gradle.org/current/userguide/java_plugin.html#testFiltering
-gradle test --tests info.shelfunit.socket.BinarySMTPSocketWorkerSpec -info
-gradle test --tests info.shelfunit.socket.ModularSMTPSocketWorkerSpec -info
-gradle test --tests info.shelfunit.socket.SMTPSocketWorkerSpec -info
+gradle test --tests info.shelfunit.smtp.ModularSMTPSocketWorkerSpec -info
 gradle test --tests info.shelfunit.smtp.command.EHLOCommandSpec -info
 gradle test --tests info.shelfunit.smtp.command.MAILCommandSpec."ad-hoc test" -info
 gradle test --tests info.shelfunit.smtp.command.MSSGCommandSpec test -info
@@ -33,6 +31,8 @@ gradle test --tests info.shelfunit.postoffice.ModularPostOfficeSocketWorkerSpec 
 
 gradle test --tests info.shelfunit.prep.FirstPrepSpec -info -Ddatabase.prep=true
 gradle test --tests info.shelfunit.teardown.FirstTeardownSpec -info -Ddatabase.teardown=true
+
+gradle test -Dclam.live.daemon=false
 
 http://stackoverflow.com/questions/24223631/h2-postgresql-mode-seems-not-working-for-me  
 I agree. Why not use postgres for testing?    

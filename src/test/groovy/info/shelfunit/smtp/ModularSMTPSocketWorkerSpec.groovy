@@ -194,17 +194,16 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    then:
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
-            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
-                "250-Hello hot-groovy.com\r\n" +
-                "250-8BITMIME\r\n" + 
-                "250-AUTH PLAIN\r\n" +
-                "250 HELP\r\n" + 
-                "250 OK\r\n" +
-                "250 OK\r\n" +
-                "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
-                "250 OK\r\n" +
-                "221 shelfunit.info Service closing transmission channel\r\n"
-                
+            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready${crlf}"  +
+               "250-Hello hot-groovy.com${crlf}"  +
+               "250-8BITMIME${crlf}"  +
+               "250-AUTH PLAIN${crlf}"  +
+               "250 HELP${crlf}"  +
+               "250 OK${crlf}"  +
+               "250 OK${crlf}"  +
+               "354 Start mail input; end with <CRLF>.<CRLF>${crlf}"  +
+               "250 OK${crlf}"  +
+               "221 shelfunit.info Service closing transmission channel${crlf}" 
 	}
 	
 	def "test common streams with reader mocking"() {
