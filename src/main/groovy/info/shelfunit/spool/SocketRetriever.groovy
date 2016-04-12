@@ -7,10 +7,11 @@ import org.xbill.DNS.Type
 
 import groovy.util.logging.Slf4j 
 
+@Slf4j 
 class SocketRetriever {
     
     def host
-    def post
+    def port
     
     SocketRetriever( argHost, argPort ) {
         this.host = argHost
