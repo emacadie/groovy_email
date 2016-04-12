@@ -15,7 +15,7 @@ class AUTHCommand {
     final sql
     AUTHCommand( argSql, argDomainList ) {
         log.info "Starting new AUTHCommand"
-        println "Here is argDomainList: ${argDomainList}"
+        log.info "Here is argDomainList: ${argDomainList}"
         this.domainList = argDomainList
         this.sql = argSql
     }

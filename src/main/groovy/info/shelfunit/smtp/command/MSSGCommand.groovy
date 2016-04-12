@@ -20,7 +20,7 @@ class MSSGCommand {
     final List domainList
     MSSGCommand( def argSql, def argDomainList ) {
         log.info "Starting new MSSGCommand"
-        println "Here is argDomainList: ${argDomainList}"
+        log.info "Here is argDomainList: ${argDomainList}"
         this.sql = argSql
         this.domainList = argDomainList
     }
@@ -87,10 +87,8 @@ class MSSGCommand {
             log.error "something went wrong", ex 
         }
         
-        println "here is insertCounts: ${insertCounts}"
+        log.info "here is insertCounts: ${insertCounts}"
         result
     } // addMessageToDatabase
 }
-
-
 

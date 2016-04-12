@@ -49,27 +49,7 @@ outgoingMap.each { k, v ->
     println "Key ${k} has value ${v}"
 }
 
-// //////////////////////
-import org.xbill.DNS.Lookup
-import org.xbill.DNS.MXRecord
-import org.xbill.DNS.Record
-import org.xbill.DNS.Type
-Record [] records = new Lookup("gmail.com", Type.MX).run();
-for (int i = 0; i < records.length; i++) {
-	MXRecord mx = (MXRecord) records[i];
-	System.out.println("Host " + mx.getTarget() + " has preference " + mx.getPriority());
-}
-
-import org.xbill.DNS.Lookup
-import org.xbill.DNS.MXRecord
-import org.xbill.DNS.Record
-import org.xbill.DNS.Type
-def records = new Lookup( "gmail.com", Type.MX ).run();
-records.each { record ->
-	MXRecord mx = ( MXRecord ) record
-	System.out.println( "Host " + mx.getTarget() + " has preference " + mx.getPriority() );
-}
-// 
+// //////////////////////// 
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.MXRecord
 import org.xbill.DNS.Record
@@ -113,19 +93,33 @@ BufferedReader inp = new BufferedReader( new InputStreamReader( socket.getInputS
 String x = inp.readLine();
 System.out.println( x );
 inp.close();
-/*
 
-def socket = new Socket( 'gmail-smtp-in.l.google.com', 25 )
+//////////////////////////////
+info.shelfunit.mail.meta.MetaProgrammer.runMetaProgramming()
+def socket = new Socket( 'mta7.am0.yahoodns.net', 25 )
 println "here is socket: ${socket}"
 def input = socket.getInputStream()
 def output = socket.getOutputStream()
+def newString 
+def done = false
+def commandList = []
 def reader = input.newReader()
+println "${reader.readLine()}"
+output << "EHLO testmail.com\r\n"
 println "About to read input line"
-// inputLine = input.read()
-def newString =  reader.readLine() 
-println "Here is newString: ${newString}"
-output << "EHLO qqq.com\r\n"
-*/
+while ( isNot( done ) ) {
+    newString = reader.readLine()
+    if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
+        commandList << newString.allButFirstFour()
+    }
+    println "Here is newString: ${newString}"
+    if ( newString.startsWith( '250 ' ) ) { 
+        done = true 
+    }
+    println "Done: ${done}"
+}
+println "Here is commandList: ${commandList}"
+
 // ////////////////////////
 info.shelfunit.mail.meta.MetaProgrammer.runMetaProgramming()
 def bString = '''250-mx.somedomain.com at your service, someotherdomain.com

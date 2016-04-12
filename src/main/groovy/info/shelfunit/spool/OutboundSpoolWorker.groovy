@@ -143,11 +143,14 @@ class OutboundSpoolWorker {
                     log.info "Looking at otherDomain ${otherDomain} with list ${otherUserList}"
                     if ( doesNot( domainList.contains( otherDomain ) ) ) {
                         // def socket = new Socket( otherDomain, String.toInt( outgoingPort ) )
-                        def socket = new Socket( otherDomain, outgoingPort )
+                        // def socket = new Socket( otherDomain, outgoingPort )
+                        def sr = SocketRetriever( otherDomain, outgoingPort ) 
+                        def socket = sr.getSocket() 
+                        // def socket = new Socket( otherDomain, outgoingPort )
                         socket.setSoTimeout( 10.minutes() )
                         socket.withStreams { input, output ->
                             def mSender = new MessageSender()
-                            mSender.doWork( input, output, row, otherDomain, otherUserList )
+                            mSender.doWork( input, output, row, otherDomain, otherUserList, domainList[ 0 ] )
                             
                         }
                     }

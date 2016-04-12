@@ -14,5 +14,5 @@ http://james.apache.org/server/3/config-ssl-tls.html
 I think RSA is preferred algo for keystore
 
 http://www.javaworld.com/article/2075188/learn-java/construct-secure-networked-applications-with-certificates--part-4.html
-
+https://docs.oracle.com/cd/E11035_01/wls100/security/SSL_client.html#wp1029656
 

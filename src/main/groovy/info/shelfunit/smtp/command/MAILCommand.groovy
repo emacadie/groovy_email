@@ -15,7 +15,7 @@ class MAILCommand {
     final sql
     MAILCommand( argSql, argDomainList ) {
         log.info "Starting new MAILCommand"
-        println "Here is argDomainList: ${argDomainList}"
+        log.info "Here is argDomainList: ${argDomainList}"
         this.sql = argSql
         this.domainList = argDomainList
     }

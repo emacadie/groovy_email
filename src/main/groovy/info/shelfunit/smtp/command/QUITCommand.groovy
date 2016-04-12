@@ -8,7 +8,7 @@ class QUITCommand {
     final List domainList
     QUITCommand( def argDomainList ) {
         log.info "Starting new QUITCommand"
-        println "Here is argDomainList: ${argDomainList}"
+        log.info "Here is argDomainList: ${argDomainList}"
         this.domainList = argDomainList
     }
     
