@@ -74,7 +74,8 @@ reverseMap.each { k, v ->
     println "target ${v} has priority ${k}"
 }
 println "Minimum priority is ${priorityList.min()}"
-println "So use server ${reverseMap[ priorityList.min() ]}"
+println "So use server ${reverseMap[ priorityList.min() ]} which is a ${reverseMap[ priorityList.min() ].getClass().name}"
+println "So use server ${reverseMap[ priorityList.min() ].toString()} "
 println ""
 ////////////////////////////////////
 def domainList = [ 'shelfunit.info', 'groovy-is-good.com' ]

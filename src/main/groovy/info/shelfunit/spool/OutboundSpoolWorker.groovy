@@ -144,7 +144,7 @@ class OutboundSpoolWorker {
                     if ( doesNot( domainList.contains( otherDomain ) ) ) {
                         // def socket = new Socket( otherDomain, String.toInt( outgoingPort ) )
                         // def socket = new Socket( otherDomain, outgoingPort )
-                        def sr = new SocketRetriever( otherDomain, outgoingPort ) 
+                        def sr = new SocketRetriever( otherDomain.toString(), outgoingPort ) 
                         def socket = sr.getSocket() 
                         // def socket = new Socket( otherDomain, outgoingPort )
                         socket.setSoTimeout( 10.minutes() )

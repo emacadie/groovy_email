@@ -40,7 +40,7 @@ class SocketRetriever {
         }
         log.info "Minimum priority is ${priorityList.min()}"
         log.info "So use server ${reverseMap[ priorityList.min() ]}"
-        def socket = new Socket( reverseMap[ priorityList.min() ], port )
+        def socket = new Socket( reverseMap[ priorityList.min() ].toString(), port )
         return socket
     }
 }

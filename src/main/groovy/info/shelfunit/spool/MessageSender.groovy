@@ -25,6 +25,7 @@ class MessageSender {
         log.info "About to send: EHLO ${outboundDomain}"
         output << "EHLO ${outboundDomain}\r\n"
         def doneWith220 = false
+        def commandList = []
         while ( isNot( doneWith220 ) ) {
             newString = reader.readLine()
             if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
