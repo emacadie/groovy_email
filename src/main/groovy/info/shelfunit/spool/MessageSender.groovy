@@ -12,7 +12,7 @@ class MessageSender {
         log.info "Starting new MessageSender"
     }
     
-    def doWork( input, output, row, otherDomain, otherUserList, outboundDomain  ) {
+    def doWork( input, output, row, otherDomain, otherUserList, outboundDomain ) {
         log.info "In doWork"
         def areWeDone = false
         def inputLine
@@ -24,18 +24,18 @@ class MessageSender {
         log.info "Here is row: it's a ${row.getClass().name}"
         log.info "About to send: EHLO ${outboundDomain}"
         output << "EHLO ${outboundDomain}\r\n"
-        def doneWith220 = false
+        def doneWith250 = false
         def commandList = []
-        while ( isNot( doneWith220 ) ) {
+        while ( isNot( doneWith250 ) ) {
             newString = reader.readLine()
             if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
                 commandList << newString.allButFirstFour()
             }
             log.info "Here is newString: ${newString}"
             if ( newString.startsWith( '250 ' ) ) { 
-                doneWith220 = true 
+                doneWith250 = true 
             }
-            log.info "doneWith220: ${doneWith220}"
+            log.info "doneWith250: ${doneWith250}"
         }
         log.info "Here is commandList: ${commandList}"
         log.info "About to send MAIL FROM:<${row.from_address}>"
@@ -58,16 +58,16 @@ class MessageSender {
             output << "DATA\r\n"
             newString = reader.readLine()
             log.info "Here is response to DATA: ${newString}"
-            if ( newString.startWith( "354" ) ) {
+            if ( newString.startsWith( "354" ) ) {
                 output << row[ text_body ]
                 output << ".\r\n"
             }
             newString = reader.readLine()
-            log.info "Here is newLine: ${newLine}"
+            log.info "Here is newLine: ${newString}"
             output << "QUIT\r\n"
         }
         newString = reader.readLine()
-        log.info "Here is newLine after QUIT: ${newLine}"
+        log.info "Here is newLine after QUIT: ${newString}"
         
         // log.info "Here is inputLine: ${inputLine}"
         /*

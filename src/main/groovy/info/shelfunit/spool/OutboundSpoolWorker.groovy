@@ -151,7 +151,6 @@ class OutboundSpoolWorker {
                         socket.withStreams { input, output ->
                             def mSender = new MessageSender()
                             mSender.doWork( input, output, row, otherDomain, otherUserList, domainList[ 0 ] )
-                            
                         }
                     }
                 }
