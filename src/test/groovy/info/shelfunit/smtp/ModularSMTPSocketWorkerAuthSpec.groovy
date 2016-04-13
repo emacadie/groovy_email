@@ -44,7 +44,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
     
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'aaa@showboat.com' ]
+        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'smtpwithauth@showboat.com' ]
         sql.execute "DELETE FROM mail_spool_out where from_address = ?", [ ( gwString + '@shelfunit.info' ) ]
         sql.close()
     }   // run after the last feature method
@@ -139,7 +139,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
             def domain = "hot-groovy.com"
             
             def dataString = "EHLO ${domain}${crlf}"  +
-            "MAIL FROM:<aaa@showboat.com>${crlf}" +
+            "MAIL FROM:<smtpwithauth@showboat.com>${crlf}" +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}"  +
             "JJJ${crlf}.${crlf}" +
@@ -172,7 +172,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	    when:
             def domain = "hot-groovy.com"
             def dataString = "EHLO ${domain}${crlf}" + 
-            "MAIL FROM:<aaa@showboat.com>${crlf}" +
+            "MAIL FROM:<smtpwithauth@showboat.com>${crlf}" +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}"
             byte[] data = dataString.getBytes()

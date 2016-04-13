@@ -42,7 +42,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'aaa@showboat.com' ]
+        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'smtpnoauth@showboat.com' ]
         sql.close()
     }   // run after the last feature method
     
@@ -117,7 +117,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    when:
             def domain = "hot-groovy.com"
             def bString = "EHLO ${domain}${crlf}" + 
-            "MAIL FROM:<aaa@showboat.com>${crlf}" +
+            "MAIL FROM:<smtpnoauth@showboat.com>${crlf}" +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}JJJ${crlf}" +
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
@@ -178,7 +178,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             def domain = "hot-groovy.com"
             
             def dataString = "EHLO ${domain}${crlf}"  +
-            "MAIL FROM:<aaa@showboat.com>${crlf}" +
+            "MAIL FROM:<smtpnoauth@showboat.com>${crlf}" +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}"  +
             "JJJ${crlf}.${crlf}" +
@@ -210,7 +210,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    when:
             def domain = "hot-groovy.com"
             def dataString = "EHLO ${domain}${crlf}" + 
-            "MAIL FROM:<aaa@showboat.com>${crlf}" +
+            "MAIL FROM:<smtpnoauth@showboat.com>${crlf}" +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}JJJ\nHHH${crlf}.${crlf}QUIT${crlf}"
             byte[] data = dataString.getBytes()

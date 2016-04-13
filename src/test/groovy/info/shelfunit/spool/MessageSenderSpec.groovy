@@ -69,25 +69,15 @@ class MessageSenderSpec extends Specification {
         addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
     
-    def insertIntoMailSpoolOut( uuid, status, toAddress ) {
+    def insertIntoMailSpoolOut( uuid, status, toAddress, message ) {
         params.clear()
         params << uuid
         params << gwString + '@' + domainList[ 0 ]
         params << toAddress
-        params << getRandomString( 500 )
+        params << message
         params << 'ENTERED'
         params << gwBase64Hash
         sql.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
-    }
-    
-    def enterOutgoingMessages() {
-        // insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 0 ] )
-        // insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil' )
-        // insertIntoMailSpoolOut( 'ENTERED', 'smtp@stargate.mil,oneill@stargate.mil' )
-        // insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 0 ] + ',jack9@gmail.com,jack@yahoo.com' )
-        // insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil,scarter@stargate.mil,weir@atlantis.mil,mckay@atlantis.mil' )
-        // insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' )
-        // insertIntoMailSpoolOut( 'ENTERED', 'rush@destiny.ancients.com,young@destiny.ancients.com' )
     }
     
     def getMessage( uuid ) {
@@ -97,19 +87,19 @@ class MessageSenderSpec extends Specification {
     def "first test"() {
         setup:
             def uuid = UUID.randomUUID()
-            def message = this.insertIntoMailSpoolOut( uuid, 'ENTERED', 'oneill@stargate.mil' )
+            def messageString = 'q' * 500
+            def message = this.insertIntoMailSpoolOut( uuid, 'ENTERED', 'oneill@stargate.mil', messageString )
             def row = this.getMessage( uuid )
         when:
-           
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
             "250-Hello ${domainList[ 0 ]}\r\n" +
             "250-8BITMIME\r\n" +
             "250-AUTH PLAIN\r\n" + 
             "250 HELP\r\n" +
-            "MAIL FROM:<aaa@showboat.com>${crlf}" +
-            "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
-            "DATA${crlf}JJJ${crlf}" +
-            "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
+            "250 OK${crlf}" + // MAIL FROM
+            "250 OK${crlf}" + // RCPT TO
+            "354 cha-cha-cha${crlf}" +
+            "250 OK${crlf}"
             byte[] data = bString.getBytes()
     
             InputStream input = new ByteArrayInputStream( data )
@@ -118,11 +108,12 @@ class MessageSenderSpec extends Specification {
             mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill@stargate.mil' ], domainList[ 0 ] )
             
         then:
-	        output.toString() == "220 stargte.mil Simple Mail Transfer Service Ready\r\n" +
-                "250-Hello hot-groovy.com\r\n" +
-                "250-8BITMIME\r\n" +
-                "250-AUTH PLAIN\r\n" + 
-                "250 HELP\r\n" +
+	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n" +
+                "MAIL FROM:<${gwString}@${domainList[ 0 ]}>\r\n" +
+                "RCPT TO:<oneill@stargate.mil>\r\n" +
+                "DATA\r\n" +
+                "${messageString}\r\n" + 
+                ".\r\n" +
                 "250 OK\r\n" +
                 "250 OK\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +

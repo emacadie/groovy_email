@@ -69,7 +69,7 @@ class OutboundSpoolWorkerSpec extends Specification {
     
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        // sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
+        sql.execute "DELETE FROM mail_spool_out where from_address = ?", [ gwString + '@' + domainList[ 0 ] ]
         sql.close()
     }   // run after the last feature method
     
