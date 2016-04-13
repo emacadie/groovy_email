@@ -98,8 +98,9 @@ class MessageSenderSpec extends Specification {
             "250 HELP\r\n" +
             "250 OK${crlf}" + // MAIL FROM
             "250 OK${crlf}" + // RCPT TO
-            "354 cha-cha-cha${crlf}" +
-            "250 OK${crlf}"
+            "354 cha-cha-cha${crlf}" + // DATA
+            "250 OK${crlf}" +          // After DATA
+            "221 stargate.mil ending transmission${crlf}"
             byte[] data = bString.getBytes()
     
             InputStream input = new ByteArrayInputStream( data )
@@ -114,92 +115,9 @@ class MessageSenderSpec extends Specification {
                 "DATA\r\n" +
                 "${messageString}\r\n" + 
                 ".\r\n" +
-                "250 OK\r\n" +
-                "250 OK\r\n" +
-                "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
-                "250 OK\r\n" +
-                "221 shelfunit.info Service closing transmission channel\r\n"
+                "QUIT\r\n" 
     }
-    
-    @Requires({ properties[ 'clam.live.daemon' ] == 'true' })
-	def "test with actual clam client running - default to ignore"() {
-	    when:
-	        
-	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	    then:
-	        enteredCount == 7
-	        cleanCount == 0
-
-	    when:
-	        osw.runClam( sql, realClamAVClient )
-	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	    then:
-	        1 == 1
-	        enteredCount == 0
-	        cleanCount == 7
-	}
 	
-	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
-	def "test cleaning messages with mocks"() {
-	    println "\n--- Starting test ${name.methodName}"
-	    def clamavMock = Mock( ClamAVClient )
-	    def inputStreamMock = Mock( InputStream )
-	    byte[] outputMock = "OK".getBytes()
-	    def numTimes = 7
-	    when:
-	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	    then:
-	        enteredCount == numTimes
-	        cleanCount == 0
-	    when:
-	        clamavMock.scan( _ ) >> outputMock
-	        outputMock.toString() >> "Hello"
-	        osw.runClam( sql, clamavMock )
-	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
-	    then:
-	        _ * ClamAVClient.isCleanReply( outputMock ) // subscriber.receive("hello")
-	        1 == 1
-	        enteredCount == 0
-	        cleanCount == numTimes
-	}
-	
-	@Ignore
-	def "Test deliverMessages( sql, domainList, outgoingPort )"() {
-	    println "\n--- Starting test ${name.methodName}"
-	    def mockSender = Mock( MessageSender )
-	}
-	
-	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
-	def "test unclean messages with mocks"() {
-	    println "\n--- Starting test ${name.methodName}"
-	    def clamavMock = Mock( ClamAVClient )
-	    def inputStreamMock = Mock( InputStream )
-	    byte[] outputMock = "FOUND".getBytes()
-	    def numTimes = 6
-	    when:
-	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' ) }
-	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        def uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
-	    then:
-	        enteredCount == numTimes
-	        uncleanCount == 0
-	    when:
-	        clamavMock.scan( _ ) >> outputMock
-	        outputMock.toString() >> "Hello"
-	        osw.runClam( sql, clamavMock )
-	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
-	    then:
-	        _ * ClamAVClient.isCleanReply( outputMock ) 
-	        1 == 1
-	        enteredCount == 0
-	        uncleanCount == numTimes
-	}
-
 	@Ignore
 	def "always ignore"() {
 	    expect:

@@ -22,6 +22,7 @@ class MessageSender {
         def newString =  reader.readLine() 
         log.info "Here is newString: ${newString}"
         log.info "Here is row: it's a ${row.getClass().name}"
+        log.info "here are the keys: ${row.keySet().toArray()}"
         log.info "About to send: EHLO ${outboundDomain}"
         output << "EHLO ${outboundDomain}\r\n"
         def doneWith250 = false
@@ -59,8 +60,8 @@ class MessageSender {
             newString = reader.readLine()
             log.info "Here is response to DATA: ${newString}"
             if ( newString.startsWith( "354" ) ) {
-                output << row[ text_body ]
-                output << ".\r\n"
+                output << row[ 'text_body' ]
+                output << "\r\n.\r\n"
             }
             newString = reader.readLine()
             log.info "Here is newLine: ${newString}"
