@@ -21,8 +21,8 @@ class MessageSender {
         def outString
         def newString =  reader.readLine() 
         log.info "Here is newString: ${newString}"
-        log.info "Here is row: it's a ${row.getClass().name}"
-        log.info "here are the keys: ${row.keySet().toArray()}"
+        // log.info "Here is row: it's a ${row.getClass().name}"
+        // log.info "here are the keys: ${row.keySet().toArray()}"
         log.info "About to send: EHLO ${outboundDomain}"
         output << "EHLO ${outboundDomain}\r\n"
         def doneWith250 = false
@@ -45,8 +45,8 @@ class MessageSender {
         log.info "Got response ${newString}"
         def got250ForRCPT = false
         otherUserList.each { uName ->
-            log.info "About to send RCPT TO:<${uName}>"
-            output << "RCPT TO:<${uName}>\r\n"
+            log.info "About to send RCPT TO:<${uName}@${otherDomain}>"
+            output << "RCPT TO:<${uName}@${otherDomain}>\r\n"
             newString = reader.readLine()
             log.info "Got response ${newString}"
             if ( newString.startsWith( "250" ) ) {

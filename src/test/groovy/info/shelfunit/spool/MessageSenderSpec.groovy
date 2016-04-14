@@ -106,7 +106,7 @@ class MessageSenderSpec extends Specification {
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill@stargate.mil' ], domainList[ 0 ] )
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 0 ] )
             
         then:
 	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n" +
