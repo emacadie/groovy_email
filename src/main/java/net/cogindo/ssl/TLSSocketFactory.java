@@ -13,6 +13,7 @@ import javax.net.ssl.SSLSocketFactory;
 
 /**
  * @author fkrauthan
+ * From https://gist.github.com/fkrauthan/ac8624466a4dee4fd02f
  */
 public class TLSSocketFactory extends SSLSocketFactory {
 
