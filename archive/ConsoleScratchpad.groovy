@@ -151,6 +151,94 @@ while ( isNot( done ) ) {
     println "Done: ${done}"
 }
 println "Here is commandList: ${commandList}"
+////////////////////////////////////////////////////
+import java.net.InetAddress
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.SSLServerSocket
+import javax.net.ssl.SSLServerSocketFactory
+import info.shelfunit.mail.SecurityTools
 
+info.shelfunit.mail.meta.MetaProgrammer.runMetaProgramming()
+def hostName = 'mta7.am0.yahoodns.net.'
+def socket = new Socket( hostName, 25 )
+println "here is socket: ${socket}"
+println "socket is a ${socket.getClass().name}"
+def input = socket.getInputStream()
+def output = socket.getOutputStream()
+def newString 
+def done = false
+def commandList = []
+def reader = input.newReader()
+println "${reader.readLine()}"
+output << "EHLO testmail.com\r\n"
+println "About to read input line"
+while ( isNot( done ) ) {
+    newString = reader.readLine()
+    if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
+        commandList << newString.allButFirstFour()
+    }
+    println "Here is newString: ${newString}"
+    if ( newString.startsWith( '250 ' ) ) { 
+        done = true 
+    }
+    println "Done: ${done}"
+}
+println "Here is commandList: ${commandList}"
+
+output << "STARTTLS\r\n"
+newString = reader.readLine()
+println "Here is newString: ${newString}"
+
+// Get the default SSLSocketFactory
+// SSLSocketFactory sf = ( ( SSLSocketFactory ) javax.net.ssl.SSLSocketFactory.getDefault() );
+SSLSocketFactory sf = (  javax.net.ssl.SSLSocketFactory.getDefault() );
+
+// Wrap 'socket' from above in a SSL socket
+InetSocketAddress remoteAddress = ( InetSocketAddress ) socket.getRemoteSocketAddress();
+SSLSocket s = ( SSLSocket ) ( sf.createSocket( socket, hostName, socket.getPort(), true ) );
+/*
+ logger.debug(clientSocket.toString() + " handled as SSL client");
+                    Socket clientSecureSocket = SecurityTools.convertToSecureSocket(clientSocket, String.format("cn=%s,ou=%s,o=%s,c=%s", cn, ou, o, c));
+                    CN=Shelf Unit, OU=ShelfUnit, O=ShelfUnit, L=Austin, ST=Texas, C=US
+                    WebConnectionHandler.handleClient(clientSecureSocket);
+*/
+// we are a client
+println "Here is s: ${s}"
+s.setUseClientMode( true );
+println "Called s.setUseClientMode"
+
+// allow all supported protocols and cipher suites
+s.setEnabledProtocols( s.getSupportedProtocols() );
+println "called s.setEnabledProtocols( s.getSupportedProtocols() )"
+s.setEnabledCipherSuites( s.getSupportedCipherSuites() );
+println "called s.setEnabledCipherSuites( s.getSupportedCipherSuites() );"
+// and go!
+s.startHandshake();
+println "called s.startHandshake();"
+
+// continue communication on 'socket'
+socket = s;
+println "here is socket: ${socket}"
+println "socket is a ${socket.getClass().name}"
+output = socket.getOutputStream()
+input = socket.getInputStream()
+reader = input.newReader()
+output << "EHLO testmail.com\r\n"
+newString = reader.readLine()
+output << "EHLO testmail.com\r\n"
+done = false
+while ( isNot( done ) ) {
+    newString = reader.readLine()
+    if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
+        commandList << newString.allButFirstFour()
+    }
+    println "Here is newString: ${newString}"
+    if ( newString.startsWith( '250 ' ) ) { 
+        done = true 
+    }
+    println "Done: ${done}"
+}
+println "Here is commandList: ${commandList}"
 
 

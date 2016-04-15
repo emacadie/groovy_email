@@ -40,6 +40,7 @@ USAGE:
                 {
                     logger.debug(clientSocket.toString() + " handled as SSL client");
                     Socket clientSecureSocket = SecurityTools.convertToSecureSocket(clientSocket, String.format("cn=%s,ou=%s,o=%s,c=%s", cn, ou, o, c));
+                    CN=Shelf Unit, OU=ShelfUnit, O=ShelfUnit, L=Austin, ST=Texas, C=US
                     WebConnectionHandler.handleClient(clientSecureSocket);
                 }
                 else {
@@ -51,7 +52,7 @@ USAGE:
 */
 public class SecurityTools {
  
-    private static final File keyStoreFile = new File( "hexcast.jks" );
+    private static final File keyStoreFile = new File( "/home/ericm/tmp/groovy/groovy-mailer/groovy_email.jks" );
  
     public static X509Certificate generateCertificate(String dn, KeyPair pair, int days, String algorithm)
             throws GeneralSecurityException, IOException
