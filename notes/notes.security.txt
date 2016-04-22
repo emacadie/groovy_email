@@ -16,4 +16,10 @@ I think RSA is preferred algo for keystore
 http://www.javaworld.com/article/2075188/learn-java/construct-secure-networked-applications-with-certificates--part-4.html
 https://docs.oracle.com/cd/E11035_01/wls100/security/SSL_client.html#wp1029656
 https://www.owasp.org/index.php/Using_the_Java_Secure_Socket_Extensions
+https://www.sslshopper.com/article-most-common-java-keytool-keystore-commands.html
+
+GUI for keytool: http://portecle.sourceforge.net/
+
+KeyStore: Your keys
+TrustManaget: Other people's certs
 

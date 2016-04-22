@@ -186,48 +186,131 @@ while ( isNot( done ) ) {
 }
 println "Here is commandList: ${commandList}"
 
-output << "STARTTLS\r\n"
-newString = reader.readLine()
-println "Here is newString: ${newString}"
+if ( commandList.contains( 'STARTTLS' ) ) {
+    output << "STARTTLS\r\n"
+    newString = reader.readLine()
+    println "Here is newString: ${newString}"
+    
+    // Get the default SSLSocketFactory
+    // SSLSocketFactory sf = ( ( SSLSocketFactory ) javax.net.ssl.SSLSocketFactory.getDefault() );
+    SSLSocketFactory sf = (  javax.net.ssl.SSLSocketFactory.getDefault() );
+    
+    // Wrap 'socket' from above in a SSL socket
+    InetSocketAddress remoteAddress = ( InetSocketAddress ) socket.getRemoteSocketAddress();
+    SSLSocket s = ( SSLSocket ) ( sf.createSocket( socket, hostName, socket.getPort(), true ) );
 
-// Get the default SSLSocketFactory
-// SSLSocketFactory sf = ( ( SSLSocketFactory ) javax.net.ssl.SSLSocketFactory.getDefault() );
-SSLSocketFactory sf = (  javax.net.ssl.SSLSocketFactory.getDefault() );
+    println "Here is s: ${s}"
+    // we are a client
+    s.setUseClientMode( true );
+    println "Called s.setUseClientMode"
+    
+    // allow all supported protocols and cipher suites
+    s.setEnabledProtocols( s.getSupportedProtocols() );
+    println "called s.setEnabledProtocols( s.getSupportedProtocols() )"
+    s.setEnabledCipherSuites( s.getSupportedCipherSuites() );
+    println "called s.setEnabledCipherSuites( s.getSupportedCipherSuites() );"
+    // and go!
+    s.startHandshake();
+    println "called s.startHandshake();"
+    
+    // continue communication on 'socket'
+    socket = s;
+    println "here is socket: ${socket}"
+    println "socket is a ${socket.getClass().name}"
+    output = socket.getOutputStream()
+    input = socket.getInputStream()
+    reader = input.newReader()
+    // output << "EHLO testmail.com\r\n"
+    // newString = reader.readLine()
+    output << "EHLO testmail.com\r\n"
+    done = false
+    while ( isNot( done ) ) {
+        newString = reader.readLine()
+        if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
+            commandList << newString.allButFirstFour()
+        }
+        println "Here is newString: ${newString}"
+        if ( newString.startsWith( '250 ' ) ) { 
+            done = true 
+        }
+        println "Done: ${done}"
+    }
+    println "Here is commandList: ${commandList}"
+} // if ( commandList.contains( 'STARTTLS' ) )
+output << 'QUIT\r\n'
+def reader = input.newReader()
+println "${reader.readLine()}"
+///////////////////////////////////
+import java.net.InetAddress
+import javax.net.ssl.SSLServerSocket
+import javax.net.ssl.SSLServerSocketFactory
 
-// Wrap 'socket' from above in a SSL socket
-InetSocketAddress remoteAddress = ( InetSocketAddress ) socket.getRemoteSocketAddress();
-SSLSocket s = ( SSLSocket ) ( sf.createSocket( socket, hostName, socket.getPort(), true ) );
-/*
- logger.debug(clientSocket.toString() + " handled as SSL client");
-                    Socket clientSecureSocket = SecurityTools.convertToSecureSocket(clientSocket, String.format("cn=%s,ou=%s,o=%s,c=%s", cn, ou, o, c));
-                    CN=Shelf Unit, OU=ShelfUnit, O=ShelfUnit, L=Austin, ST=Texas, C=US
-                    WebConnectionHandler.handleClient(clientSecureSocket);
-*/
-// we are a client
-println "Here is s: ${s}"
-s.setUseClientMode( true );
-println "Called s.setUseClientMode"
+import javax.net.ssl.SSLContext
+import javax.net.ssl.SSLException
+import javax.net.ssl.SSLSocket
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
+// import java.io.*;
+import java.security.KeyStore;
+import java.security.MessageDigest;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 
-// allow all supported protocols and cipher suites
-s.setEnabledProtocols( s.getSupportedProtocols() );
-println "called s.setEnabledProtocols( s.getSupportedProtocols() )"
-s.setEnabledCipherSuites( s.getSupportedCipherSuites() );
-println "called s.setEnabledCipherSuites( s.getSupportedCipherSuites() );"
-// and go!
-s.startHandshake();
-println "called s.startHandshake();"
+char[] HEXDIGITS = "0123456789abcdef".toCharArray( )
 
-// continue communication on 'socket'
-socket = s;
+    def toHexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder( bytes.length * 3 )
+        char[] HEXDIGITS = "0123456789abcdef".toCharArray( )
+        for (int b : bytes) {
+            b &= 0xff;
+            sb.append(HEXDIGITS[b >> 4] )
+            sb.append(HEXDIGITS[b & 15] )
+            sb.append(' ' )
+        }
+        return sb.toString( )
+    }
+
+    class SavingTrustManager implements X509TrustManager {
+
+        private final X509TrustManager tm;
+        private X509Certificate[] chain;
+
+        SavingTrustManager(X509TrustManager tm) {
+            this.tm = tm;
+        }
+
+        public X509Certificate[] getAcceptedIssuers() {
+            throw new UnsupportedOperationException( )
+        }
+
+        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            throw new UnsupportedOperationException( )
+        }
+
+        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+            this.chain = chain;
+            tm.checkServerTrusted(chain, authType )
+        }
+    }
+
+info.shelfunit.mail.meta.MetaProgrammer.runMetaProgramming()
+def hostName = 'mta7.am0.yahoodns.net.'
+def socket = new Socket( hostName, 25 )
 println "here is socket: ${socket}"
 println "socket is a ${socket.getClass().name}"
-output = socket.getOutputStream()
-input = socket.getInputStream()
-reader = input.newReader()
+def input = socket.getInputStream()
+def output = socket.getOutputStream()
+def newString 
+def done = false
+def commandList = []
+def reader = input.newReader()
+println "${reader.readLine()}"
 output << "EHLO testmail.com\r\n"
-newString = reader.readLine()
-output << "EHLO testmail.com\r\n"
-done = false
+println "About to read input line"
 while ( isNot( done ) ) {
     newString = reader.readLine()
     if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
@@ -240,5 +323,139 @@ while ( isNot( done ) ) {
     println "Done: ${done}"
 }
 println "Here is commandList: ${commandList}"
+
+if ( commandList.contains( 'STARTTLS' ) ) {
+    output << "STARTTLS\r\n"
+    newString = reader.readLine()
+    println "Here is newString: ${newString}"
+    
+    // Get the default SSLSocketFactory
+    
+            File file = new File( "jssecacerts" )
+        if ( file.isFile() == false ) {
+            char SEP = File.separatorChar;
+            File dir = new File( System.getProperty( "java.home" ) + SEP
+                    + "lib" + SEP + "security" )
+            file = new File( dir, "jssecacerts" )
+            if ( file.isFile() == false ) {
+                file = new File( dir, "cacerts" )
+            }
+        }
+        println( "Loading KeyStore " + file + "..." )
+        InputStream ins = new FileInputStream( file )
+        KeyStore ks = KeyStore.getInstance( KeyStore.getDefaultType() )
+        def passphrase = 'changeit' as char[]
+        ks.load( ins, passphrase )
+        ins.close( )
+
+        SSLContext context = SSLContext.getInstance( "TLS" )
+        TrustManagerFactory tmf =
+                TrustManagerFactory.getInstance( TrustManagerFactory.getDefaultAlgorithm() )
+        tmf.init( ks )
+        X509TrustManager defaultTrustManager = ( X509TrustManager ) tmf.getTrustManagers()[ 0 ];
+        SavingTrustManager tm = new SavingTrustManager( defaultTrustManager )
+        // context.init( null, new TrustManager[ tm ], null )
+        context.init( null, [ tm ] as TrustManager[ ], null )
+        SSLSocketFactory sf = context.getSocketFactory( )
+
+
+    
+    // Wrap 'socket' from above in a SSL socket
+    InetSocketAddress remoteAddress = ( InetSocketAddress ) socket.getRemoteSocketAddress();
+    SSLSocket s = ( SSLSocket ) ( sf.createSocket( socket, hostName, socket.getPort(), true ) );
+
+    println "Here is s: ${s}"
+    // we are a client
+    s.setUseClientMode( true );
+    println "Called s.setUseClientMode"
+    
+    // allow all supported protocols and cipher suites
+    s.setEnabledProtocols( s.getSupportedProtocols() );
+    println "called s.setEnabledProtocols( s.getSupportedProtocols() )"
+    s.setEnabledCipherSuites( s.getSupportedCipherSuites() );
+    println "called s.setEnabledCipherSuites( s.getSupportedCipherSuites() );"
+    // and go!
+    try {
+    s.startHandshake();
+    println "called s.startHandshake();"
+    } catch ( Exception e ) {
+        X509Certificate[] chain = tm.chain;
+        if ( chain == null ) {
+            println( "Could not obtain server certificate chain" )
+            return;
+        }
+
+        BufferedReader breader =
+                new BufferedReader( new InputStreamReader( System.in ) )
+
+        println(  )
+        println( "Server sent " + chain.length + " certificate(s):" )
+        println(  )
+        MessageDigest sha1 = MessageDigest.getInstance( "SHA1" )
+        MessageDigest md5 = MessageDigest.getInstance( "MD5" )
+        for ( int i = 0; i < chain.length; i++) {
+            X509Certificate cert = chain[ i ];
+            println(" " + ( i + 1 ) + " Subject " + cert.getSubjectDN() )
+            println( "   Issuer  " + cert.getIssuerDN() )
+            sha1.update( cert.getEncoded() )
+            println( "   sha1    " + toHexString( sha1.digest() ) )
+            md5.update( cert.getEncoded() )
+            println( "   md5     " + toHexString( md5.digest() ) )
+            println(  )
+        }
+
+        println( "Enter certificate to add to trusted keystore or 'q' to quit: [1]" )
+        String line = '1'
+        int k;
+        try {
+            k = ( line.length() == 0 ) ? 0 : Integer.parseInt( line ) - 1;
+        } catch ( NumberFormatException ex ) {
+            println( "KeyStore not changed" )
+            // return;
+        }
+
+        X509Certificate cert = chain[ k ];
+        String alias = hostName + "-" + ( k + 1 )
+        ks.setCertificateEntry( alias, cert )
+
+        OutputStream out = new FileOutputStream( "jssecacerts" )
+        ks.store( out, passphrase )
+        out.close( )
+
+        println(  )
+        println( cert )
+        println(  )
+        println("Added certificate to keystore 'jssecacerts' using alias '"
+                        + alias + "'" )
+    }
+    // continue communication on 'socket'
+    output << 'QUIT\r\n'
+    /*
+    socket = s;
+    println "here is socket: ${socket}"
+    println "socket is a ${socket.getClass().name}"
+    output = socket.getOutputStream()
+    input = socket.getInputStream()
+    reader = input.newReader()
+    // output << "EHLO testmail.com\r\n"
+    // newString = reader.readLine()
+    output << "EHLO testmail.com\r\n"
+    done = false
+    while ( isNot( done ) ) {
+        newString = reader.readLine()
+        if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
+            commandList << newString.allButFirstFour()
+        }
+        println "Here is newString: ${newString}"
+        if ( newString.startsWith( '250 ' ) ) { 
+            done = true 
+        }
+        println "Done: ${done}"
+    }
+    println "Here is commandList: ${commandList}"
+    */
+} // if ( commandList.contains( 'STARTTLS' ) )
+output << 'QUIT\r\n'
+
 
 

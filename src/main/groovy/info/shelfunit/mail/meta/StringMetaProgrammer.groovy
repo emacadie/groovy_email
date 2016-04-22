@@ -94,10 +94,23 @@ class StringMetaProgrammer {
         }
         
         String.metaClass.toInt = { ->
-            return Integer.parseInt( delegate )
+            def toIntResult
+            try {
+                toIntResult = Integer.parseInt( delegate )
+            } catch ( java.lang.NumberFormatException nfe ) {
+                result = 0
+            }
+            toIntResult
         }
+        
         String.metaClass.getIntInPOP3Command { ->
-            Integer.parseInt( delegate.allButFirstFour().trim() )
+            def toIntResult
+            try {
+                toIntResult = Integer.parseInt( delegate.allButFirstFour().trim() )
+            } catch ( java.lang.NumberFormatException nfe ) {
+                result = 0
+            }
+            toIntResult
         }
     }
 }
