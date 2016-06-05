@@ -23,17 +23,17 @@ class ModularPostOfficeSocketWorker {
 
     @Hidden InputStream input
     @Hidden OutputStream output
-	@Hidden String domain
+    @Hidden String domain
     @Hidden String theResponse
     @Hidden String serverName
-	@Hidden prevCommandSet 
-	@Hidden def bufferMap
-	@Hidden def sql
-	@Hidden def serverList
-	
-	@Hidden def commandResultMap
-
-	ModularPostOfficeSocketWorker( argIn, argOut, argServerList ) {
+    @Hidden prevCommandSet 
+    @Hidden def bufferMap
+    @Hidden def sql
+    @Hidden def serverList
+    
+    @Hidden def commandResultMap
+    
+    ModularPostOfficeSocketWorker( argIn, argOut, argServerList ) {
         input = argIn
         output = argOut
         
@@ -47,9 +47,9 @@ class ModularPostOfficeSocketWorker {
         prevCommandSet = [] as Set
         commandResultMap = [:]
         bufferMap = [:]
-	}
-
-	def doWork() {
+    }
+    
+    def doWork() {
         String sCurrentLine
         def gotQuitCommand = false
         log.info "beginning doWork, input is a ${input.class.name}"
@@ -61,79 +61,79 @@ class ModularPostOfficeSocketWorker {
         bufferMap.state = 'AUTHORIZATION'
         def responseString
         while ( !gotQuitCommand ) {
-	        responseString = ''
-	        log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
-	        log.info "Got the reader, and it's a ${reader.getClass().getName()}"
-	        def newString =  reader.readLine() 
-	        log.info "Here is newString: ${newString}"
-	        
-	        if ( newString == null ) { 
-	            responseString = "+OK\r\n"
-	        } else if ( newString.startsWith( 'QUIT' ) ) {
-		        log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
-		        responseString = this.handleMessage( newString )
-		        gotQuitCommand = true
-		        log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
-	        } else {
-		        responseString = this.handleMessage( newString )
-	        }
-	        log.info "responseString: ${responseString}"
-	        output << responseString
+            responseString = ''
+            log.info "About to read input in the loop, gotQuitCommand: ${gotQuitCommand}"
+            log.info "Got the reader, and it's a ${reader.getClass().getName()}"
+            def newString =  reader.readLine() 
+            log.info "Here is newString: ${newString}"
+            
+            if ( newString == null ) { 
+                responseString = "+OK\r\n"
+            } else if ( newString.startsWith( 'QUIT' ) ) {
+                log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
+                responseString = this.handleMessage( newString )
+                gotQuitCommand = true
+                log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
+            } else {
+                responseString = this.handleMessage( newString )
+            }
+            log.info "responseString: ${responseString}"
+            output << responseString
         }
         
         log.info "Here is prevCommandSet: ${prevCommandSet}"
         log.info "ending doWork"
-	} 
-	
-	def cleanup () {
-	    sql.close()
-	}
-
-	def handleMessage( theMessage, def isActualMessage = false ) {
-		theResponse = ""
-		log.info "Incoming message: ${theMessage}"
-		if ( theMessage.isOptionalPostOfficeCommand() ) {
-		    theResponse = '-ERR Command not implemented'
+    } 
+    
+    def cleanup () {
+        sql.close()
+    }
+    
+    def handleMessage( theMessage, def isActualMessage = false ) {
+        theResponse = ""
+        log.info "Incoming message: ${theMessage}"
+        if ( theMessage.isOptionalPostOfficeCommand() ) {
+            theResponse = '-ERR Command not implemented'
         } else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
-		    theResponse = '+OK'
-		} else if ( theMessage.isRFC5034Command() ) { 
-		    theResponse = '-ERR Command not implemented'
-		} else if ( theMessage.isEncapsulated( ) || isActualMessage ) {
-		    def commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
-		    log.info "returned a command object that is a ${commandObject.class.name}"
-		    commandResultMap.clear()
-		    commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
-		    prevCommandSet = commandResultMap.prevCommandSet.clone()
-		    bufferMap = commandResultMap.bufferMap.clone() 
-			theResponse = commandResultMap.resultString
-		
-		} else {
-			theResponse = '-ERR Command not implemented'
-		}
-		theResponse + "\r\n"
-	}
-	
-	def returnCurrentCommand( theMessage, isActualMessage ) {
-	    log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
-		if ( isActualMessage ) {
-		    return mssgCommand
-		} else if ( theMessage.startsWith( 'USER' ) ) {
-			return new USERCommand( sql )
-		} else if ( theMessage.startsWith( 'PASS' ) ) {
-			return new PASSCommand( sql )
-		} else if ( theMessage.startsWith( 'RSET' ) ) {
-		    return new RSETCommand( sql )
-		} else if ( theMessage.startsWith( 'STAT' ) ) {
-		    return new STATCommand( sql )
-		} else if ( theMessage.startsWith( 'RETR' ) ) {
-		    return new RETRCommand( sql )
-		} else if ( theMessage.startsWith( 'LIST' ) ) {
-		    return new LISTCommand( sql )
-		} else if ( theMessage.startsWith( 'QUIT' ) ) {
-		    return new QUITCommand( sql, serverName )
-		} else if ( theMessage.startsWith( 'DELE' ) ) {
-		    return new DELECommand( sql )
-		}
-	}
+            theResponse = '+OK'
+        } else if ( theMessage.isRFC5034Command() ) { 
+            theResponse = '-ERR Command not implemented'
+        } else if ( theMessage.isEncapsulated( ) || isActualMessage ) {
+            def commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
+            log.info "returned a command object that is a ${commandObject.class.name}"
+            commandResultMap.clear()
+            commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
+            prevCommandSet = commandResultMap.prevCommandSet.clone()
+            bufferMap = commandResultMap.bufferMap.clone() 
+            theResponse = commandResultMap.resultString
+        
+        } else {
+            theResponse = '-ERR Command not implemented'
+        }
+        theResponse + "\r\n"
+    }
+    
+    def returnCurrentCommand( theMessage, isActualMessage ) {
+        log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
+        if ( isActualMessage ) {
+            return mssgCommand
+        } else if ( theMessage.startsWith( 'USER' ) ) {
+            return new USERCommand( sql )
+        } else if ( theMessage.startsWith( 'PASS' ) ) {
+            return new PASSCommand( sql )
+        } else if ( theMessage.startsWith( 'RSET' ) ) {
+            return new RSETCommand( sql )
+        } else if ( theMessage.startsWith( 'STAT' ) ) {
+            return new STATCommand( sql )
+        } else if ( theMessage.startsWith( 'RETR' ) ) {
+            return new RETRCommand( sql )
+        } else if ( theMessage.startsWith( 'LIST' ) ) {
+            return new LISTCommand( sql )
+        } else if ( theMessage.startsWith( 'QUIT' ) ) {
+            return new QUITCommand( sql, serverName )
+        } else if ( theMessage.startsWith( 'DELE' ) ) {
+            return new DELECommand( sql )
+        }
+    }
 } // line 156
 
