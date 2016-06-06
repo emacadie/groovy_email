@@ -12,10 +12,10 @@ class RSETCommand {
         prevCommandSet.clear()
         prevCommandSet << 'RSET'
         resultMap.bufferMap = bufferMap
-		resultMap.prevCommandSet = prevCommandSet
-		resultMap.resultString = "250 OK"
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        resultMap.prevCommandSet = prevCommandSet
+        resultMap.resultString = "250 OK"
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 
