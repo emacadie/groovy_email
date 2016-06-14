@@ -44,7 +44,7 @@ class HiddenTransformation implements ASTTransformation {
 
         // println "\n--------------------------------------\n\n"
 
-        def methodString = new StringBuffer()
+        def methodString = new StringBuilder()
         methodString << """
     public void set${fieldNode.name.capitalize()}( Object arg ) {
         if ( arg.getClass().getName() == "java.lang.String" ) {

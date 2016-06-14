@@ -43,7 +43,7 @@ class RETRCommand {
                 if ( ans.isEmpty() ) {
                     resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
                 } else {
-                    def sBuff = new StringBuffer()
+                    def sBuff = new StringBuilder()
                     sBuff << "+OK ${ans.length} octets\r\n"
                     sBuff << ans.text_body
                     sBuff << "\r\n"

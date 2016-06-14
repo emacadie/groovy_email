@@ -14,7 +14,7 @@ class MetaProgrammer {
         runMapMetaProgramming()
         runSetMetaProgramming()
         MatcherMetaProgrammer.runMatcherMetaProgramming() 
-        runStringBufferMetaProgramming()
+        runStringBuilderMetaProgramming()
         StringMetaProgrammer.runStringMetaProgramming()
         java.sql.Timestamp.metaClass.static.create = {
             return new java.sql.Timestamp( new java.util.Date().getTime() )
@@ -128,8 +128,8 @@ class MetaProgrammer {
         
     }
     
-    static runStringBufferMetaProgramming() {
-        StringBuffer.metaClass.endsWith = { end ->
+    static runStringBuilderMetaProgramming() {
+        StringBuilder.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {
                 return false
             } else if ( delegate.substring( ( delegate.length() - end.length() ), delegate.length() ).equals( end ) ) {
@@ -138,7 +138,7 @@ class MetaProgrammer {
                 return false
             }   
         }
-        StringBuffer.metaClass.startsWith = { start ->
+        StringBuilder.metaClass.startsWith = { start ->
             if ( delegate.length() < start.length() ) {
                 return false
             } else if ( delegate.substring( 0, start.length() ).equals( start ) ) {
@@ -147,7 +147,7 @@ class MetaProgrammer {
                 return false
             }   
         }
-        StringBuffer.metaClass.clear = { ->
+        StringBuilder.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
         }
     }

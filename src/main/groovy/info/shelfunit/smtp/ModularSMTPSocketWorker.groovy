@@ -73,7 +73,7 @@ class ModularSMTPSocketWorker {
                 log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
             
             } else if ( prevCommandSet?.lastItem() == 'DATA' ) {
-                def sBuffer = new StringBuffer()
+                def sBuffer = new StringBuilder()
                 while ( doesNot( newString.equals( "." ) ) ) {
                     sBuffer << newString 
                     sBuffer << "\r\n"
@@ -148,7 +148,7 @@ class ModularSMTPSocketWorker {
         } else if ( theMessage.startsWith( 'QUIT' ) ) {
             return new QUITCommand( domainList )
         } else if ( theMessage.startsWith( 'AUTH' ) ) {
-        r   eturn new AUTHCommand( sql, domainList )
+            return new AUTHCommand( sql, domainList )
         }
     }
 
