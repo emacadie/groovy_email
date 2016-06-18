@@ -22,17 +22,17 @@ class DATACommand {
         } else if ( !prevCommandSet.lastSMTPCommandPrecedesDATA() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
-		    prevCommandSet << "DATA"
-		    if ( bufferMap.handles8bit == "true" ) {
-		        resultMap.resultString = "354 Send 8BITMIME message, ending in <CRLF>.<CRLF>"
-		    } else {
-		        resultMap.resultString = "354 Start mail input; end with <CRLF>.<CRLF>"
-		    }
-		}
-		resultMap.prevCommandSet = prevCommandSet
-		resultMap.bufferMap = bufferMap
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+            prevCommandSet << "DATA"
+            if ( bufferMap.handles8bit == "true" ) {
+                resultMap.resultString = "354 Send 8BITMIME message, ending in <CRLF>.<CRLF>"
+            } else {
+                resultMap.resultString = "354 Start mail input; end with <CRLF>.<CRLF>"
+            }
+        }
+        resultMap.prevCommandSet = prevCommandSet
+        resultMap.bufferMap = bufferMap
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 

@@ -24,7 +24,7 @@ class AUTHCommand {
     static firstPart = '''^(AUTH PLAIN) '''
     static encryptedPart = '''(.*)'''
     static regex = firstPart + encryptedPart
-
+    
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -44,8 +44,8 @@ class AUTHCommand {
             def q = theMessage =~ pattern
             def base64Part = q.getBase64InAuth()
             def userInfoFrombase64 = sql.firstRow( 'select * from email_user where base_64_hash=?', base64Part )
+            
             if ( userInfoFrombase64 ) {
-                
                 bufferMap.userInfo = userInfoFrombase64
                 resultMap.resultString = "235 2.7.0 Authentication successful"
                 log.info "Here is bufferMap in AUTHCommand: ${bufferMap}"
@@ -53,15 +53,14 @@ class AUTHCommand {
             } else {
                 resultMap.resultString = "535 5.7.8  Authentication credentials invalid"
             }
-            
             log.info "here is q: ${q}"
-            
+        
         }
         resultMap.prevCommandSet = prevCommandSet
         resultMap.bufferMap = bufferMap
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 

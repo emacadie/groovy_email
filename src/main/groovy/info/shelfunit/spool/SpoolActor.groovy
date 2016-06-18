@@ -31,14 +31,14 @@ class SpoolActor extends DynamicDispatchActor {
                 isw.deleteTransferredMessages( sql )
                 log.info "About to construct OutboundSpoolWorker"
                 try {
-                def osw = new OutboundSpoolWorker()
-                log.info "about to call osw.runClam( sql, clamAV )"
-                osw.runClam( sql, clamAV )
-                log.info "About to call osw.deliverMessages( sql, ${message.serverList}, ${message.port} )"
-                osw.deliverMessages( sql, message.serverList, message.port )
-                log.info "About to call osw.deleteTransferredMessages( sql )"
-                osw.deleteTransferredMessages( sql )
-                log.info "osw.deleteTransferredMessages( sql )"
+                    def osw = new OutboundSpoolWorker()
+                    log.info "about to call osw.runClam( sql, clamAV )"
+                    osw.runClam( sql, clamAV )
+                    log.info "About to call osw.deliverMessages( sql, ${message.serverList}, ${message.port} )"
+                    osw.deliverMessages( sql, message.serverList, message.port )
+                    log.info "About to call osw.deleteTransferredMessages( sql )"
+                    osw.deleteTransferredMessages( sql )
+                    log.info "osw.deleteTransferredMessages( sql )"
                 } catch ( Exception e ) {
                     log.error "Exception: ", e
                 }
