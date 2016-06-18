@@ -5,7 +5,7 @@ import groovy.util.logging.Slf4j
 
 @Slf4j
 class RSETCommand {
-    
+
     final Sql sql
     
     RSETCommand( def argSql ) {
@@ -15,7 +15,7 @@ class RSETCommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "Starting RSETCommand.process"
-   
+        
         def resultString
         def resultMap = [:]
         resultMap.clear()
@@ -39,12 +39,12 @@ class RSETCommand {
             bufferMap.remove( deleteMap )
             resultMap.resultString = "+OK maildrop has ${bufferMap.uuidList.size()} messages (${bufferMap.totalMessageSize} octets)"
         }
-
+        
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 

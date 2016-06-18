@@ -19,10 +19,10 @@ class MSSGCommand {
     final Sql sql
     final List domainList
     MSSGCommand( def argSql, def argDomainList ) {
-    log.info "Starting new MSSGCommand"
-    log.info "Here is argDomainList: ${argDomainList}"
-    this.sql = argSql
-    this.domainList = argDomainList
+        log.info "Starting new MSSGCommand"
+        log.info "Here is argDomainList: ${argDomainList}"
+        this.sql = argSql
+        this.domainList = argDomainList
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {

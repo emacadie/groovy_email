@@ -5,16 +5,16 @@ import groovy.util.logging.Slf4j
 
 @Slf4j
 class USERCommand {
-    
+
     final Sql sql
     USERCommand( def argSql ) {
         log.info "Starting new USERCommand"
         this.sql = argSql
     }
-
+    
     static regex = '''^(USER )([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*)$(?x)'''
-
+    *+/=?`{|}~^-]+)*)$(?x)'''
+    
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -34,7 +34,7 @@ class USERCommand {
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else {
-            
+        
             def userName = theMessage.substring( 5 ) // convert to regex?
             def rows = sql.rows( 'select * from email_user where lower( username )=?', userName.toLowerCase() )
             log.info "Here is rows, it's a : ${rows.class.name}"
@@ -47,9 +47,9 @@ class USERCommand {
         }
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 

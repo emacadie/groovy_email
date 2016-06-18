@@ -5,7 +5,7 @@ import groovy.util.logging.Slf4j
 
 @Slf4j
 class RETRCommand {
-    
+
     final def regex = "RETR\\s\\d+"
     final Sql sql
     
@@ -16,7 +16,7 @@ class RETRCommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "Starting RETRCommand.process"
-   
+        
         def resultString
         def resultMap = [:]
         resultMap.clear()
@@ -55,9 +55,9 @@ class RETRCommand {
         }
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 

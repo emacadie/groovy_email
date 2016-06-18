@@ -16,7 +16,7 @@ class DELECommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "Starting DELECommand.process"
-   
+        
         def resultString
         def resultMap = [:]
         resultMap.clear()
@@ -51,9 +51,9 @@ class DELECommand {
         bufferMap.deleteMap = deleteMap
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 

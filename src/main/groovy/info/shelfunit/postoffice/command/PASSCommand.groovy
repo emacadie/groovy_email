@@ -16,9 +16,9 @@ class PASSCommand {
         log.info "Starting new PASSCommand"
         this.sql = argSql
     }
-
+    
     static regex = '''^(PASS )(.*)$(?x)'''
-
+    
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -56,13 +56,13 @@ class PASSCommand {
             } else {
                 resultMap.resultString = "-ERR ${userInfo.username} not authenticated"
             }
-            
+        
         }
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
     
     private changeLoggedInFlag( def argUserid ) {

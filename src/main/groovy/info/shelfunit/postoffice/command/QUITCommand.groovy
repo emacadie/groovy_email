@@ -6,7 +6,7 @@ import java.sql.SQLException
 
 @Slf4j
 class QUITCommand {
-    
+
     final def regex = "RETR\\s\\d+"
     
     final Sql sql
@@ -20,7 +20,7 @@ class QUITCommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "Starting QUITCommand.process"
-   
+        
         def resultString
         def resultMap = [:]
         resultMap.clear()
@@ -53,9 +53,9 @@ class QUITCommand {
         }
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
     
     private changeLoggedInFlag( def argUserid ) {

@@ -14,7 +14,7 @@ class LISTCommand {
     
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "Starting LISTCommand.process"
-   
+        
         def resultString
         def resultMap = [:]
         resultMap.clear()
@@ -33,8 +33,8 @@ class LISTCommand {
             def sBuff = new StringBuilder()
             sBuff << "+OK ${bufferMap.totalMessageSize}\r\n"
             rows.eachWithIndex { r, i ->
-                sBuff << "${i + 1} ${r.length}"
-                sBuff << "\r\n" 
+            sBuff << "${i + 1} ${r.length}"
+            sBuff << "\r\n" 
             } 
             sBuff << "."
             resultMap.resultString = sBuff.toString()
@@ -57,9 +57,9 @@ class LISTCommand {
         }
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     } // line 65
 }
 
