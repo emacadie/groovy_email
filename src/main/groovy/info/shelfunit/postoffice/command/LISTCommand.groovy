@@ -33,8 +33,8 @@ class LISTCommand {
             def sBuff = new StringBuilder()
             sBuff << "+OK ${bufferMap.totalMessageSize}\r\n"
             rows.eachWithIndex { r, i ->
-            sBuff << "${i + 1} ${r.length}"
-            sBuff << "\r\n" 
+                sBuff << "${i + 1} ${r.length}"
+                sBuff << "\r\n" 
             } 
             sBuff << "."
             resultMap.resultString = sBuff.toString()
