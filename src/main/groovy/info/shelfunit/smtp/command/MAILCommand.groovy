@@ -13,6 +13,7 @@ class MAILCommand {
     
     final List domainList
     final sql
+    
     MAILCommand( argSql, argDomainList ) {
         log.info "Starting new MAILCommand"
         log.info "Here is argDomainList: ${argDomainList}"
@@ -26,7 +27,7 @@ class MAILCommand {
     static domain    = '''((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>'''
     static eightBitRuntime = '''(\\s{0,}BODY=8BITMIME)?$(?x)'''
     static regex = mailFrom + localPart + domain + eightBitRuntime
-
+    
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -44,7 +45,6 @@ class MAILCommand {
             prevCommandSet << 'MAIL'
             
             def q = theMessage =~ pattern
-            
             q.each { match ->
                 match.eachWithIndex { group, n ->
                     log.info "${n}, <$group>"
@@ -58,7 +58,7 @@ class MAILCommand {
                 // get user info here
                 if ( !prevCommandSet.contains( 'AUTH' ) ) {
                     bufferMap.userInfo = 
-                        sql.firstRow( 'select * from email_user where base_64_hash=?', q.getUsernameInMAIL() )
+                    sql.firstRow( 'select * from email_user where base_64_hash=?', q.getUsernameInMAIL() )
                 }
                 bufferMap.messageDirection = "outbound"
             } else {
@@ -75,9 +75,9 @@ class MAILCommand {
             resultMap.bufferMap = bufferMap
         }
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 

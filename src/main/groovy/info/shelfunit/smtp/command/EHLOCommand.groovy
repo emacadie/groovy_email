@@ -7,7 +7,6 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class EHLOCommand {
     
-    
     // RFC 5321 Sec.4.1.4: If the EHLO command is not acceptable to the SMTP server, 501, 500,
     //    502, or 550 failure replies MUST be returned as appropriate. 
     // https://tools.ietf.org/html/rfc3696#section-3  Domain cannot be more than 255 chars
@@ -30,14 +29,14 @@ class EHLOCommand {
             resultMap.resultString = "250-Hello ${domain}\r\n250-8BITMIME\r\n" +
             "250-AUTH PLAIN\r\n" +
             "250 HELP"
-		} else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithHELO() ) ) {
-		    prevCommandSet.clear()
-		    prevCommandSet << "HELO"
-		    resultMap.resultString = "250 Hello ${domain}"
-		}
-		resultMap.prevCommandSet = prevCommandSet
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        } else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithHELO() ) ) {
+            prevCommandSet.clear()
+            prevCommandSet << "HELO"
+            resultMap.resultString = "250 Hello ${domain}"
+        }
+        resultMap.prevCommandSet = prevCommandSet
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
     
     // RFC 5321, Section 4.1.4.: Order of Commands and Section 7.9.: Scope of Operation of SMTP Servers: 

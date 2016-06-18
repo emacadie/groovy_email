@@ -14,15 +14,15 @@ There is no MSSG command in RFC 5321. But I needed something to handle the actua
 class MSSGCommand {
     
     static regex = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
-*+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)'''    
-
+    *+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)'''    
+    
     final Sql sql
     final List domainList
     MSSGCommand( def argSql, def argDomainList ) {
-        log.info "Starting new MSSGCommand"
-        log.info "Here is argDomainList: ${argDomainList}"
-        this.sql = argSql
-        this.domainList = argDomainList
+    log.info "Starting new MSSGCommand"
+    log.info "Here is argDomainList: ${argDomainList}"
+    this.sql = argSql
+    this.domainList = argDomainList
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -30,7 +30,7 @@ class MSSGCommand {
         def resultString
         def resultMap = [:]
         resultMap.clear()
-
+        
         if ( !prevCommandSet.lastSMTPCommandPrecedesMSSG() ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
@@ -40,9 +40,9 @@ class MSSGCommand {
             resultMap.bufferMap = [:]
         }
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     } // process
     
     def addMessageToDatabase( theMessage, bufferMap ) {

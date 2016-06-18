@@ -21,15 +21,13 @@ class HELOCommand {
         } else {
             prevCommandSet.clear()
             resultString = "250 Hello ${domain}"
-            
-		}
-		resultMap.resultString = resultString
-		resultMap.prevCommandSet = prevCommandSet
+        }
+        resultMap.resultString = resultString
+        resultMap.prevCommandSet = prevCommandSet
     }
     
     // RFC 5321, Section 4.1.4.: Order of Commands and Section 7.9.: Scope of Operation of SMTP Servers: 
     // Do not reject a message due to a bad address. The internet might stop working.
-    
     
     def processDomain( domain ) {
         def addressGood = true

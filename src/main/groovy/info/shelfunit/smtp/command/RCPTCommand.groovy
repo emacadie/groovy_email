@@ -10,12 +10,12 @@ class RCPTCommand {
         log.info "Starting new RCPTCommand, here is argDomainList: ${argDomainList}"
         this.domainList = argDomainList
     }
-
+    
     static rcptTo     = '''^(RCPT TO):<'''
     static localPart  = '''([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*@'''
     static domainName = '''((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>$(?x)'''
     static regex = rcptTo + localPart + domainName 
-
+    
     def process( theMessage, prevCommandSet, bufferMap ) {
         log.info "In RCPTCommand"
         def resultMap = [:]
@@ -40,9 +40,9 @@ class RCPTCommand {
         }
         resultMap.bufferMap = bufferMap
         resultMap.prevCommandSet = prevCommandSet
-
-		log.info "here is resultMap: ${resultMap.toString()}"
-		resultMap
+        
+        log.info "here is resultMap: ${resultMap.toString()}"
+        resultMap
     }
 }
 /* def userName = q.extractUserNameInRCPT() 
