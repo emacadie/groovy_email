@@ -41,6 +41,8 @@ class SpoolActor extends DynamicDispatchActor {
                     log.info "osw.deleteTransferredMessages( sql )"
                 } catch ( Exception e ) {
                     log.error "Exception: ", e
+                } finally {
+                    sql.close()
                 }
             }
         }

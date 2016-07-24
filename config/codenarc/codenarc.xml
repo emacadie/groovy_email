@@ -22,6 +22,7 @@
         <!--<exclude name='ExplicitCallToOrMethod'/>-->
     <!--</ruleset-ref>-->
     <ruleset-ref path='rulesets/braces.xml'/>
+    <ruleset-ref path='rulesets/groovyism.xml'/>
     <ruleset-ref path='rulesets/imports.xml'>
         <exclude name="UnnecessaryGroovyImport" />
         <exclude name="ImportFromSunPackages"/>
@@ -43,7 +44,7 @@
         <rule-config name='VariableName'>
             <property name='finalRegex' value='^[a-z][a-zA-Z0-9]*$'/>
         </rule-config>
-        <exclude name="ConfusingMethodName"/>
-        <exclude name="FactoryMethodName"/>
+        <exclude name="ConfusingMethodName" />
+        <exclude name="FactoryMethodName" />
     </ruleset-ref>
 </ruleset>
