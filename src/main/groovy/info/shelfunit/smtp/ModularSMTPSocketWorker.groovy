@@ -74,7 +74,7 @@ class ModularSMTPSocketWorker {
             
             } else if ( prevCommandSet?.lastItem() == 'DATA' ) {
                 def sBuffer = new StringBuilder()
-                while ( doesNot( newString.equals( "." ) ) ) {
+                while ( doesNot( newString == "."  ) ) {
                     sBuffer << newString 
                     sBuffer << "\r\n"
                     try {

@@ -15,9 +15,9 @@ class InboundSpoolWorker{
     final config
     final sql
     ClamAVClient clamavj
-    static QUERY_STATUS_STRING = 'select * from mail_spool_in where status_string = ?'
-    static INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
-    static SELECT_USER_STRING = 'select username from email_user where lower( username )=?'
+    static final QUERY_STATUS_STRING = 'select * from mail_spool_in where status_string = ?'
+    static final INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
+    static final SELECT_USER_STRING = 'select username from email_user where lower( username ) = ?'
     
     InboundSpoolWorker( ) {
     }
@@ -42,18 +42,18 @@ class InboundSpoolWorker{
        }
     } // runClam
     
-    def updateMessageStatus( sql, UUIDs, status ) {
+    def updateMessageStatus( sql, uuidList, status ) {
         try {
-            log.info "here is idsToDelete: ${UUIDs} and it is a ${UUIDs.getClass().name}"
+            log.info "here is idsToDelete: ${uuidList} and it is a ${uuidList.getClass().name}"
             def insertCounts 
             def params = []
-            def newObject = UUIDs.plus( 0, status )
+            def newObject = uuidList.plus( 0, status )
             log.info "newObject is a ${newObject.getClass().name}, here it is: ${newObject}"
-            if ( isNot( UUIDs.isEmpty() ) ) { 
+            if ( isNot( uuidList.isEmpty() ) ) { 
                 sql.withTransaction {
                     params << status
-                    params += UUIDs // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
-                    sql.execute( "UPDATE mail_spool_in set status_string = ? where id in (${UUIDs.getQMarkString()}) ", UUIDs.plus( 0, status ) )
+                    params += uuidList // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
+                    sql.execute( "UPDATE mail_spool_in set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
                 }
             }
             

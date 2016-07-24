@@ -132,7 +132,7 @@ class MetaProgrammer {
         StringBuilder.metaClass.endsWith = { end ->
             if ( delegate.length() < end.length() ) {
                 return false
-            } else if ( delegate.substring( ( delegate.length() - end.length() ), delegate.length() ).equals( end ) ) {
+            } else if ( delegate.substring( ( delegate.length() - end.length() ), delegate.length() ) == end  ) {
                 return true
             } else {
                 return false
@@ -141,7 +141,7 @@ class MetaProgrammer {
         StringBuilder.metaClass.startsWith = { start ->
             if ( delegate.length() < start.length() ) {
                 return false
-            } else if ( delegate.substring( 0, start.length() ).equals( start ) ) {
+            } else if ( delegate.substring( 0, start.length() ) == start  ) {
                 return true
             } else {
                 return false

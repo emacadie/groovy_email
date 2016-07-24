@@ -1,9 +1,5 @@
 package info.shelfunit.mail.meta
 
-import groovy.sql.Sql
-
-import groovy.util.logging.Slf4j 
-
 class StringMetaProgrammer {
     
     static runStringMetaProgramming() {
