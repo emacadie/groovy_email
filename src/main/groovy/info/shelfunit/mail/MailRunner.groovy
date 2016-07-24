@@ -50,6 +50,7 @@ class MailRunner {
         while ( keepGoing ) {
             sleep( 60.seconds() )
             log.info "still going in runWithActors"
+            /*
             def db = ConfigHolder.instance.returnDbMap()         
             def sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
             log.info "Starting clamAV"
@@ -62,6 +63,7 @@ class MailRunner {
             isw.moveCleanMessages( sql )
             log.info "about to call deleteTransferredMessages"
             isw.deleteTransferredMessages( sql )
+            */
         }
     }
     
