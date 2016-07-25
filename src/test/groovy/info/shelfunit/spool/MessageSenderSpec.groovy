@@ -1,12 +1,12 @@
 package info.shelfunit.spool
 
 import spock.lang.Ignore
-import spock.lang.Requires
+// import spock.lang.Requires
 import spock.lang.Specification
 import spock.lang.Stepwise
 
 import java.io.InputStream
-import java.io.OutputStream
+// import java.io.OutputStream
 
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -15,10 +15,10 @@ import info.shelfunit.mail.ConfigHolder
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
-import static info.shelfunit.mail.GETestUtils.getTableCount
+// import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import info.shelfunit.mail.meta.MetaProgrammer
-import info.shelfunit.smtp.command.EHLOCommand
+// import info.shelfunit.smtp.command.EHLOCommand
 
 @Stepwise
 class MessageSenderSpec extends Specification {

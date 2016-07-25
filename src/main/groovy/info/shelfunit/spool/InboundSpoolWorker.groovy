@@ -1,8 +1,8 @@
 package info.shelfunit.spool
 
 import groovy.util.logging.Slf4j 
-import info.shelfunit.mail.ConfigHolder
-import java.io.IOException
+// import info.shelfunit.mail.ConfigHolder
+// import java.io.IOException
 import java.sql.SQLException
 import fi.solita.clamav.ClamAVClient
 
@@ -12,7 +12,7 @@ class InboundSpoolWorker{
     // states of message: ENTERED, CLEAN (clean CalmAV scan) or UNCLEAN (unclean ClamAV scan)
     // TRANSFERRED: a clean message has been copied to mail_store for each user listed in the message
     
-    final config
+    // final config
     final sql
     ClamAVClient clamavj
     static final QUERY_STATUS_STRING = 'select * from mail_spool_in where status_string = ?'

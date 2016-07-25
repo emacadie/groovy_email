@@ -175,6 +175,13 @@ class MetaProgrammer {
                 return true 
             }
         }
+        java.lang.Object.metaClass.static.haveNot = { boolean arg ->
+            if ( arg == true ) { 
+                return false 
+            } else { 
+                return true 
+            }
+        }
         
     }
 } // line 231

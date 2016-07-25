@@ -7,7 +7,7 @@ import info.shelfunit.mail.ConfigHolder
 class SpoolRunner {
     
     private config
-    final sql
+    final Sql sql
     def iSW
     def clamavj
     

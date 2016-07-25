@@ -2,7 +2,7 @@ package info.shelfunit.spool
 
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.MXRecord
-import org.xbill.DNS.Record
+// import org.xbill.DNS.Record
 import org.xbill.DNS.Type
 
 import groovy.util.logging.Slf4j 

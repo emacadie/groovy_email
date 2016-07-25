@@ -6,7 +6,7 @@ import spock.lang.Specification
 import spock.lang.Stepwise
 
 import java.io.InputStream
-import java.io.OutputStream
+// import java.io.OutputStream
 
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -18,7 +18,7 @@ import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import info.shelfunit.mail.meta.MetaProgrammer
-import info.shelfunit.smtp.command.EHLOCommand
+// import info.shelfunit.smtp.command.EHLOCommand
 
 import fi.solita.clamav.ClamAVClient
 

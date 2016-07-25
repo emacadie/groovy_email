@@ -1,8 +1,8 @@
 package info.shelfunit.spool
 
 import groovy.util.logging.Slf4j 
-import info.shelfunit.mail.ConfigHolder
-import java.io.IOException
+// import info.shelfunit.mail.ConfigHolder
+// import java.io.IOException
 import java.sql.SQLException
 // import java.util.concurrent.ConcurrentHashMap
 import fi.solita.clamav.ClamAVClient

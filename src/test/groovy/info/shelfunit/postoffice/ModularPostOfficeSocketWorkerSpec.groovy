@@ -13,7 +13,7 @@ import info.shelfunit.mail.meta.MetaProgrammer
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
-import info.shelfunit.smtp.command.EHLOCommand
+// import info.shelfunit.smtp.command.EHLOCommand
 
 class ModularPostOfficeSocketWorkerSpec extends Specification {
     @Rule 
