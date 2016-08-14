@@ -25,6 +25,7 @@ class OutboundSpoolWorker {
     static final INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
     static final SELECT_USER_STRING = 'select username from email_user where lower( username ) = ?'
     static final SELECT_INVALID_USER_STRING = 'select id, from_username from mail_spool_out  where from_username not in (select username from email_user)'
+    static final SELECT_INVALID_DOMAIN_STRING = 'select id, from_domain from mail_spool_out  where from_domain not in '
     
     OutboundSpoolWorker( ) {
     }
@@ -184,6 +185,10 @@ class OutboundSpoolWorker {
             idsToDelete << row[ 'id' ]
             log.info "invalid user ${row[ 'from_username' ]} with id ${row[ 'id' ]}"
         } // sql.eachRow
+        sql.eachRow( "SELECT id, from_domain from mail_spool_out where from_domain not in (${domainList.getQMarkString() })", domainList ) { row ->
+            idsToDelete << row[ 'id' ]
+            log.info "invalid domain ${row[ 'from_domain' ]} with id ${row[ 'id' ]}"
+        }
         this.updateMessageStatus( sql, idsToDelete, 'INVALID_USER' )
     }
     

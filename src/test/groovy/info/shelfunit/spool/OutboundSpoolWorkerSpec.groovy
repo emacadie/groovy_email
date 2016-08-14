@@ -86,15 +86,15 @@ class OutboundSpoolWorkerSpec extends Specification {
         return new ClamAVClient( host, port.toInt() )
     }
     
-    def insertIntoMailSpoolOut( status, toAddress, userName = gwString, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
+    def insertIntoMailSpoolOut( status, toAddress, userName = gwString, message = getRandomString( 500 ), uuid = UUID.randomUUID(), userDomain = domainList[ 0 ] ) {
         params.clear() 
         params << uuid // id,
         params << userName + '@' + domainList[ 0 ] // from_address
         params << userName // from_username, 
-        params << domainList[ 0 ] // from_domain
-        params << toAddress // to_address_list
-        params << message   // text_body
-        params << status    // status_string
+        params << userDomain // from_domain
+        params << toAddress  // to_address_list
+        params << message    // text_body
+        params << status     // status_string
         params << gwBase64Hash // base_64_hash
         sql.execute 'insert into mail_spool_out( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
     }
@@ -215,8 +215,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        
 	}
 	
-	def "test if outgoing messages are from valid users"() {
-	    def cleanCountStart = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	def "test if outgoing messages from invalid users are deleted"() {
+	    def cleanCountStart = getTableCount( sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
 	    println "cleanCountStart: ${cleanCountStart}"
 	    sql.eachRow( 'select from_address from mail_spool_out where status_string = ?', [ 'CLEAN' ] ) { row ->
             println "here is user name of clean message: ${row[ 'from_address' ]}"
@@ -257,10 +257,67 @@ class OutboundSpoolWorkerSpec extends Specification {
             )
         then:
             invalidCount == 0
-            
-        // deleteInvalidUserMessages( sql )
-	}
+        when:
+            def cleanCountEnd = getTableCount( sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
+        then:
+            cleanCountStart == cleanCountEnd
+	} // "test if outgoing messages from invalid users are deleted" 
+	
+	def "test if outgoing messages with invalid domains are deleted"() {
+	    def cleanCountStart = getTableCount( sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
+	    println "cleanCountStart: ${cleanCountStart}"
+	    sql.eachRow( 'select from_address from mail_spool_out where status_string = ?', [ 'CLEAN' ] ) { row ->
+            println "here is user name of clean message: ${row[ 'from_address' ]}"
+        } // sql.eachRow
+        when:
+            def f = 0
+        then:
+            1 == 1
+        def badDomainCount = 5
+        def badDomainName
+        badDomainCount.times {
+            badDomainName = getRandomString( 10 ) + ".com"
+            insertIntoMailSpoolOut( 
+                'CLEAN',     // status, 
+                'rr@rr.com', // toAddress, 
+                gwString,    // userName = gwString, 
+                getRandomString( 500 ), // message = getRandomString( 500 ), 
+                UUID.randomUUID(), // uuid = UUID.randomUUID(), 
+                badDomainName      // userDomain = domainList[ 0 ] 
+            )
+            println "Inserted outward spool with domain name ${badDomainName}"
+        }
+        when:
+            def newCleanCount = getTableCount( 
+                sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] 
+            )
+            println "newCleanCount: ${newCleanCount}"
+        then:
+            newCleanCount == badDomainCount + cleanCountStart
+        when:
+            osw.findInvalidUsers( sql, domainList ) 
+            def invalidCount = getTableCount( 
+                sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_USER' ] 
+            )
+        then:
+            invalidCount == badDomainCount
+        when:
+            osw.deleteInvalidUserMessages( sql )
+            invalidCount = getTableCount( 
+                sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_USER' ] 
+            )
+        then:
+            invalidCount == 0
+        when:
+            def cleanCountEnd = getTableCount( sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
+        then:
+            cleanCountStart == cleanCountEnd
+  
+	} // "test if outgoing messages with invalid domains are deleted"
 
+
+	
+	
 	@Ignore
 	def "always ignore"() {
 	    expect:
