@@ -69,7 +69,7 @@ class OutboundSpoolWorkerSpec extends Specification {
     
     def cleanupSpec() {
         // sql.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
-        // sql.execute "DELETE FROM mail_spool_out where from_address = ?", [ gwString + '@' + domainList[ 0 ] ]
+        // sql.execute "DELETE FROM mail_spool_out where from_username = ?", [ gwString ]
         sql.close()
     }   // run after the last feature method
     
@@ -226,12 +226,15 @@ class OutboundSpoolWorkerSpec extends Specification {
         then:
             1 == 1
         def badUserCount = 5
+        def badUserName
         badUserCount.times {
+            badUserName = getRandomString( 10 ) 
             insertIntoMailSpoolOut( 
                 'CLEAN', // "${getRandomString( 10 )}@${getRandomString( 10 )}.com".toString(), 
                 'rrrr@rrrr.com',
-                getRandomString( 10 ) 
+                badUserName
             ) 
+            println "Inserted outward spool with user name ${badUserName}"
         }
         when:
             def newCleanCount = getTableCount( 
@@ -240,6 +243,22 @@ class OutboundSpoolWorkerSpec extends Specification {
             println "newCleanCount: ${newCleanCount}"
         then:
             newCleanCount == badUserCount + cleanCountStart
+        when:
+            osw.findInvalidUsers( sql, domainList ) 
+            def invalidCount = getTableCount( 
+                sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_USER' ] 
+            )
+        then:
+            invalidCount == badUserCount
+        when:
+            osw.deleteInvalidUserMessages( sql )
+            invalidCount = getTableCount( 
+                sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_USER' ] 
+            )
+        then:
+            invalidCount == 0
+            
+        // deleteInvalidUserMessages( sql )
 	}
 
 	@Ignore

@@ -24,6 +24,7 @@ class OutboundSpoolWorker {
     static final QUERY_STATUS_STRING = 'select * from mail_spool_out where status_string = ?'
     static final INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
     static final SELECT_USER_STRING = 'select username from email_user where lower( username ) = ?'
+    static final SELECT_INVALID_USER_STRING = 'select id, from_username from mail_spool_out  where from_username not in (select username from email_user)'
     
     OutboundSpoolWorker( ) {
     }
@@ -177,12 +178,25 @@ class OutboundSpoolWorker {
         }
     }
     
+    def findInvalidUsers( sql, domainList ) {
+        def idsToDelete = []
+        sql.eachRow( SELECT_INVALID_USER_STRING ) { row ->
+            idsToDelete << row[ 'id' ]
+            log.info "invalid user ${row[ 'from_username' ]} with id ${row[ 'id' ]}"
+        } // sql.eachRow
+        this.updateMessageStatus( sql, idsToDelete, 'INVALID_USER' )
+    }
+    
     def deleteTransferredMessages( sql ) {
         this.deleteOutboundMessages( sql, 'TRANSFERRED' ) 
     }
     
     def deleteUncleanMessages( sql ) {
         this.deleteOutboundMessages( sql, 'UNCLEAN' ) 
+    }
+    
+    def deleteInvalidUserMessages( sql ) {
+        this.deleteOutboundMessages( sql, 'INVALID_USER' )
     }
     
     private deleteOutboundMessages( sql, status ) {
