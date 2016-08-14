@@ -68,8 +68,8 @@ class OutboundSpoolWorkerSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
-        sql.execute "DELETE FROM mail_spool_out where from_address = ?", [ gwString + '@' + domainList[ 0 ] ]
+        // sql.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
+        // sql.execute "DELETE FROM mail_spool_out where from_address = ?", [ gwString + '@' + domainList[ 0 ] ]
         sql.close()
     }   // run after the last feature method
     
@@ -86,15 +86,17 @@ class OutboundSpoolWorkerSpec extends Specification {
         return new ClamAVClient( host, port.toInt() )
     }
     
-    def insertIntoMailSpoolOut( status, toAddress, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
-        params.clear()
-        params << uuid
-        params << gwString + '@' + domainList[ 0 ]
-        params << toAddress
-        params << message
-        params << 'ENTERED'
-        params << gwBase64Hash
-        sql.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+    def insertIntoMailSpoolOut( status, toAddress, userName = gwString, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
+        params.clear() 
+        params << uuid // id,
+        params << userName + '@' + domainList[ 0 ] // from_address
+        params << userName // from_username, 
+        params << domainList[ 0 ] // from_domain
+        params << toAddress // to_address_list
+        params << message   // text_body
+        params << status    // status_string
+        params << gwBase64Hash // base_64_hash
+        sql.execute 'insert into mail_spool_out( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
     }
     
     def enterOutgoingMessages() {
@@ -115,7 +117,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    when:
 	        
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        def cleanCount   = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
 	        enteredCount == 7
 	        cleanCount == 0
@@ -140,15 +142,17 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    when:
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        println "enteredCount: ${enteredCount}, cleanCount: ${cleanCount}"
 	    then:
 	        enteredCount == numTimes
-	        cleanCount == 0
+	        cleanCount   == 0
 	    when:
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
 	        osw.runClam( sql, clamavMock )
 	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        cleanCount   = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        println "enteredCount: ${enteredCount}, cleanCount: ${cleanCount}"
 	    then:
 	        _ * ClamAVClient.isCleanReply( outputMock ) // subscriber.receive("hello")
 	        1 == 1
@@ -173,6 +177,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' ) }
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        def uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	        println "enteredCount: ${enteredCount}, uncleanCount: ${uncleanCount}"
 	    then:
 	        enteredCount == numTimes
 	        uncleanCount == 0
@@ -182,6 +187,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        osw.runClam( sql, clamavMock )
 	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
 	        uncleanCount = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	        println "enteredCount: ${enteredCount}, uncleanCount: ${uncleanCount}"
 	    then:
 	        _ * ClamAVClient.isCleanReply( outputMock ) 
 	        1 == 1
@@ -203,9 +209,37 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    when:
 	        osw.deleteUncleanMessages( sql )
 	        uncleanMessages = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	        println "numUnclean == ${numUnclean} and uncleanMessages == ${uncleanMessages}"
 	    then:
 	        uncleanMessages == 0
 	        
+	}
+	
+	def "test if outgoing messages are from valid users"() {
+	    def cleanCountStart = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	    println "cleanCountStart: ${cleanCountStart}"
+	    sql.eachRow( 'select from_address from mail_spool_out where status_string = ?', [ 'CLEAN' ] ) { row ->
+            println "here is user name of clean message: ${row[ 'from_address' ]}"
+        } // sql.eachRow
+        when:
+            def f = 0
+        then:
+            1 == 1
+        def badUserCount = 5
+        badUserCount.times {
+            insertIntoMailSpoolOut( 
+                'CLEAN', // "${getRandomString( 10 )}@${getRandomString( 10 )}.com".toString(), 
+                'rrrr@rrrr.com',
+                getRandomString( 10 ) 
+            ) 
+        }
+        when:
+            def newCleanCount = getTableCount( 
+                sql, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] 
+            )
+            println "newCleanCount: ${newCleanCount}"
+        then:
+            newCleanCount == badUserCount + cleanCountStart
 	}
 
 	@Ignore

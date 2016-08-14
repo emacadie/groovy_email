@@ -16,6 +16,7 @@ class OutboundSpoolWorker {
     
     // states of message: ENTERED, CLEAN (clean CalmAV scan) or UNCLEAN (unclean ClamAV scan)
     // TRANSFERRED: a clean message has been copied to mail_store for each user listed in the message
+    // INVALID_USER: An outgoing user with proper domain name, but not in the user table
     
     final config
     final sql

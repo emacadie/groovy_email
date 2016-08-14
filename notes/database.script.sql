@@ -34,6 +34,8 @@ create table mail_store (
 create table mail_spool_in (
     id UUID PRIMARY KEY  NOT NULL unique,
     from_address character varying( 255 ) not null,
+    from_username character varying( 255 ) not null,
+    from_domain character varying( 255 ) not null,
     to_address_list text not null,
     message bytea,
     text_body text not null,
@@ -46,6 +48,8 @@ create table mail_spool_in (
 create table mail_spool_out (
     id UUID PRIMARY KEY  NOT NULL unique,
     from_address character varying( 255 ) not null,
+    from_username character varying( 255 ) not null,
+    from_domain character varying( 255 ) not null,
     to_address_list text not null,
     message bytea,
     text_body text not null,

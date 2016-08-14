@@ -56,9 +56,9 @@ class MSSGCommand {
         def sqlString
         if ( bufferMap.messageDirection == 'outbound' ) {
             log.info "It is an outbound message"
-            sqlString = 'insert into mail_spool_out( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)'
+            sqlString = 'insert into mail_spool_out( id, from_address, from_username, from_domain, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)'
         } else {
-            sqlString = 'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)'
+            sqlString = 'insert into mail_spool_in( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)'
         }
         try {
             sql.withTransaction {
@@ -70,9 +70,11 @@ class MSSGCommand {
                     stmt.addBatch( [ 
                         UUID.randomUUID(), // id, 
                         wholeFromAddress,  // from_address, 
+                        q.getUserNameInMSSG(),   // from_username, 
+                        q.getFromDomainInMSSG(), // from_domain, 
                         toAddresses.join( ',' ), // to_address_list, 
-                        theMessage,  // text_body, 
-                        "ENTERED",    // status_string
+                        theMessage, // text_body, 
+                        "ENTERED",  // status_string
                         bufferMap.userInfo?.base_64_hash ?: "" // base_64_hash
                     ] )
                 }

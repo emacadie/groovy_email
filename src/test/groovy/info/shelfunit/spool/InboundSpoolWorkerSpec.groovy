@@ -85,13 +85,16 @@ class InboundSpoolWorkerSpec extends Specification {
     def insertIntoMailSpoolIn( status, toAddress = gwString + '@' + domainList[ 0 ]  ) {
         params.clear()
         def uuid = UUID.randomUUID()
-        params << uuid
-        params << fromString
-        params << toAddress
-        params << getRandomString( 500 )
-        params << status
-        params << ""
-        sql.execute 'insert into mail_spool_in( id, from_address, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+        params << uuid // id
+        params << fromString // from_address
+        params << " "        // from_username
+        params << " "        // from_domain,
+        params << toAddress  // to_address_list,
+        params << getRandomString( 500 ) // text_body,
+        params << status // status_string,
+        params << "" //  base_64_hash
+        
+        sql.execute 'insert into mail_spool_in( id, from_address, from_username, from_domain, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
         println "Entered ${uuid} with ${fromString}"
     }
     
@@ -104,7 +107,7 @@ class InboundSpoolWorkerSpec extends Specification {
 	        insertIntoMailSpoolIn( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' + jaString + '@' + domainList[0 ] )
 	        insertIntoMailSpoolIn( 'ENTERED', gwString + '@' + domainList[ 0 ] + ',' +  getRandomString() + '@' + domainList[0 ] )
 	        def enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        def cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        def cleanCount   = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
 	        enteredCount == 7
 	        cleanCount == 0

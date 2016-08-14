@@ -85,13 +85,15 @@ class MessageSenderSpec extends Specification {
     
     def insertIntoMailSpoolOut( status, toAddress, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
         params.clear()
-        params << uuid
-        params << gwString + '@' + domainList[ 0 ]
-        params << toAddress
-        params << message
-        params << 'ENTERED'
-        params << gwBase64Hash
-        sql.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+        params << uuid // id
+        params << gwString + '@' + domainList[ 0 ] // from_address, 
+        params << gwString // from_username, 
+        params << domainList[ 0 ] // from_domain,
+        params << toAddress // to_address_list
+        params << message   // text_body,
+        params << status    // status_string,  
+        params << gwBase64Hash // base_64_hash
+        sql.execute 'insert into mail_spool_out( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
     }
     
     def getMessage( uuid ) {
