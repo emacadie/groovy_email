@@ -60,6 +60,7 @@ class MessageSenderSpec extends Specification {
     def cleanupSpec() {
         sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
         sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
+        sql.execute "DELETE FROM mail_spool_out where from_address in (?, ?, ?, ?)", [ fromString, gwString, jaString, tjString ]
         sql.close()
     }   // run after the last feature method
     
@@ -69,7 +70,20 @@ class MessageSenderSpec extends Specification {
         addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
     
+    /*
     def insertIntoMailSpoolOut( uuid, status, toAddress, message ) {
+        params.clear()
+        params << uuid
+        params << gwString + '@' + domainList[ 0 ]
+        params << toAddress
+        params << message
+        params << 'ENTERED'
+        params << gwBase64Hash
+        sql.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+    }
+    */
+    
+    def insertIntoMailSpoolOut( status, toAddress, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
         params.clear()
         params << uuid
         params << gwString + '@' + domainList[ 0 ]
@@ -88,7 +102,7 @@ class MessageSenderSpec extends Specification {
         setup:
             def uuid = UUID.randomUUID()
             def messageString = 'q' * 500
-            def message = this.insertIntoMailSpoolOut( uuid, 'ENTERED', 'oneill@stargate.mil', messageString )
+            def message = this.insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil', messageString, uuid )
             def row = this.getMessage( uuid )
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 

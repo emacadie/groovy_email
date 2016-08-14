@@ -86,13 +86,12 @@ class OutboundSpoolWorkerSpec extends Specification {
         return new ClamAVClient( host, port.toInt() )
     }
     
-    def insertIntoMailSpoolOut( status, toAddress ) {
+    def insertIntoMailSpoolOut( status, toAddress, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
         params.clear()
-        def uuid = UUID.randomUUID()
         params << uuid
         params << gwString + '@' + domainList[ 0 ]
         params << toAddress
-        params << getRandomString( 500 )
+        params << message
         params << 'ENTERED'
         params << gwBase64Hash
         sql.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
@@ -158,7 +157,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	}
 	
 	@Ignore
-	def "Test deliverMessages( sql, domainList, outgoingPort )"() {
+	def "test deliverMessages( sql, domainList, outgoingPort )"() {
 	    println "\n--- Starting test ${name.methodName}"
 	    def mockSender = Mock( MessageSender )
 	}

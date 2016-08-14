@@ -20,6 +20,7 @@ gradle test --tests info.shelfunit.smtp.ModularSMTPSocketWorkerAuthSpec."test wi
 gradle test --tests info.shelfunit.spool.InboundSpoolWorkerSpec
 gradle test --tests *InboundSpoolWorkerSpec
 
+gradle test --tests info.shelfunit.spool.OutboundSpoolWorkerSpec  -info 
 
 gradle test --tests "info.shelfunit.smtp.command.AUTHCommandSpec"
 

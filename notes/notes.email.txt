@@ -220,6 +220,29 @@ IMAP DEBUG 23:51:23 2/28: 250 OK
 IMAP DEBUG 23:51:23 2/28: MAIL FROM:<malcolm@shelfunit.info>
 IMAP DEBUG 23:51:23 2/28: 503 Bad sequence of commands
 
+or i in `pgrep -f 'Oct 29.*postgres: grmail groovy_mail_db'`
+ do
+   kill -9 $i
+ done
+.
+ps -deaf | grep 'postgres: grmail groovy_mail_db'
+for i in `pgrep -f .*java.*james.*`
+pgrep -f 'Oct 29.*postgres.*grmail.*groovy_mail_db'
 
+for i in `pgrep -o -f 'postgres: grmail groovy_mail_db'`
+ do
+   kill -9 $i
+ done
+pgrep -o -f 'postgres: grmail groovy_mail_db'
+
+COUNTER=0
+while [  $COUNTER -lt 80 ]; do
+for i in `pgrep -o -f 'postgres: grmail groovy_mail_db'`
+ do
+   kill -9 $i
+ done
+   echo The counter is $COUNTER
+   let COUNTER=COUNTER+1 
+done
 
 

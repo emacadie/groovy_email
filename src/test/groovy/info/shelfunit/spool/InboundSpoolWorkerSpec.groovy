@@ -163,6 +163,7 @@ class InboundSpoolWorkerSpec extends Specification {
 	    then:
 	        enteredCount == numTimes
 	        uncleanCount == 0
+	        
 	    when:
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
@@ -232,6 +233,23 @@ class InboundSpoolWorkerSpec extends Specification {
 	        1 == 1
 	        transferredCount == 0
 	        storeCount == 8
+	}
+	
+	def "test delete unclean messages"() {
+	    def numUnclean = 5
+	    def uncleanMessages = 0
+	    when:
+	        numUnclean.times { insertIntoMailSpoolIn( 'UNCLEAN' ) }
+	        uncleanMessages = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	        println "numUnclean == ${numUnclean} and uncleanMessages == ${uncleanMessages}"
+	    then:
+	        numUnclean != uncleanMessages
+	    when:
+	        isw.deleteUncleanMessages( sql )
+	        uncleanMessages = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	    then:
+	        uncleanMessages == 0
+	        
 	}
 
 	@Ignore

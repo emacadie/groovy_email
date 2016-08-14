@@ -111,8 +111,16 @@ class InboundSpoolWorker{
     }
     
     def deleteTransferredMessages( sql ) {
+        this.deleteMessages( sql, 'TRANSFERRED' )
+    }
+    
+    def deleteUncleanMessages( sql ) {
+        this.deleteMessages( sql, 'UNCLEAN' )
+    }
+    
+    private deleteMessages( sql, status ) {
         def uuidsToDelete = []
-        sql.eachRow( QUERY_STATUS_STRING, [ 'TRANSFERRED' ] ) { row ->
+        sql.eachRow( QUERY_STATUS_STRING, [ status ] ) { row ->
             uuidsToDelete << row[ 'id' ]
         }
         if ( isNot( uuidsToDelete.isEmpty() ) ) {
@@ -120,7 +128,6 @@ class InboundSpoolWorker{
                 sql.execute "DELETE from mail_spool_in where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
             }
         }
-
     }
     
 }
