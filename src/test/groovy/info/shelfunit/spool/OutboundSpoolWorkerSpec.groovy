@@ -29,7 +29,7 @@ class OutboundSpoolWorkerSpec extends Specification {
     
     def crlf = "\r\n"
     static sql
-    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.com' ]
     static rString    = getRandomString()
     static gwString   = 'gw' + rString
     static jaString   = 'ja' + rString
