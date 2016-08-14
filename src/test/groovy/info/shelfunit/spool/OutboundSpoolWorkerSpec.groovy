@@ -47,7 +47,7 @@ class OutboundSpoolWorkerSpec extends Specification {
     
     def setup() {
         println "\n--- Starting test ${name.methodName}"
-    }          // run before every feature method
+    } // run before every feature method
     
     def cleanup() {}        // run after every feature method
     
@@ -68,7 +68,7 @@ class OutboundSpoolWorkerSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
+        sql.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
         sql.execute "DELETE FROM mail_spool_out where from_address = ?", [ gwString + '@' + domainList[ 0 ] ]
         sql.close()
     }   // run after the last feature method
@@ -187,6 +187,25 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        1 == 1
 	        enteredCount == 0
 	        uncleanCount == numTimes
+	}
+	
+	def "test delete unclean messages"() {
+	    def numUnclean = 5
+	    def uncleanMessages = 0
+	    when:
+	        numUnclean.times { 
+	            insertIntoMailSpoolOut( 'UNCLEAN', "${getRandomString( 10 )}@${getRandomString( 10 )}.com".toString() ) 
+	        }
+	        uncleanMessages = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	        println "numUnclean == ${numUnclean} and uncleanMessages == ${uncleanMessages}"
+	    then:
+	        numUnclean != uncleanMessages
+	    when:
+	        osw.deleteUncleanMessages( sql )
+	        uncleanMessages = getTableCount( sql, sqlCountString, [ 'UNCLEAN', fromString ] )
+	    then:
+	        uncleanMessages == 0
+	        
 	}
 
 	@Ignore
