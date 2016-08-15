@@ -24,8 +24,8 @@ class OutboundSpoolWorker {
     static final QUERY_STATUS_STRING = 'select * from mail_spool_out where status_string = ?'
     static final INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
     static final SELECT_USER_STRING = 'select username from email_user where lower( username ) = ?'
-    static final SELECT_INVALID_USER_STRING = 'select id, from_username from mail_spool_out  where from_username not in (select username from email_user)'
-    static final SELECT_INVALID_DOMAIN_STRING = 'select id, from_domain from mail_spool_out  where from_domain not in '
+    static final SELECT_INVALID_USER_STRING = 'select id, from_username from mail_spool_out where from_username not in (select username from email_user)'
+    static final SELECT_INVALID_DOMAIN_STRING = 'select id, from_domain from mail_spool_out where from_domain not in '
     
     OutboundSpoolWorker( ) {
     }

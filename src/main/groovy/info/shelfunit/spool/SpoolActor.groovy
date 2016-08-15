@@ -34,6 +34,10 @@ class SpoolActor extends DynamicDispatchActor {
                     def osw = new OutboundSpoolWorker()
                     log.info "about to call osw.runClam( sql, clamAV )"
                     osw.runClam( sql, clamAV )
+                    
+                    osw.findInvalidUsers( sql, domainList )
+                    osw.deleteInvalidUserMessages( sql )
+                    
                     log.info "About to call osw.deliverMessages( sql, ${message.serverList}, ${message.port} )"
                     osw.deliverMessages( sql, message.serverList, message.port )
                     log.info "About to call osw.deleteTransferredMessages( sql )"
