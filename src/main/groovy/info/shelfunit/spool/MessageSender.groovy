@@ -27,9 +27,9 @@ class MessageSender {
         output << "EHLO ${outboundDomain}\r\n"
         def doneWith250 = false
         def commandList = []
-        while ( isNot( doneWith250 ) ) {
+        while ( _not( doneWith250 ) ) {
             newString = reader.readLine()
-            if ( doesNot( newString.matches( ".*[a-z].*" ) ) ) {
+            if ( _not( newString.matches( ".*[a-z].*" ) ) ) {
                 commandList << newString.allButFirstFour()
             }
             log.info "Here is newString: ${newString}"
@@ -53,7 +53,7 @@ class MessageSender {
                 got250ForRCPT = true
             }
         }
-        if ( isNot( got250ForRCPT ) ) {
+        if ( _not( got250ForRCPT ) ) {
             output << "QUIT\r\n"
         } else {
             output << "DATA\r\n"

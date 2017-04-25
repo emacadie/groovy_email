@@ -36,6 +36,8 @@ https://cafe.bevocal.com/docs/grammar/abnf.html
 http://www.freesoft.org/CIE/RFC/1945/7.htm
 https://en.wikipedia.org/wiki/Augmented_Backus%E2%80%93Naur_Form
 
+http://www.fehcom.de/qmail/smtpauth.html
+
 http://www.iana.org/assignments/mail-parameters/mail-parameters.xhtml
 List of James RFCs: http://james.apache.org/server/rfclist.html
 http://james.apache.org/server/2/smtp_auth.html
@@ -67,6 +69,8 @@ https://github.com/voodoodyne/subethasmtp/blob/master/src/main/java/org/subetham
 
 Making certs: http://tomcat.apache.org/tomcat-9.0-doc/ssl-howto.html
 
+https://www.smtpbucket.com/blog/a-brief-tutorial-on-the-smtp-protocol/
+
 5321 minimum implementation:
 x EHLO
 x HELO
@@ -86,6 +90,8 @@ x EXPN
 HELP
 x TURN Deprecated	502	Command not implemented
 
+Look up https://www.smtpbucket.com/ - 
+from their Twitter profile: A fake SMTP server for e-mail integration testing. We capture all the e-mails we receive and make them available via our website & API
 
 PING shelfunit.info (45.33.18.182) 56(84) bytes of data
 02/05/15 12:42:04 INFO  James.Mailet: RemoteDelivery: Exception reading response
@@ -245,4 +251,11 @@ for i in `pgrep -o -f 'postgres: grmail groovy_mail_db'`
    let COUNTER=COUNTER+1 
 done
 
+https://www.mail-tester.com/
+https://www.mail-tester.com/spf-dkim-check
+http://mailtester.com/
+http://mailtester.com/links.php
+http://www.mailtester.com/showpage.php?name=download
+
+mail in a box installation: https://www.youtube.com/watch?v=9WOmkoEYMIg got to about 13:00
 

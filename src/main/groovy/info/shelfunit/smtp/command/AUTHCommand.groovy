@@ -42,7 +42,7 @@ class AUTHCommand {
             resultMap.resultString = "501 Command not in proper form"
         } else {
             def q = theMessage =~ pattern
-            def base64Part = q.getBase64InAuth()
+            def base64Part = q.getBase64InAUTH()
             def userInfoFrombase64 = sql.firstRow( 'select * from email_user where base_64_hash=?', base64Part )
             
             if ( userInfoFrombase64 ) {

@@ -17,7 +17,11 @@ class StringMetaProgrammer {
         }
         
         String.metaClass.allButFirstFour = { ->
-            return delegate.substring( 4, delegate.length() )
+            if ( delegate.length() <= 4 ) {
+                return delegate
+            } else { 
+                return delegate.substring( 4, delegate.length() )
+            }
         }
         String.metaClass.startsWithEHLO = { ->
             return delegate.startsWith( 'EHLO' )
@@ -94,7 +98,7 @@ class StringMetaProgrammer {
             try {
                 toIntResult = Integer.parseInt( delegate )
             } catch ( java.lang.NumberFormatException nfe ) {
-                result = 0
+                toIntResult = 0
             }
             toIntResult
         }
@@ -104,7 +108,7 @@ class StringMetaProgrammer {
             try {
                 toIntResult = Integer.parseInt( delegate.allButFirstFour().trim() )
             } catch ( java.lang.NumberFormatException nfe ) {
-                result = 0
+                toIntResult = 0
             }
             toIntResult
         }

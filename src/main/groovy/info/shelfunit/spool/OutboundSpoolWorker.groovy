@@ -45,7 +45,7 @@ class OutboundSpoolWorker {
             }
         } // sql.eachRow
        this.updateMessageStatus( sql, cleanUUIDs, 'CLEAN' )
-       if ( isNot( uncleanUUIDs.isEmpty() ) ) { 
+       if ( _not( uncleanUUIDs.isEmpty() ) ) { 
            this.updateMessageStatus( sql, uncleanUUIDs, 'UNCLEAN' ) 
        }
     } // runClam
@@ -57,7 +57,7 @@ class OutboundSpoolWorker {
             def params = []
             def newObject = uuidList.plus( 0, status )
             log.info "newObject is a ${newObject.getClass().name}, here it is: ${newObject}"
-            if ( isNot( uuidList.isEmpty() ) ) { 
+            if ( _not( uuidList.isEmpty() ) ) { 
                 
                 sql.withTransaction {
                     params << status
@@ -85,7 +85,7 @@ class OutboundSpoolWorker {
             throw new RuntimeException( "Could not scan the input", e )
         }
         log.info "ClamAVClient.isCleanReply( reply ) : ${ClamAVClient.isCleanReply( reply ) }"
-        if ( isNot( ClamAVClient.isCleanReply( reply ) ) ) {
+        if ( _not( ClamAVClient.isCleanReply( reply ) ) ) {
             log.info "aaargh. Something was found"
             messageIsClean = false
         }
@@ -144,7 +144,7 @@ class OutboundSpoolWorker {
                 // go through, see if any messages are to anyone not in this domain
                 outgoingMap.each { otherDomain, otherUserList ->
                     log.info "Looking at otherDomain ${otherDomain} with list ${otherUserList}"
-                    if ( doesNot( domainList.contains( otherDomain ) ) ) {
+                    if ( _not( domainList.contains( otherDomain ) ) ) {
                         // def socket = new Socket( otherDomain, String.toInt( outgoingPort ) )
                         // def socket = new Socket( otherDomain, outgoingPort )
                         def sr = new SocketRetriever( otherDomain.toString(), outgoingPort ) 
@@ -163,7 +163,7 @@ class OutboundSpoolWorker {
                     nameToCheck = address.replaceFirst( '@.*', '' )
                     rows = sql.rows( SELECT_USER_STRING, nameToCheck.toLowerCase() )
                     def newUUID = UUID.randomUUID()
-                    if ( isNot( rows.isEmpty() ) ) {
+                    if ( _not( rows.isEmpty() ) ) {
                         sql.execute( INSERT_STRING, [ newUUID, nameToCheck, row[ 'from_address' ], address, row[ 'text_body' ], row[ 'msg_timestamp' ] ] )
                         log.info "Entered ${newUUID} into mail_store from ${row[ 'id' ]} in mail_spool_out"
                     }
@@ -209,7 +209,7 @@ class OutboundSpoolWorker {
         sql.eachRow( QUERY_STATUS_STRING, [ status ] ) { row ->
             uuidsToDelete << row[ 'id' ]
         }
-        if ( isNot( uuidsToDelete.isEmpty() ) ) {
+        if ( _not( uuidsToDelete.isEmpty() ) ) {
             sql.withTransaction {
                 sql.execute "DELETE from mail_spool_out where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
             }

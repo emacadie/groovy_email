@@ -32,6 +32,7 @@ class MetaProgrammer {
     }
     
     static runListMetaProgramming() {
+        // groovy lists have ".last()" - perhaps I don't need this method - or perhaps this is for null checking
         java.util.List.metaClass.lastItem = { ->
             if ( delegate.size() != 0 ) {
                 delegate.last()
@@ -43,7 +44,7 @@ class MetaProgrammer {
         java.util.List.metaClass.lastSMTPCommandPrecedesRCPT = { ->
             delegate.last().matches( 'MAIL|RCPT' ) 
         }
-        
+        // java.util.List has "contains" - do I need this?
         java.util.List.metaClass.includes = { i -> i in delegate 
         }
         
@@ -96,10 +97,16 @@ class MetaProgrammer {
                 delegate[ domain ] = [ ] 
             }
         }
+
+        java.util.Map.metaClass.addToListInMap = { Object key, Object value ->
+            if ( !delegate.containsKey( key ) ) { delegate[ key ] = [] }
+                        delegate[ key ] << value
+        }
         
     }
     
     static runSetMetaProgramming() {
+        // null checking
         java.util.Set.metaClass.lastItem = { ->
             if ( delegate.size() != 0 ) {
                 delegate.last()
@@ -153,7 +160,18 @@ class MetaProgrammer {
     }
     
     static runJavaObjectMetaProgramming() {
-
+        /**
+        I decided to use metaprogramming to do something other that ! to mean "not".
+        The issue is that in Groovy, "not" is already taken in groovy.xml.Entity and org.codehaus.groovy.ast.builder.AstSpecificationCompiler. So I tried isNot, doesNot, doNot, haveNot. It was kind of awkward. So I just decided to add a "_" in front of "not" and be done with it.
+        */
+        java.lang.Object.metaClass.static._not = { boolean arg ->
+            if ( arg == true ) { 
+                return false 
+            } else { 
+                return true 
+            }
+        }
+        /*
         java.lang.Object.metaClass.static.isNot = { boolean arg ->
             if ( arg == true ) { 
                 return false 
@@ -182,6 +200,7 @@ class MetaProgrammer {
                 return true 
             }
         }
+        */
         
     }
 } // line 231
