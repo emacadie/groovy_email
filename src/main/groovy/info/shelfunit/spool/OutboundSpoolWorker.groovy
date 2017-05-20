@@ -130,8 +130,9 @@ class OutboundSpoolWorker {
                     if ( domainList.contains( k ) ) {
                         sql.withTransaction {
                             def userList = v
-                            useList.each { user ->
-                                sql.execute "insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )", [ UUID.randomUUID(), user, row[ 'from_address' ], user + '@' + k , row[ 'text_body' ], row[ 'msg_timestamp' ] ]
+                            userList.each { user ->
+                                sql.execute "insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )",
+                                [ UUID.randomUUID(), user, row[ 'from_address' ], user + '@' + k , row[ 'text_body' ], row[ 'msg_timestamp' ] ]
                             }
                         }
                         outgoingMap.remove( k )
