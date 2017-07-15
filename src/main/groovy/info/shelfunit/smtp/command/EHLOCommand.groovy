@@ -35,6 +35,7 @@ class EHLOCommand {
             resultMap.resultString = "250 Hello ${domain}"
         }
         resultMap.prevCommandSet = prevCommandSet
+        // resultMap.rawCommandList << theMessage
         log.info "here is resultMap: ${resultMap.toString()}"
         resultMap
     }

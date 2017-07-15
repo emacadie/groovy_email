@@ -59,6 +59,7 @@ class MetaProgrammer {
             ( delegate.size() ).times { qMarks << '?' }
             return qMarks.join( ',' )
         }
+
     }
     
     static runMapMetaProgramming() {

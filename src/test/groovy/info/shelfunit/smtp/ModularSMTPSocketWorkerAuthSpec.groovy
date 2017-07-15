@@ -57,7 +57,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 
 	def "test handling EHLO"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) 
+	    def ssWorker    = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
@@ -65,7 +65,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${domain}", [], [:] )
+	        def resultMap    = ehloCommand.process( "EHLO ${domain}", [], [:] )
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250-Hello ${domain}\r\n" +
@@ -76,7 +76,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	}
 	
 	def "test handling HELO"() {
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList ) 
+	    def ssWorker    = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
@@ -84,7 +84,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "HELO ${domain}", [], [:] )
+	        def resultMap    = ehloCommand.process( "HELO ${domain}", [], [:] )
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
@@ -109,7 +109,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
             ssWorker.doWork()
             ssWorker.cleanup()
             
@@ -134,8 +134,8 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 
 	def "test common streams"() {
 	    when:
-            def mIs = Mock( InputStream )
-            def mOs = Mock( OutputStream )
+            def mIs    = Mock( InputStream )
+            def mOs    = Mock( OutputStream )
             def domain = "hot-groovy.com"
             
             def dataString = "EHLO ${domain}${crlf}"  +
@@ -148,7 +148,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
             byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def msmtpw = new ModularSMTPSocketWorker( input, output, domainList )
+            def msmtpw = new ModularSMTPSocketWorker( input, output, domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
             msmtpw.doWork()
             msmtpw.cleanup()
             
@@ -178,7 +178,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
             byte[] data = dataString.getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList )
+            def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
             ssWorker.doWork()
             ssWorker.cleanup()
             

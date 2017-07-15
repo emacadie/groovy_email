@@ -2,7 +2,7 @@ package info.shelfunit.smtp
 
 import java.io.InputStream
 import java.io.OutputStream
-
+import java.sql.SQLException
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
@@ -27,11 +27,19 @@ class ModularSMTPSocketWorker {
     @Hidden String theResponse
     @Hidden String serverName
     @Hidden prevCommandSet 
+    @Hidden rawCommandList
     @Hidden def bufferMap
+    @Hidden def copyMap
     @Hidden def sql
     @Hidden def domainList
     @Hidden def commandResultMap
-    
+    @Hidden def mssgUUID
+    @Hidden def fromIPAddress
+    @Hidden def fromHostName
+    @Hidden def fromUserName
+    @Hidden def toAddressListString
+    @Hidden def statusString
+
     ModularSMTPSocketWorker( argIn, argOut, argDomainList, argFromAddress, argFromHost ) {
         input  = argIn
         output = argOut
@@ -43,12 +51,19 @@ class ModularSMTPSocketWorker {
         
         serverName = domainList[ 0 ]
         log.info "server name is ${serverName}"
+        statusString     = "ABORTED BY THEM"
         prevCommandSet   = [] as Set
+        rawCommandList   = []
         commandResultMap = [:]
         bufferMap        = [:]
-        bufferMap.fromAddress  = argFromAddress
+        copyMap          = [:]
+        // bufferMap.rawCommandList = rawCommandList
+        bufferMap.fromIPAddress  = argFromAddress
         bufferMap.fromHostName = argFromHost
-        bufferMap.mssgUUID     = UUID.randomUUID()
+        fromIPAddress  = argFromAddress
+        fromHostName = argFromHost
+        mssgUUID               = UUID.randomUUID()
+        bufferMap.mssgUUID     = mssgUUID
     }
     
     def doWork() {
@@ -75,7 +90,7 @@ class ModularSMTPSocketWorker {
                 responseString = this.handleMessage( newString )
                 gotQuitCommand = true
                 log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
-            
+                rawCommandList << newString
             } else if ( prevCommandSet?.lastItem() == 'DATA' ) {
                 def sBuffer = new StringBuilder()
                 while ( _not( newString == "."  ) ) {
@@ -95,16 +110,67 @@ class ModularSMTPSocketWorker {
                 prevCommandSet << 'THE MESSAGE'
             } else {
                 responseString = this.handleMessage( newString )
+                rawCommandList << newString
             }
             log.info "responseString: ${responseString}"
             output << responseString
         }
         log.info "Here is prevCommandSet: ${prevCommandSet}"
+        log.info "here is rawCommandList: ${rawCommandList}"
+        log.info "here is rawCommandList.length: ${rawCommandList.size}"
+        log.info "Here is bufferMap: ${bufferMap}"
+        log.info "Here is copyMap: ${copyMap}"
+        this.commitIncomingMailLog()
+        // do sql stuff here
+        // 
         log.info "ending doWork"
     } 
+
+    def commitIncomingMailLog(  ) {
+      def sqlString = 'insert into mail_from_log( id, from_ip_address, from_username, from_domain, to_address_list, status_string, command_sequence ) values (?, ?, ?, ?, ?, ?, ?)'
+      try {
+            sql.withTransaction {
+                log.info "About to call sql to enter message"
+                def insertCounts = sql.withBatch( sqlString ) { stmt ->
+                    log.info "stmt is a ${stmt.class.name}"
+                    stmt.addBatch( [ 
+                        UUID.randomUUID(), // id, 
+                        fromIPAddress,  // from_address, 
+                        fromUserName,   // from_username, 
+                        fromHostName, // from_domain, 
+                        toAddressListString, // to_address_list, 
+                        statusString,  // status_string // I might need to change this
+                        rawCommandList.toString() //command_sequence
+                        
+                    ] )
+                }
+            }
+        } catch ( Exception e ) {
+            log.info "Next exception message: ${e.getMessage()}"
+            log.error "something went wrong", e
+
+            SQLException ex = e.getNextException()
+            // log.info "Next exception message: ${ex?.getMessage()}"
+            // log.error "something went wrong", ex? 
+
+        }
+
+    } // def commitIncomingMailLog()
     
     def cleanup() {
         sql.close()
+    }
+
+    def updateVarsFromBufferMap() {
+        if ( this.bufferMap.reversePath?.length() > 0 ) {
+            this.fromUserName = this.bufferMap.reversePath
+        }
+        if ( this.bufferMap.forwardPath?.size() > 0 ) {
+            this.toAddressListString = this.bufferMap.forwardPath.join( "," )
+        }
+        if ( this.bufferMap.statusString?.length() > 0 ) {
+            this.statusString = this.bufferMap.statusString
+        }
     }
     
     def handleMessage( theMessage, def isActualMessage = false ) {
@@ -116,7 +182,8 @@ class ModularSMTPSocketWorker {
             commandResultMap.clear()
             commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
             prevCommandSet   = commandResultMap.prevCommandSet.clone()
-            bufferMap        = commandResultMap.bufferMap?.clone() 
+            bufferMap        = commandResultMap.bufferMap?.clone()
+            this.updateVarsFromBufferMap()
             theResponse      = commandResultMap.resultString
         } else if ( prevCommandSet.lastItem() == 'DATA' ) {
             log.info "prevCommand is DATA, here is the message: ${theMessage}"

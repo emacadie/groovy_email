@@ -36,8 +36,11 @@ class MSSGCommand {
         } else {
             resultMap.resultString =  this.addMessageToDatabase( theMessage, bufferMap )
         }
+        resultMap.bufferMap = [:] // why do I clear the map again? Need to remember.....
         if ( resultMap.resultString == '250 OK' ) {
-            resultMap.bufferMap = [:]
+            resultMap.bufferMap.statusString = "ENTERED"
+        } else {
+            resultMap.bufferMap.statusString = "ERROR ON INSERTION"
         }
         resultMap.prevCommandSet = prevCommandSet
         

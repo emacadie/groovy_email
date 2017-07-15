@@ -30,7 +30,8 @@ class DATACommand {
             }
         }
         resultMap.prevCommandSet = prevCommandSet
-        resultMap.bufferMap = bufferMap
+        resultMap.bufferMap      = bufferMap
+        // resultMap.rawCommandList << theMessage
         log.info "here is resultMap: ${resultMap.toString()}"
         resultMap
     }

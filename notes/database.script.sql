@@ -61,11 +61,12 @@ create table mail_spool_out (
 
 create table mail_from_log (
     id UUID PRIMARY KEY  NOT NULL unique,
-    from_address character varying( 255 ) not null,
-    from_username character varying( 255 ) not null,
+    from_ip_address character varying( 255 ) not null,
+    from_username character varying( 255 ),
     from_domain character varying( 255 ) not null,
-    to_address_list text not null,
+    to_address_list text,
     status_string text,
+    command_sequence text,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null       
 );
 

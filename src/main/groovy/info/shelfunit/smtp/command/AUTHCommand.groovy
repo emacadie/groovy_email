@@ -58,7 +58,7 @@ class AUTHCommand {
         }
         resultMap.prevCommandSet = prevCommandSet
         resultMap.bufferMap = bufferMap
-        
+        // resultMap.rawCommandList << theMessage
         log.info "here is resultMap: ${resultMap.toString()}"
         resultMap
     }
