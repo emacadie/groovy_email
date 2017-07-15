@@ -18,7 +18,7 @@ class QUITCommand {
         resultMap.clear()
         
         bufferMap.clear()
-        resultMap.bufferMap = [:]
+        resultMap.bufferMap    = [:]
         resultMap.resultString = "221 ${domainList[ 0 ]} Service closing transmission channel"
         
         resultMap.prevCommandSet = prevCommandSet

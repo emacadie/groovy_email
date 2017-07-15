@@ -1,8 +1,6 @@
 package info.shelfunit.spool
 
 import groovy.util.logging.Slf4j 
-// import info.shelfunit.mail.ConfigHolder
-// import java.io.IOException
 import java.sql.SQLException
 import fi.solita.clamav.ClamAVClient
 
@@ -16,14 +14,14 @@ class InboundSpoolWorker{
     final sql
     ClamAVClient clamavj
     static final QUERY_STATUS_STRING = 'select * from mail_spool_in where status_string = ?'
-    static final INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
-    static final SELECT_USER_STRING = 'select username from email_user where lower( username ) = ?'
+    static final INSERT_STRING       = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
+    static final SELECT_USER_STRING  = 'select username from email_user where lower( username ) = ?'
     
     InboundSpoolWorker( ) {
     }
     
     def runClam( sql, clamavj ) {
-        def cleanUUIDs = []
+        def cleanUUIDs   = []
         def uncleanUUIDs = []
         sql.eachRow( QUERY_STATUS_STRING, [ 'ENTERED' ] ) { row ->
             byte[] data = row[ 'text_body' ].getBytes()

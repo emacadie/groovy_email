@@ -14,7 +14,7 @@ class QUITCommand {
     
     QUITCommand( def argSql, def argServerName ) {
         log.info "Starting new QUITCommand"
-        this.sql = argSql
+        this.sql        = argSql
         this.serverName = argServerName
     }
     
@@ -51,7 +51,7 @@ class QUITCommand {
                 result = '500 Something went wrong'
             }
         }
-        resultMap.bufferMap = bufferMap
+        resultMap.bufferMap      = bufferMap
         resultMap.prevCommandSet = prevCommandSet
         
         log.info "here is resultMap: ${resultMap.toString()}"

@@ -55,7 +55,7 @@ class LISTCommand {
                 }
             }
         }
-        resultMap.bufferMap = bufferMap
+        resultMap.bufferMap      = bufferMap
         resultMap.prevCommandSet = prevCommandSet
         
         log.info "here is resultMap: ${resultMap.toString()}"

@@ -4,7 +4,6 @@ import groovy.util.logging.Slf4j
 import java.io.IOException
 
 import info.shelfunit.mail.ConfigHolder
-// import java.io.IOException
 import fi.solita.clamav.ClamAVClient
 
 @Slf4j 

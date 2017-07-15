@@ -1,9 +1,6 @@
 package info.shelfunit.spool
 
 import groovy.util.logging.Slf4j 
-// import info.shelfunit.mail.ConfigHolder
-// import java.io.IOException
-// import java.sql.SQLException
 
 @Slf4j
 class MessageSender {

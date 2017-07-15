@@ -14,7 +14,7 @@ class PostOfficeActor extends DynamicDispatchActor {
     void onMessage( PostOfficeRunnerMessage message ) {
         log.info "About to start the server"
         log.info "here is the serverList: ${message.serverList}"
-        poServer = new PostOfficeServer( message.serverList )
+        poServer   = new PostOfficeServer( message.serverList )
         def config = ConfigHolder.instance.getConfObject()
         log.info "About to call doStuff with ${config.postoffice.server.port.toInteger() }"
         poServer.doStuff( config.postoffice.server.port.toInteger()  )

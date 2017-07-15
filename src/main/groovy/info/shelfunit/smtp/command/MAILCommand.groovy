@@ -65,7 +65,7 @@ class MAILCommand {
                 bufferMap.messageDirection = "inbound"
             }
             if ( q.handles8BitInMAIL() ) {
-                bufferMap.handles8bit = "true"
+                bufferMap.handles8bit  = "true"
                 resultMap.resultString = "250 <${bufferMap.reversePath}> Sender and 8BITMIME OK"
             } else {
                 resultMap.resultString = '250 OK'

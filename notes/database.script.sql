@@ -59,4 +59,13 @@ create table mail_spool_out (
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
 );
 
+create table mail_from_log (
+    id UUID PRIMARY KEY  NOT NULL unique,
+    from_address character varying( 255 ) not null,
+    from_username character varying( 255 ) not null,
+    from_domain character varying( 255 ) not null,
+    to_address_list text not null,
+    status_string text,
+    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null       
+);
 

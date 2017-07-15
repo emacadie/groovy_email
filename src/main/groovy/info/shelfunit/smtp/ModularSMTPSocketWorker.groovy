@@ -32,20 +32,23 @@ class ModularSMTPSocketWorker {
     @Hidden def domainList
     @Hidden def commandResultMap
     
-    ModularSMTPSocketWorker( argIn, argOut, argDomainList ) {
-        input = argIn
+    ModularSMTPSocketWorker( argIn, argOut, argDomainList, argFromAddress, argFromHost ) {
+        input  = argIn
         output = argOut
         
-        def db = ConfigHolder.instance.returnDbMap()         
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        def db     = ConfigHolder.instance.returnDbMap()         
+        sql        = Sql.newInstance( db.url, db.user, db.password, db.driver )
         domainList = []
         argDomainList.collect{ domainList << it.toLowerCase() }
         
         serverName = domainList[ 0 ]
         log.info "server name is ${serverName}"
-        prevCommandSet = [] as Set
+        prevCommandSet   = [] as Set
         commandResultMap = [:]
-        bufferMap = [:]
+        bufferMap        = [:]
+        bufferMap.fromAddress  = argFromAddress
+        bufferMap.fromHostName = argFromHost
+        bufferMap.mssgUUID     = UUID.randomUUID()
     }
     
     def doWork() {
@@ -67,6 +70,7 @@ class ModularSMTPSocketWorker {
             log.info "Here is newString: ${newString}"
             
             if ( newString.startsWith( 'QUIT' ) ) {
+                // QUITCommand clears the map, so I might want to call a method here to record the status
                 log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
                 responseString = this.handleMessage( newString )
                 gotQuitCommand = true
@@ -111,9 +115,9 @@ class ModularSMTPSocketWorker {
             log.info "returned a command object that is a ${commandObject.class.name}"
             commandResultMap.clear()
             commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
-            prevCommandSet = commandResultMap.prevCommandSet.clone()
-            bufferMap = commandResultMap.bufferMap?.clone() 
-            theResponse = commandResultMap.resultString
+            prevCommandSet   = commandResultMap.prevCommandSet.clone()
+            bufferMap        = commandResultMap.bufferMap?.clone() 
+            theResponse      = commandResultMap.resultString
         } else if ( prevCommandSet.lastItem() == 'DATA' ) {
             log.info "prevCommand is DATA, here is the message: ${theMessage}"
             theResponse = '250 OK'

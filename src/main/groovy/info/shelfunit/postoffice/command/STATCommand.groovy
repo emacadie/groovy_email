@@ -29,11 +29,11 @@ class STATCommand {
             if ( !bufferMap.hasSTATInfo() ) {
                 bufferMap.getSTATInfo( sql )
             }
-            def userInfo = bufferMap.userInfo
+            def userInfo  = bufferMap.userInfo
             def timestamp = bufferMap.timestamp
             resultMap.resultString = "+OK ${bufferMap.uuidList.size()} ${bufferMap.totalMessageSize}"
         }
-        resultMap.bufferMap = bufferMap
+        resultMap.bufferMap      = bufferMap
         resultMap.prevCommandSet = prevCommandSet
         
         log.info "here is resultMap: ${resultMap.toString()}"

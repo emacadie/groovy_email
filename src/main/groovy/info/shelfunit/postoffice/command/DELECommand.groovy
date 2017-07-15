@@ -48,8 +48,8 @@ class DELECommand {
                 }
             }
         }
-        bufferMap.deleteMap = deleteMap
-        resultMap.bufferMap = bufferMap
+        bufferMap.deleteMap      = deleteMap
+        resultMap.bufferMap      = bufferMap
         resultMap.prevCommandSet = prevCommandSet
         
         log.info "here is resultMap: ${resultMap.toString()}"

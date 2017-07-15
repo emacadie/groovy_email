@@ -44,9 +44,9 @@ class ModularPostOfficeSocketWorker {
         argServerList.collect{ serverList << it.toLowerCase() }
         serverName = serverList[ 0 ]
         log.info "server name is ${serverName}"
-        prevCommandSet = [] as Set
+        prevCommandSet   = [] as Set
         commandResultMap = [:]
-        bufferMap = [:]
+        bufferMap        = [:]
     }
     
     def doWork() {
@@ -103,9 +103,9 @@ class ModularPostOfficeSocketWorker {
             log.info "returned a command object that is a ${commandObject.class.name}"
             commandResultMap.clear()
             commandResultMap = commandObject.process( theMessage, prevCommandSet, bufferMap ) 
-            prevCommandSet = commandResultMap.prevCommandSet.clone()
-            bufferMap = commandResultMap.bufferMap.clone() 
-            theResponse = commandResultMap.resultString
+            prevCommandSet   = commandResultMap.prevCommandSet.clone()
+            bufferMap        = commandResultMap.bufferMap.clone() 
+            theResponse      = commandResultMap.resultString
         
         } else {
             theResponse = '-ERR Command not implemented'

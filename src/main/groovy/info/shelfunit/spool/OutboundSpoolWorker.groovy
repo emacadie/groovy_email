@@ -1,10 +1,7 @@
 package info.shelfunit.spool
 
 import groovy.util.logging.Slf4j 
-// import info.shelfunit.mail.ConfigHolder
-// import java.io.IOException
 import java.sql.SQLException
-// import java.util.concurrent.ConcurrentHashMap
 import fi.solita.clamav.ClamAVClient
 
 @Slf4j
@@ -21,17 +18,17 @@ class OutboundSpoolWorker {
     final config
     final sql
     ClamAVClient clamavj
-    static final QUERY_STATUS_STRING = 'select * from mail_spool_out where status_string = ?'
-    static final INSERT_STRING = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
-    static final SELECT_USER_STRING = 'select username from email_user where lower( username ) = ?'
-    static final SELECT_INVALID_USER_STRING = 'select id, from_username from mail_spool_out where from_username not in (select username from email_user)'
+    static final QUERY_STATUS_STRING          = 'select * from mail_spool_out where status_string = ?'
+    static final INSERT_STRING                = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
+    static final SELECT_USER_STRING           = 'select username from email_user where lower( username ) = ?'
+    static final SELECT_INVALID_USER_STRING   = 'select id, from_username from mail_spool_out where from_username not in (select username from email_user)'
     static final SELECT_INVALID_DOMAIN_STRING = 'select id, from_domain from mail_spool_out where from_domain not in '
     
     OutboundSpoolWorker( ) {
     }
     
     def runClam( sql, clamavj ) {
-        def cleanUUIDs = []
+        def cleanUUIDs   = []
         def uncleanUUIDs = []
         sql.eachRow( QUERY_STATUS_STRING, [ 'ENTERED' ] ) { row ->
             byte[] data = row[ 'text_body' ].getBytes()
@@ -105,7 +102,7 @@ class OutboundSpoolWorker {
                 log.info "---------------------------------------------------------------------------------------\n\n"
                 log.info "row['text_body'] is a ${row['text_body'].getClass().name}"
                 // in the database, the "list" is one field, so it's not quite a groovy list
-                toAddressList = row[ 'to_address_list' ].split( ',' )
+                toAddressList   = row[ 'to_address_list' ].split( ',' )
                 def outgoingMap = [:]
                 toAddressList.each { address ->
                     log.info "Here is addr: ${address}"

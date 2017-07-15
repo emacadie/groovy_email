@@ -42,23 +42,23 @@ class PASSCommand {
         } else if ( !bufferMap.userInfo ) {
             resultMap.resultString = "-ERR Command not in proper form - No user sent"
         } else {
-            def userInfo = bufferMap.userInfo
-            def password = q.getPasswordInPASS()
-            def rawHash = new Sha512Hash( password, userInfo.username, userInfo.iterations.toInteger() ) 
+            def userInfo  = bufferMap.userInfo
+            def password  = q.getPasswordInPASS()
+            def rawHash   = new Sha512Hash( password, userInfo.username, userInfo.iterations.toInteger() ) 
             def finalHash = rawHash.toBase64()
             log.info "here is bufferMap.userInfo.userid: ${bufferMap.userInfo.userid} and it's a ${bufferMap.userInfo.userid.getClass().name}"
             if ( ( userInfo.password_hash == finalHash ) && 
             ( this.changeLoggedInFlag( bufferMap.userInfo.userid ) == '250 OK' ) ) { 
                 bufferMap.userInfo.logged_in = true
                 resultMap.resultString = "+OK ${userInfo.username} authenticated"
-                bufferMap.state = 'TRANSACTION'
-                bufferMap.timestamp = Timestamp.create()
+                bufferMap.state        = 'TRANSACTION'
+                bufferMap.timestamp    = Timestamp.create()
             } else {
                 resultMap.resultString = "-ERR ${userInfo.username} not authenticated"
             }
         
         }
-        resultMap.bufferMap = bufferMap
+        resultMap.bufferMap      = bufferMap
         resultMap.prevCommandSet = prevCommandSet
         
         log.info "here is resultMap: ${resultMap.toString()}"

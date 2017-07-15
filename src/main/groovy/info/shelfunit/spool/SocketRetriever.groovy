@@ -2,7 +2,6 @@ package info.shelfunit.spool
 
 import org.xbill.DNS.Lookup
 import org.xbill.DNS.MXRecord
-// import org.xbill.DNS.Record
 import org.xbill.DNS.Type
 
 import groovy.util.logging.Slf4j 
@@ -19,9 +18,9 @@ class SocketRetriever {
     }
     
     def getSocket() {
-        def records = new Lookup( host, Type.MX ).run()
-        def targetMap = [:]
-        def reverseMap = [:]
+        def records      = new Lookup( host, Type.MX ).run()
+        def targetMap    = [:]
+        def reverseMap   = [:]
         def priorityList = []
         records.each { record ->
             MXRecord mx = ( MXRecord ) record

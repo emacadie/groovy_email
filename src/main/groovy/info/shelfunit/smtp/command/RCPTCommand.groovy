@@ -38,23 +38,12 @@ class RCPTCommand {
             resultMap.resultString = '250 OK'
             prevCommandSet << 'RCPT'
         }
-        resultMap.bufferMap = bufferMap
+        resultMap.bufferMap      = bufferMap
         resultMap.prevCommandSet = prevCommandSet
         
         log.info "here is resultMap: ${resultMap.toString()}"
         resultMap
     }
 }
-/* def userName = q.extractUserNameInRCPT() 
-            // log.info "here is userName: ${userName}"
-            def rows = sql.rows( 'select * from email_user where username=?', userName )
-            // log.info "here is rows?.size() : ${rows?.size()} "
-            if ( rows.size() != 0 ) { // row?.size() != null ) { //  != 0 ) {
-                bufferMap.forwardPath << q.getEmailAddressInRCPT() 
-                resultMap.resultString = '250 OK'
-                prevCommandSet << 'RCPT'
-            } else {
-                resultMap.resultString = "550 No such user"
-            }
-*/
+
 

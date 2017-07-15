@@ -22,7 +22,7 @@ class HELOCommand {
             prevCommandSet.clear()
             resultString = "250 Hello ${domain}"
         }
-        resultMap.resultString = resultString
+        resultMap.resultString   = resultString
         resultMap.prevCommandSet = prevCommandSet
     }
     
@@ -35,7 +35,7 @@ class HELOCommand {
         try {
             // Some networks return '198.105.254.228' for IPAddress for invalid domains
             InetAddress addr = Address.getByName( domain )
-            hostAddress = addr.hostAddress
+            hostAddress      = addr.hostAddress
         } catch ( java.net.UnknownHostException uhEx ) {
             addressGood = false
             hostAddress = 'X.X.X.X'

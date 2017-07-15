@@ -29,7 +29,7 @@ class SMTPServer {
                     log.info "socket address is ${socket.getInetAddress().toString()}, its name is  ${socket.getInetAddress().getCanonicalHostName()}"
                     ModularSMTPSocketWorker sSockW
                     try {
-                        sSockW = new ModularSMTPSocketWorker( input, output, serverList )
+                        sSockW = new ModularSMTPSocketWorker( input, output, serverList, socket.getInetAddress().toString(), socket.getInetAddress().getCanonicalHostName() )
                         sSockW.doWork(  )
                     } finally {
                         sSockW.cleanup()
