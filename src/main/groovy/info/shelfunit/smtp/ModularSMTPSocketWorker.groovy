@@ -60,8 +60,8 @@ class ModularSMTPSocketWorker {
         // bufferMap.rawCommandList = rawCommandList
         bufferMap.fromIPAddress  = argFromAddress
         bufferMap.fromHostName = argFromHost
-        fromIPAddress  = argFromAddress
-        fromHostName = argFromHost
+        fromIPAddress = argFromAddress
+        fromHostName  = argFromHost
         mssgUUID               = UUID.randomUUID()
         bufferMap.mssgUUID     = mssgUUID
     }
@@ -205,7 +205,7 @@ class ModularSMTPSocketWorker {
     def returnCurrentCommand( theMessage, isActualMessage ) {
         log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
         if ( isActualMessage ) {
-            return new MSSGCommand( sql, domainList )
+            return new MSSGCommand( this.mssgUUID, sql, domainList )
         } else if ( theMessage.isHelloCommand() ) {
             return new EHLOCommand()
         } else if ( theMessage.startsWith( 'MAIL' ) ) {

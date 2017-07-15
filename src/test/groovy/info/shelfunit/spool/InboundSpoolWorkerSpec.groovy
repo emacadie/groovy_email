@@ -54,7 +54,7 @@ class InboundSpoolWorkerSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        config = ConfigHolder.instance.getConfObject()
+        config   = ConfigHolder.instance.getConfObject()
         def host = config.clamav.hostname
         def port = config.clamav.port
         realClamAVClient = this.createClamAVClient()

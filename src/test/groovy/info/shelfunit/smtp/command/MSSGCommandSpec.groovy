@@ -19,7 +19,7 @@ class MSSGCommandSpec extends Specification {
     
     def crlf = "\r\n"
     static sql
-    static mssgCommand
+    // static mssgCommand
     static rString = getRandomString()
     static georgeW = 'gw' + rString
     static johnA   = 'ja' + rString
@@ -40,7 +40,6 @@ class MSSGCommandSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        mssgCommand = new MSSGCommand( sql, domainList )
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -56,6 +55,8 @@ class MSSGCommandSpec extends Specification {
     }
     
 	def "test handling wrong command"() {
+          def mssgUUID = UUID.randomUUID()
+          def mssgCommand = new MSSGCommand( mssgUUID, sql, domainList )
 	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: 'oneillMSSG@stargate.mil' ]
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
@@ -68,6 +69,8 @@ class MSSGCommandSpec extends Specification {
 	
 	// @Ignore
 	def "test handling a message"() {
+          def mssgUUID = UUID.randomUUID()
+          def mssgCommand = new MSSGCommand( mssgUUID, sql, domainList )
 	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {
@@ -87,6 +90,8 @@ class MSSGCommandSpec extends Specification {
 	
 	// @Ignore
 	def "test handling a non-existant inbound recipient"() {
+          def mssgUUID = UUID.randomUUID()
+          def mssgCommand = new MSSGCommand( mssgUUID, sql, domainList )
 	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' , 'chumba-wumba@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {

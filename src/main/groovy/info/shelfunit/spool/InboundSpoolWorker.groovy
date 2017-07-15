@@ -54,6 +54,14 @@ class InboundSpoolWorker{
                     sql.execute( "UPDATE mail_spool_in set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
                 }
             }
+            if ( _not( uuidList.isEmpty() ) ) {
+                params = []
+                sql.withTransaction {
+                    params << status
+                    params += uuidList // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
+                    sql.execute( "UPDATE mail_from_log set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
+                }
+            }
             
         } catch ( Exception e ) {
             log.error "Here is exception: ", e

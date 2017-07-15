@@ -18,11 +18,13 @@ class MSSGCommand {
     
     final Sql sql
     final List domainList
-    MSSGCommand( def argSql, def argDomainList ) {
+    final mssgUUID
+    MSSGCommand( def argUUID, def argSql, def argDomainList ) {
         log.info "Starting new MSSGCommand"
         log.info "Here is argDomainList: ${argDomainList}"
         this.sql = argSql
         this.domainList = argDomainList
+        this.mssgUUID = argUUID
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -71,7 +73,7 @@ class MSSGCommand {
                 insertCounts = sql.withBatch( sqlString ) { stmt ->
                     log.info "stmt is a ${stmt.class.name}"
                     stmt.addBatch( [ 
-                        UUID.randomUUID(), // id, 
+                        this.mssgUUID, // id, 
                         wholeFromAddress,  // from_address, 
                         q.getUserNameInMSSG(),   // from_username, 
                         q.getFromDomainInMSSG(), // from_domain, 

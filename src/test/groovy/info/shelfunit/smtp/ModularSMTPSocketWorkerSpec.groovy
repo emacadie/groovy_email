@@ -152,7 +152,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
             InputStream input = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
-            def worker = new ModularSMTPSocketWorker( input, output, domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
+            def worker = new ModularSMTPSocketWorker( input, output, domainList, '/10.1.2.3', 'groovy-email-is-awesome.com' ) 
             worker.doWork()
             worker.cleanup()
             
