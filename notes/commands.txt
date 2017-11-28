@@ -11,6 +11,10 @@ gradle test --tests info.shelfunit.postoffice.command.DELECommandSpec test -info
 gradle test --tests info.shelfunit.postoffice.command.DELECommandSpec -info
 gradle test --tests info.shelfunit.smtp.command.MSSGCommandSpec -info
 
+For just a package:
+gradle test --tests "mrhaki.gradle.model.*"
+Thanks, Mr Haki!
+
 To run with Groovy:   
 gradle runGroovy -PmainClass="org.lookup"    
 

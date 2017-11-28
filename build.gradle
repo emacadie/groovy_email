@@ -39,11 +39,15 @@ allprojects {
     
         compile 'org.codehaus.groovy:groovy-all:2.4.0'
         compile 'dnsjava:dnsjava:2.1.7'
-        compile 'org.postgresql:postgresql:9.3-1101-jdbc41'
+        // compile 'org.postgresql:postgresql:9.3-1101-jdbc41'
+        compile 'org.postgresql:postgresql:42.1.4'
         compile 'org.apache.shiro:shiro-core:1.2.3'
         compile 'commons-cli:commons-cli:1.2'
         compile 'org.codehaus.gpars:gpars:1.2.1'
         compile 'fi.solita.clamav:clamav-client:1.0.0'
+        compile 'de.mkammerer:argon2-jvm:2.2'
+        compile 'com.lambdaworks:scrypt:1.4.0'
+        compile 'org.mindrot:jbcrypt:0.4'
     }
     
     tasks.withType( GroovyCompile ) { GroovyCompile compile ->

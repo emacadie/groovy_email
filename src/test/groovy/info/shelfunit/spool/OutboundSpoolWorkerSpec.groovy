@@ -56,7 +56,7 @@ class OutboundSpoolWorkerSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sql = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        config = ConfigHolder.instance.getConfObject()
+        config   = ConfigHolder.instance.getConfObject()
         def host = config.clamav.hostname
         def port = config.clamav.port
         realClamAVClient = this.createClamAVClient()
@@ -68,8 +68,8 @@ class OutboundSpoolWorkerSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        // sql.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
-        // sql.execute "DELETE FROM mail_spool_out where from_username = ?", [ gwString ]
+        sql.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
+        sql.execute "DELETE FROM mail_spool_out where from_username = ?", [ gwString ]
         sql.close()
     }   // run after the last feature method
     
@@ -120,12 +120,12 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        def cleanCount   = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
 	        enteredCount == 7
-	        cleanCount == 0
+	        cleanCount   == 0
 
 	    when:
 	        osw.runClam( sql, realClamAVClient )
 	        enteredCount = getTableCount( sql, sqlCountString, [ 'ENTERED', fromString ] )
-	        cleanCount = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
+	        cleanCount   = getTableCount( sql, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
 	        1 == 1
 	        enteredCount == 0
@@ -157,7 +157,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        _ * ClamAVClient.isCleanReply( outputMock ) // subscriber.receive("hello")
 	        1 == 1
 	        enteredCount == 0
-	        cleanCount == numTimes
+	        cleanCount   == numTimes
 	}
 	
 	@Ignore
@@ -169,9 +169,9 @@ class OutboundSpoolWorkerSpec extends Specification {
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test unclean messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    def clamavMock = Mock( ClamAVClient )
+	    def clamavMock      = Mock( ClamAVClient )
 	    def inputStreamMock = Mock( InputStream )
-	    byte[] outputMock = "FOUND".getBytes()
+	    byte[] outputMock   = "FOUND".getBytes()
 	    def numTimes = 6
 	    when:
 	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' ) }
