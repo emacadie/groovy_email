@@ -2,12 +2,14 @@
 drop table mail_store;
 drop table email_user;
 drop table mail_spool_in;
-drop table mail_spool_out;   
+drop table mail_spool_out;  
+drop table mail_from_log;
 
 -- to create tables
 CREATE TABLE email_user (
     userid serial primary key NOT NULL,
     username      character varying( 64 )  not null unique,
+    username_lc   character varying( 64 )  not null unique,
     password_hash character varying( 150 ) not null,
     password_algo character varying( 32 )  not null,
     iterations    bigint                   not null,
@@ -23,12 +25,13 @@ CREATE INDEX user_base_64_hash ON email_user ( base_64_hash );
 create table mail_store (
     id UUID PRIMARY KEY NOT NULL unique,
     username      character varying( 64 )  not null,
+    username_lc   character varying( 64 )  not null,
     from_address  character varying( 255 ) not null,
     to_address    character varying( 255 ) not null,
     message       bytea,
     text_body     text                     not null,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null,
-    FOREIGN KEY ( username ) REFERENCES email_user ( username ) on delete cascade
+    FOREIGN KEY ( username_lc ) REFERENCES email_user ( username_lc ) on delete cascade
 );
 
 create table mail_spool_in (

@@ -19,16 +19,16 @@ class GETestUtils {
         user: conf.database.dbuser, password: conf.database.dbpassword, driver: conf.database.driver ]
         return db
     }
-    static sql = null
-    static getSql() {
+    static sqlObject = null
+    static getSqlObject() {
         GETestUtils.getDb()
        
-        sql ?: Sql.newInstance( db.url, db.user, db.password, db.driver )
-        return new Sql( sql )
+        sqlObject ?: Sql.newInstance( db.url, db.user, db.password, db.driver )
+        return new Sql( sqlObject )
     }
     
     static def getBase64Hash( username, password ) {
-        "${Character.MIN_VALUE}${username}${Character.MIN_VALUE}${password}".bytes.encodeBase64().toString()
+        "${Character.MIN_VALUE}${username.toLowerCase()}${Character.MIN_VALUE}${password}".bytes.encodeBase64().toString()
     }
     
     static def alphabet =  ( 'a'..'z' ).join()
@@ -44,28 +44,34 @@ class GETestUtils {
     
     static iterations = 10000
     
-    static addUser( sql, firstName, lastName, userName, password, loggedIn = false ) {
-        def params = [ userName, ( new Sha512Hash( password, userName, iterations ).toBase64() ), 'SHA-512', iterations, getBase64Hash( userName, password ), firstName, lastName, 0, loggedIn ]
-        sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )', params
+    static addUser( sqlObject, firstName, lastName, userName, password, loggedIn = false ) {
+        def params = [ userName, userName.toLowerCase(), ( new Sha512Hash( password, userName.toLowerCase(), iterations ).toBase64() ), 
+                       'SHA-512', iterations, getBase64Hash( userName.toLowerCase(), password ), firstName, lastName, 0, loggedIn 
+        ]
+        sqlObject.execute "insert into  email_user( username, username_lc, password_hash, " +
+            "password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in )" +
+            "values ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ? )", params
     }
     
-    static addMessage( def sql, def uuid, def userName, def messageString, def domain, def fromAddress = "hello@test.com" ) {
+    static addMessage( def sqlObject, def uuid, def userName, def messageString, def domain, def fromAddress = "hello@test.com" ) {
         def toAddress = "${userName}@${domain}".toString()
-        def params = [ uuid, userName, fromAddress, toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
+        def params = [ uuid, userName, userName.toLowerCase(), fromAddress, toAddress, messageString ]
+        sqlObject.execute "insert into mail_store(id, username, username_lc, " +
+            "from_address, to_address, text_body) " +
+            "values (?, ?, ?, ?, ?, ?)", params
     }
     
-    static getUserId( sql, userName ) {
-        def userResult = sql.firstRow( 'select userid from email_user where username = ?', [ userName ] )
+    static getUserId( sqlObject, userName ) {
+        def userResult = sqlObject.firstRow( 'select userid from email_user where username_lc = ?', [ userName.toLowerCase() ] )
         return userResult.userid
     }
     
-    static getUserInfo( sql, userName ) {
-        return sql.firstRow( 'select * from email_user where username=?', userName )
+    static getUserInfo( sqlObject, userName ) {
+        return sqlObject.firstRow( 'select * from email_user where username_lc = ?', userName.toLowerCase() )
     }
     
-    static getTableCount( sql, statement, params ) {
-        def result = sql.firstRow( statement, params )
+    static getTableCount( sqlObject, statement, params ) {
+        def result = sqlObject.firstRow( statement, params )
         return result.count
     }
 

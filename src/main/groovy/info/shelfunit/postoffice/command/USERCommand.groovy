@@ -6,10 +6,10 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class USERCommand {
 
-    final Sql sql
+    final Sql sqlObject
     USERCommand( def argSql ) {
         log.info "Starting new USERCommand"
-        this.sql = argSql
+        this.sqlObject = argSql
     }
     
     static regex = '''^(USER )([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
@@ -36,7 +36,7 @@ class USERCommand {
         } else {
         
             def userName = theMessage.substring( 5 ) // convert to regex?
-            def rows = sql.rows( 'select * from email_user where lower( username )=?', userName.toLowerCase() )
+            def rows = sqlObject.rows( 'select * from email_user where lower( username )=?', userName.toLowerCase() )
             log.info "Here is rows, it's a : ${rows.class.name}"
             if ( rows.size() != 0 ) { 
                 bufferMap.userInfo = rows[ 0 ]

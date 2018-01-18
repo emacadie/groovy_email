@@ -20,7 +20,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     TestName name = new TestName()
     
     def crlf = "\r\n"
-    static sql
+    static sqlObject
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static rString    = getRandomString()
     static gwString   = 'gw' + rString
@@ -36,20 +36,20 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'smtpnoauth@showboat.com' ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
+        sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'smtpnoauth@showboat.com' ]
+        sqlObject.close()
     }   // run after the last feature method
     
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
 
 	def "test handling EHLO"() {

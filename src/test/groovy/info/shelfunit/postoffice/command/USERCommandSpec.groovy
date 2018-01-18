@@ -19,7 +19,7 @@ class USERCommandSpec extends Specification {
     def crlf = "\r\n"
     
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
+    static sqlObject
     static userCommand
     static rString     = getRandomString( 12 )
     static gwShelf     = 'gw' + rString // @shelfunit.info'
@@ -40,20 +40,20 @@ class USERCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        userCommand = new USERCommand( sql )
+        userCommand = new USERCommand( sqlObject )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ?)", [ gwShelf, jAdamsShelf, jackShelf ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ?)", [ gwShelf, jAdamsShelf, jackShelf ]
+        sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwShelf, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jAdamsShelf, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", jackShelf, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwShelf, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jAdamsShelf, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", jackShelf, 'somePassword' )
     }
 
 

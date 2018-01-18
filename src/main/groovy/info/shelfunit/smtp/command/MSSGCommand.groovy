@@ -16,15 +16,15 @@ class MSSGCommand {
     static regex = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’ # WTF?
     *+/=?`{|}~^-]+)*)@((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))$(?x)'''    
     
-    final Sql sql
+    final Sql sqlObject
     final List domainList
     final mssgUUID
     MSSGCommand( def argUUID, def argSql, def argDomainList ) {
         log.info "Starting new MSSGCommand"
         log.info "Here is argDomainList: ${argDomainList}"
-        this.sql = argSql
+        this.sqlObject  = argSql
         this.domainList = argDomainList
-        this.mssgUUID = argUUID
+        this.mssgUUID   = argUUID
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -66,11 +66,11 @@ class MSSGCommand {
             sqlString = 'insert into mail_spool_in( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)'
         }
         try {
-            sql.withTransaction {
+            sqlObject.withTransaction {
                 def wholeFromAddress = q.getWholeFromAddressInMSSG()
                 log.info "here are the args: wholeFromAddress: ${wholeFromAddress}, toAddresses: ${toAddresses}, theMessage: ${theMessage}"
                 log.info "About to call sql to enter message"
-                insertCounts = sql.withBatch( sqlString ) { stmt ->
+                insertCounts = sqlObject.withBatch( sqlString ) { stmt ->
                     log.info "stmt is a ${stmt.class.name}"
                     stmt.addBatch( [ 
                         this.mssgUUID, // id, 

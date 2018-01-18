@@ -52,24 +52,24 @@ class MailRunner {
             log.info "still going in runWithActors"
             /*
             def db = ConfigHolder.instance.returnDbMap()         
-            def sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+            def sqlObject = Sql.newInstance( db.url, db.user, db.password, db.driver )
             log.info "Starting clamAV"
             def clamAV = ClamAvClientHolder.getClamAvClient()
             log.info "Starting InboundSpoolWorker"
             def isw = new InboundSpoolWorker()
             log.info "About to run CLAM"
-            isw.runClam( sql, clamAV )
+            isw.runClam( sqlObject, clamAV )
             log.info "About to call moveCleanMessage"
-            isw.moveCleanMessages( sql )
+            isw.moveCleanMessages( sqlObject )
             log.info "about to call deleteTransferredMessages"
-            isw.deleteTransferredMessages( sql )
+            isw.deleteTransferredMessages( sqlObject )
             */
         }
     }
     
     def runWithoutActors( def path ) {
         ConfigHolder.instance.setConfObject( path )
-        def config = ConfigHolder.instance.getConfObject()
+        def config     = ConfigHolder.instance.getConfObject()
         def serverList = [ config.smtp.server.name ]
         config.smtp.other.domains.isEmpty() ?: ( serverList += config.smtp.other.domains )
         PostOfficeServer postO = new PostOfficeServer( serverList )

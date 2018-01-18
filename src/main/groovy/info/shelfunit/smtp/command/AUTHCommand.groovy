@@ -12,18 +12,18 @@ import groovy.util.logging.Slf4j
 class AUTHCommand {
     
     final List domainList
-    final sql
+    final sqlObject
     AUTHCommand( argSql, argDomainList ) {
         log.info "Starting new AUTHCommand"
         log.info "Here is argDomainList: ${argDomainList}"
         this.domainList = argDomainList
-        this.sql = argSql
+        this.sqlObject  = argSql
     }
     
     // http://howtodoinjava.com/2014/11/11/java-regex-validate-email-address/
-    static firstPart = '''^(AUTH PLAIN) '''
+    static firstPart     = '''^(AUTH PLAIN) '''
     static encryptedPart = '''(.*)'''
-    static regex = firstPart + encryptedPart
+    static regex         = firstPart + encryptedPart
     
     static pattern = ~regex
     
@@ -43,7 +43,7 @@ class AUTHCommand {
         } else {
             def q = theMessage =~ pattern
             def base64Part = q.getBase64InAUTH()
-            def userInfoFrombase64 = sql.firstRow( 'select * from email_user where base_64_hash=?', base64Part )
+            def userInfoFrombase64 = sqlObject.firstRow( 'select * from email_user where base_64_hash=?', base64Part )
             
             if ( userInfoFrombase64 ) {
                 bufferMap.userInfo = userInfoFrombase64

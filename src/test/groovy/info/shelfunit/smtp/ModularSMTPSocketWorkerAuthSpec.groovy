@@ -22,7 +22,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
     TestName name = new TestName()
     
     def crlf = "\r\n"
-    static sql
+    static sqlObject
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static rString    = getRandomString()
     static gwString   = 'gw' + rString
@@ -38,21 +38,21 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'smtpwithauth@showboat.com' ]
-        sql.execute "DELETE FROM mail_spool_out where from_address = ?", [ ( gwString + '@shelfunit.info' ) ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
+        sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ 'smtpwithauth@showboat.com' ]
+        sqlObject.execute "DELETE FROM mail_spool_out where from_address = ?", [ ( gwString + '@shelfunit.info' ) ]
+        sqlObject.close()
     }   // run after the last feature method
     
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
 
 	def "test handling EHLO"() {
@@ -94,7 +94,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	
 	def "test with a line containing two periods"() {
 	    def fakeUser = "${gwString}QQQ@shelfunit.info".toString()
-        def mssgCount = getTableCount( sql, 'select count(*) from mail_spool_out where to_address_list = ?' , fakeUser )
+        def mssgCount = getTableCount( sqlObject, 'select count(*) from mail_spool_out where to_address_list = ?' , fakeUser )
 	    when:
 	        def hashString = getBase64Hash( gwString, 'somePassword' )
             def domain = "hot-groovy.com"
@@ -126,7 +126,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
                 "250 OK\r\n" +
                 "221 shelfunit.info Service closing transmission channel\r\n"
           when:
-              def countResult = getTableCount( sql, 'select count(*) from mail_spool_out where to_address_list = ?' , fakeUser )
+              def countResult = getTableCount( sqlObject, 'select count(*) from mail_spool_out where to_address_list = ?' , fakeUser )
           then:
               countResult == ( mssgCount + 1 )
 	}

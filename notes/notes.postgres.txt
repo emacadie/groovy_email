@@ -11,13 +11,13 @@ create user gemail_dev with password 'dev-word-to-pass001';
 create database gemail_dev_db with owner gemail_dev;
 grant all privileges on database gemail_dev_db to gemail_dev;
 
-psql -h localhost -U gemail_dev -d gemail_dev_db
+psql -h localhost --port=5433 -U gemail_dev -d gemail_dev_db
 
 create user gemail_test with password 'dev-word-to-pass002';
 create database gemail_test_db with owner gemail_test;
 grant all privileges on database gemail_test_db to gemail_test;
 
-psql -h localhost -U gemail_test -d gemail_test_db
+psql -h localhost --port=5433 -U gemail_test -d gemail_test_db
 
 pg_dump --schema-only --username=gemail_test --host=localhost --password gemail_test_db
 

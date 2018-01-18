@@ -1,8 +1,8 @@
 package info.shelfunit.mail;
 
-import sun.misc.BASE64Encoder;
-import sun.security.provider.X509Factory;
-import sun.security.x509.*;
+// import sun.misc.BASE64Encoder;
+// import sun.security.provider.X509Factory;
+// import sun.security.x509.*;
 
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
@@ -53,7 +53,7 @@ USAGE:
 public class SecurityTools {
  
     private static final File keyStoreFile = new File( "/home/ericm/tmp/groovy/groovy-mailer/groovy_email.jks" );
- 
+/* 
     public static X509Certificate generateCertificate(String dn, KeyPair pair, int days, String algorithm)
             throws GeneralSecurityException, IOException
     {
@@ -85,7 +85,8 @@ public class SecurityTools {
         cert.sign( privkey, algorithm );
         return cert;
     }
- 
+ */
+/*
     public static SSLSocket convertToSecureSocket( Socket baseSocket, String X500name ) throws Exception {
         KeyStore keyStore = KeyStore.getInstance( "JKS" );
  
@@ -135,7 +136,7 @@ public class SecurityTools {
  
         return sslSocket;
     }
- 
+*/ 
     public static boolean isSSLPacket( BufferedInputStream input ) throws IOException {
         input.mark( 10 );
         byte[] fingerPrint = new byte[ 10 ];

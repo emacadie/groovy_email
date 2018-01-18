@@ -17,36 +17,36 @@ class SpoolActor extends DynamicDispatchActor {
             sleep( 60.seconds() )
             log.info "still going in runWithActors"
             def db = ConfigHolder.instance.returnDbMap()         
-            def sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+            def sqlObject = Sql.newInstance( db.url, db.user, db.password, db.driver )
             log.info "Starting clamAV"
             def clamAV = ClamAvClientHolder.getClamAvClient()
             if ( ClamAvClientHolder.checkClam( clamAV ) ) {
                 log.info "Starting InboundSpoolWorker"
                 def isw = new InboundSpoolWorker()
                 log.info "About to run CLAM"
-                isw.runClam( sql, clamAV )
+                isw.runClam( sqlObject, clamAV )
                 log.info "About to call moveCleanMessage"
-                isw.moveCleanMessages( sql )
+                isw.moveCleanMessages( sqlObject )
                 log.info "about to call deleteTransferredMessages"
-                isw.deleteTransferredMessages( sql )
+                isw.deleteTransferredMessages( sqlObject )
                 log.info "About to construct OutboundSpoolWorker"
                 try {
                     def osw = new OutboundSpoolWorker()
-                    log.info "about to call osw.runClam( sql, clamAV )"
-                    osw.runClam( sql, clamAV )
+                    log.info "about to call osw.runClam( sqlObject, clamAV )"
+                    osw.runClam( sqlObject, clamAV )
                     log.info "here is message.serverList: ${message.serverList}"
-                    osw.findInvalidUsers( sql, message.serverList )
-                    osw.deleteInvalidUserMessages( sql )
+                    osw.findInvalidUsers( sqlObject, message.serverList )
+                    osw.deleteInvalidUserMessages( sqlObject )
                     
-                    log.info "About to call osw.deliverMessages( sql, ${message.serverList}, ${message.port} )"
-                    osw.deliverMessages( sql, message.serverList, message.port )
-                    log.info "About to call osw.deleteTransferredMessages( sql )"
-                    osw.deleteTransferredMessages( sql )
-                    log.info "osw.deleteTransferredMessages( sql )"
+                    log.info "About to call osw.deliverMessages( sqlObject, ${message.serverList}, ${message.port} )"
+                    osw.deliverMessages( sqlObject, message.serverList, message.port )
+                    log.info "About to call osw.deleteTransferredMessages( sqlObject )"
+                    osw.deleteTransferredMessages( sqlObject )
+                    log.info "osw.deleteTransferredMessages( sqlObject )"
                 } catch ( Exception e ) {
                     log.error "Exception: ", e
                 } finally {
-                    sql.close()
+                    sqlObject.close()
                 }
             }
         }

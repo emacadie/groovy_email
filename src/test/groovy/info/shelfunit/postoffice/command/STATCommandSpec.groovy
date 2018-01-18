@@ -22,7 +22,7 @@ class STATCommandSpec extends Specification {
     
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
+    static sqlObject
     static statCommand
     static rString = getRandomString()
     static gwSTAT  = 'gwstat' + rString // @shelfunit.info'
@@ -40,34 +40,34 @@ class STATCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject()
+        sqlObject = ConfigHolder.instance.getSqlObject()
         this.addUsers()
-        statCommand = new STATCommand( sql )
+        statCommand = new STATCommand( sqlObject )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ${gwSTAT}, ${jaSTAT}, ${joSTAT} )"
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ${gwSTAT}, ${jaSTAT}, ${joSTAT} )"
+        sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwSTAT, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaSTAT, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", joSTAT, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwSTAT, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaSTAT, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", joSTAT, 'somePassword' )
     }
 
     def "test uuid list"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = 0
         def messageString = 'aq' * 10
         totalMessageSizeTest = messageString.size()
         def toAddress = "${gwSTAT}@${domainList[ 0 ]}".toString()
-        def params = [ uuid, gwSTAT, 'hello@test.com', toAddress, messageString ]
-        sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params
+        def params = [ uuid, gwSTAT, gwSTAT.toLowerCase(), 'hello@test.com', toAddress, messageString ]
+        sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params
         def bufferInputMap = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = Timestamp.create()
         def userInfo = [:]
 	    userInfo.username = gwSTAT
@@ -83,9 +83,9 @@ class STATCommandSpec extends Specification {
 
         when:
             bufferInputMap = resultMap.bufferMap
-            params = [ UUID.randomUUID(), gwSTAT, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwSTAT ] )
+            params = [ UUID.randomUUID(), gwSTAT, gwSTAT.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwSTAT ] )
         then:
             messageCount == 2
         when:

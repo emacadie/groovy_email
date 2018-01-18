@@ -18,7 +18,7 @@ import groovy.util.logging.Slf4j
 class AUTHCommandSpec extends Specification {
     
     def crlf = "\r\n"
-    static sql
+    static sqlObject
     static authCommand
     static rString = getRandomString()
     static georgeW = 'gw' + rString
@@ -38,21 +38,21 @@ class AUTHCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        authCommand = new AUTHCommand( sql, domainList )
+        authCommand = new AUTHCommand( sqlObject, domainList )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ georgeW, johnA, jackO ]
-        // sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ ( jackO + '@stargate.mil' ) ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ georgeW, johnA, jackO ]
+        // sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ ( jackO + '@stargate.mil' ) ]
+        sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', georgeW, 'somePassword', true )
-        addUser( sql, 'John', 'Adams', johnA, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", jackO, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', georgeW, 'somePassword', true )
+        addUser( sqlObject, 'John', 'Adams', johnA, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", jackO, 'somePassword' )
     }
     
 	def "test handling with AUTH in previous command set"() {

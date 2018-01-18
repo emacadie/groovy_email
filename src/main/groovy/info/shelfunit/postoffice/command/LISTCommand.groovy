@@ -6,10 +6,10 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class LISTCommand {
     
-    final Sql sql
+    final Sql sqlObject 
     LISTCommand( def argSql ) {
         log.info "Starting new LISTCommand"
-        this.sql = argSql
+        this.sqlObject = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -21,7 +21,7 @@ class LISTCommand {
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( !bufferMap.hasSTATInfo() ) {
-            bufferMap.getSTATInfo( sql )
+            bufferMap.getSTATInfo( sqlObject )
         }
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {
@@ -29,7 +29,7 @@ class LISTCommand {
         } else if ( !theMessage.startsWith( 'LIST' ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( theMessage == 'LIST' ) {
-            def rows = sql.rows( 'select length( text_body ) from mail_store where username = ? and msg_timestamp < ? order by msg_timestamp', bufferMap.userInfo.username, bufferMap.timestamp )
+            def rows = sqlObject.rows( 'select length( text_body ) from mail_store where username = ? and msg_timestamp < ? order by msg_timestamp', bufferMap.userInfo.username, bufferMap.timestamp )
             def sBuff = new StringBuilder()
             sBuff << "+OK ${bufferMap.totalMessageSize}\r\n"
             rows.eachWithIndex { r, i ->
@@ -47,7 +47,7 @@ class LISTCommand {
                 def uuid = bufferMap.uuidList[ messageNum - 1 ].id
                 log.info "here is bufferMap.uuidList: ${bufferMap.uuidList}"
                 log.info "uuid is a ${uuid.getClass().name}"
-                def ans = sql.firstRow( "select length( text_body ) from mail_store where id = ?", [ uuid ] )
+                def ans = sqlObject.firstRow( "select length( text_body ) from mail_store where id = ?", [ uuid ] )
                 if ( ans.isEmpty() ) {
                     resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
                 } else {

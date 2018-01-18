@@ -28,7 +28,7 @@ class DELECommandSpec extends Specification {
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static iterations = 10000
     static deleCommand
-    static sql
+    static sqlObject
     static theTimestamp
     static rString = getRandomString()
     static gwDELE  = 'gw' + rString // 'gwdele' // @shelfunit.info'
@@ -52,37 +52,37 @@ class DELECommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        deleCommand = new DELECommand( sql )
+        deleCommand = new DELECommand( sqlObject )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ${gwDELE}, ${jaDELE}, ${joDELE} )"
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ${gwDELE}, ${jaDELE}, ${joDELE} )"
+        sqlObject.close()
     }   // run after the last feature method
     
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwDELE, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaDELE, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", joDELE, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwDELE, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaDELE, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", joDELE, 'somePassword' )
         
-        addMessage( sql, uuidA, gwDELE, msgA, domainList[ 0 ] )
-        addMessage( sql, uuidB, gwDELE, msgB, domainList[ 0 ] )
-        addMessage( sql, uuidC, gwDELE, msgC, domainList[ 0 ] )
+        addMessage( sqlObject, uuidA, gwDELE, msgA, domainList[ 0 ] )
+        addMessage( sqlObject, uuidB, gwDELE, msgB, domainList[ 0 ] )
+        addMessage( sqlObject, uuidC, gwDELE, msgC, domainList[ 0 ] )
         theTimestamp = Timestamp.create()
     }
     
     // @Ignore
     def "test uuid list"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
-        def userInfo = [:]
+        def userInfo      = [:]
 	    userInfo.username = gwDELE
         bufferInputMap.userInfo = userInfo
         sleep( 2.seconds() )
@@ -95,9 +95,9 @@ class DELECommandSpec extends Specification {
         def toAddress = "${gwDELE}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwDELE, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwDELE ] )
+            def params = [ UUID.randomUUID(), gwDELE, gwDELE.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwDELE ] )
         then:
             messageCount == 4
         when:
@@ -108,11 +108,11 @@ class DELECommandSpec extends Specification {
 
 	def "test individual messages"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
         def userInfo = [:]
 	    userInfo.username = gwDELE
@@ -125,7 +125,7 @@ class DELECommandSpec extends Specification {
             resultMap.resultString == "+OK message 1 deleted"  
             resultMap.bufferMap.deleteMap.containsKey( 1 ) == true
             resultMap.bufferMap.deleteMap.containsKey( 2 ) == false
-            resultMap.bufferMap.deleteMap[ 1 ].toString() == uuidA.toString()
+            resultMap.bufferMap.deleteMap[ 1 ].toString()  == uuidA.toString()
         
         when:
             resultMap = deleCommand.process( 'DELE 3', [] as Set, bufferInputMap )
@@ -134,7 +134,7 @@ class DELECommandSpec extends Specification {
             resultMap.resultString == "+OK message 3 deleted"  
             resultMap.bufferMap.deleteMap.containsKey( 3 ) == true
             resultMap.bufferMap.deleteMap.containsKey( 2 ) == false
-            resultMap.bufferMap.deleteMap[ 3 ].toString() == uuidC.toString()
+            resultMap.bufferMap.deleteMap[ 3 ].toString()  == uuidC.toString()
             
         when:
             resultMap = deleCommand.process( 'DELE 2', [] as Set, bufferInputMap )
@@ -142,15 +142,15 @@ class DELECommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK message 2 deleted" 
             resultMap.bufferMap.deleteMap.containsKey( 2 ) == true
-            resultMap.bufferMap.deleteMap[ 2 ].toString() == uuidB.toString()
+            resultMap.bufferMap.deleteMap[ 2 ].toString()  == uuidB.toString()
         
         def messageStringB = 'aw' * 11
         def toAddress = "${gwDELE}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwDELE, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwDELE ] )
+            def params     = [ UUID.randomUUID(), gwDELE, gwDELE.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwDELE ] )
         then:
             messageCount == 5
         

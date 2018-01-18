@@ -9,7 +9,7 @@ import groovy.util.ConfigSlurper
 class ConfigHolder {
     ConfigObject confObject
     
-    Sql sql = null
+    Sql sqlObject = null
     
     def setConfObject( String filePath ) {
         confObject = new ConfigSlurper().parse( new File( filePath ).toURL() )
@@ -27,11 +27,11 @@ class ConfigHolder {
     }
     
     def getSqlObject() {
-        return sql ?: Sql.newInstance( 
+        return sqlObject ?: Sql.newInstance( 
             "jdbc:postgresql://${confObject.database.host_and_port}/${confObject.database.dbname}", // db.url,
-            confObject.database.dbuser, // db.user, 
+            confObject.database.dbuser,      // db.user, 
             confObject.database.dbpassword, // db.password, 
-            confObject.database.driver // db.driver 
+            confObject.database.driver      // db.driver 
         )
         
     }

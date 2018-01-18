@@ -9,12 +9,12 @@ class QUITCommand {
 
     final def regex = "RETR\\s\\d+"
     
-    final Sql sql
+    final Sql sqlObject
     final serverName
     
     QUITCommand( def argSql, def argServerName ) {
         log.info "Starting new QUITCommand"
-        this.sql        = argSql
+        this.sqlObject  = argSql
         this.serverName = argServerName
     }
     
@@ -34,11 +34,11 @@ class QUITCommand {
             resultMap.resultString = "+OK ${serverName}  POP3 server signing off"
         } else if ( bufferMap.state == 'TRANSACTION' ) {
             if ( !bufferMap.hasSTATInfo() && !bufferMap.userInfo ) {
-                bufferMap.getSTATInfo( sql )
+                bufferMap.getSTATInfo( sqlObject )
             }
             log.info "in the reg ex part"
             log.info "here is bufferMap in QUITCommand.process: ${bufferMap}"
-            def idsToDelete = bufferMap.deleteMap?.values() as List
+            def idsToDelete        = bufferMap.deleteMap?.values() as List
             resultMap.resultString = "+OK ${serverName} POP3 server signing off"
             
             def result = '250 OK'
@@ -62,7 +62,7 @@ class QUITCommand {
         def result = '250 OK'
         log.info "in changedLoggedInFlag with arg ${argUserid}"
         try {
-            sql.executeUpdate "UPDATE email_user set logged_in = ? where userid = ?", [ false, argUserid ]
+            sqlObject.executeUpdate "UPDATE email_user set logged_in = ? where userid = ?", [ false, argUserid ]
         } catch ( SQLException ex ) {
             result = '500 Something went wrong'
         }
@@ -74,7 +74,7 @@ class QUITCommand {
         if ( idsToDelete ) {
             try {
                 log.info "here is idsToDelete: ${idsToDelete} and it is a ${idsToDelete.getClass().name}"
-                sql.execute "DELETE from mail_store where id in (${ idsToDelete.getQMarkString() })", idsToDelete
+                sqlObject.execute "DELETE from mail_store where id in (${ idsToDelete.getQMarkString() })", idsToDelete
                 log.info "Called the delete command"
             } catch ( Exception e ) {
                 result = '500 Something went wrong'

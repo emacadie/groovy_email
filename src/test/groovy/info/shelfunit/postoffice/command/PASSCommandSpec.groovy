@@ -25,7 +25,7 @@ class PASSCommandSpec extends Specification {
     static iterations = 10000
     static passCommand
     static somePassword = 'somePassword'
-    static sql
+    static sqlObject
     static rString     = getRandomString( 12 )
     static gwPASS     = 'gw' + rString // @shelfunit.info'
     static jaPASS  = 'ja' + rString // @shelfunit.info'
@@ -43,20 +43,20 @@ class PASSCommandSpec extends Specification {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         def conf = ConfigHolder.instance.getConfObject()
-        sql = ConfigHolder.instance.getSqlObject()
-        passCommand = new PASSCommand( sql )
+        sqlObject = ConfigHolder.instance.getSqlObject()
+        passCommand = new PASSCommand( sqlObject )
         this.addUsers()
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ?)", [ gwPASS, jaPASS, onPASS ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ?)", [ gwPASS, jaPASS, onPASS ]
+        sqlObject.close()
     }   // run after the last feature method
     
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwPASS, somePassword )
-        addUser( sql, 'John', 'Adams', jaPASS, somePassword )
-        addUser( sql, 'Jack', "O'Neill", onPASS, somePassword )
+        addUser( sqlObject, 'George', 'Washington', gwPASS, somePassword )
+        addUser( sqlObject, 'John', 'Adams', jaPASS, somePassword )
+        addUser( sqlObject, 'Jack', "O'Neill", onPASS, somePassword )
     }
     
     def "test wrong buffer state"() {
@@ -153,11 +153,11 @@ class PASSCommandSpec extends Specification {
 	    	    
 	    def bufferMap = [:]
 	    bufferMap.state = 'AUTHORIZATION'
-	    bufferMap.userInfo = getUserInfo( sql, jaPASS )
+	    bufferMap.userInfo = getUserInfo( sqlObject, jaPASS )
         def resultMap
 
         when:
-            bufferMap.userInfo = getUserInfo( sql, jaPASS )
+            bufferMap.userInfo = getUserInfo( sqlObject, jaPASS )
         then:
             bufferMap.userInfo.logged_in == false
         
@@ -169,7 +169,7 @@ class PASSCommandSpec extends Specification {
 	        resultMap.bufferMap.timestamp.class.name == 'java.sql.Timestamp'
 	        
 	    when:
-            bufferMap.userInfo = getUserInfo( sql, jaPASS )
+            bufferMap.userInfo = getUserInfo( sqlObject, jaPASS )
         then:
             bufferMap.userInfo.logged_in == true
 	}
@@ -181,11 +181,11 @@ class PASSCommandSpec extends Specification {
 	    	    
 	    def bufferMap = [:]
 	    bufferMap.state = 'AUTHORIZATION'
-	    bufferMap.userInfo = getUserInfo( sql, onPASS )
+	    bufferMap.userInfo = getUserInfo( sqlObject, onPASS )
         def resultMap
 
         when:
-            bufferMap.userInfo = getUserInfo( sql, onPASS )
+            bufferMap.userInfo = getUserInfo( sqlObject, onPASS )
         then:
             bufferMap.userInfo.logged_in == false
         
@@ -194,7 +194,7 @@ class PASSCommandSpec extends Specification {
         then:
             resultMap.resultString == "-ERR ${onPASS} not authenticated"
         when:
-            bufferMap.userInfo = getUserInfo( sql, onPASS )
+            bufferMap.userInfo = getUserInfo( sqlObject, onPASS )
         then:
             bufferMap.userInfo.logged_in == false
             
@@ -206,7 +206,7 @@ class PASSCommandSpec extends Specification {
 	        resultMap.bufferMap.timestamp.class.name == 'java.sql.Timestamp'
 	        
 	    when:
-            bufferMap.userInfo = getUserInfo( sql, onPASS )
+            bufferMap.userInfo = getUserInfo( sqlObject, onPASS )
         then:
             bufferMap.userInfo.logged_in == true
 	}

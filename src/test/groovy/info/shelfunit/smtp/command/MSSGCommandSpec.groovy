@@ -18,7 +18,7 @@ import groovy.util.logging.Slf4j
 class MSSGCommandSpec extends Specification {
     
     def crlf = "\r\n"
-    static sql
+    static sqlObject
     // static mssgCommand
     static rString = getRandomString()
     static georgeW = 'gw' + rString
@@ -38,25 +38,25 @@ class MSSGCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ georgeW, johnA, jackO ]
-        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ ( jackO + '@stargate.mil' ) ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ georgeW, johnA, jackO ]
+        sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ ( jackO + '@stargate.mil' ) ]
+        sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', georgeW, 'somePassword' )
-        addUser( sql, 'John', 'Adams', johnA, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", jackO, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', georgeW, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', johnA, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", jackO, 'somePassword' )
     }
     
 	def "test handling wrong command"() {
           def mssgUUID = UUID.randomUUID()
-          def mssgCommand = new MSSGCommand( mssgUUID, sql, domainList )
+          def mssgCommand = new MSSGCommand( mssgUUID, sqlObject, domainList )
 	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: 'oneillMSSG@stargate.mil' ]
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
@@ -70,19 +70,19 @@ class MSSGCommandSpec extends Specification {
 	// @Ignore
 	def "test handling a message"() {
           def mssgUUID = UUID.randomUUID()
-          def mssgCommand = new MSSGCommand( mssgUUID, sql, domainList )
+          def mssgCommand = new MSSGCommand( mssgUUID, sqlObject, domainList )
 	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
         }
-        def mssgCount = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
+        def mssgCount = getTableCount( sqlObject, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
             
         def theMessage = "The next meeting of the board of directors will be on Tuesday.\nJohn."
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
 	    when:
 	        def mailResponse = mssgCommand.addMessageToDatabase( theMessage, bufferMapArg ) 
-	        def countResult = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
+	        def countResult = getTableCount( sqlObject, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
 	    then:
 	        mailResponse == "250 OK"
 	        countResult == ( mssgCount + 1 )
@@ -91,13 +91,13 @@ class MSSGCommandSpec extends Specification {
 	// @Ignore
 	def "test handling a non-existant inbound recipient"() {
           def mssgUUID = UUID.randomUUID()
-          def mssgCommand = new MSSGCommand( mssgUUID, sql, domainList )
+          def mssgCommand = new MSSGCommand( mssgUUID, sqlObject, domainList )
 	    def bufferMapArg = [ forwardPath:[ johnA + '@shelfunit.info', georgeW + '@shelfunit.info' , 'chumba-wumba@shelfunit.info' ], reversePath: jackO + '@stargate.mil' ]
 	    def uuidSet = [] as Set
 	    bufferMapArg.forwardPath.size().times() {
             uuidSet << UUID.randomUUID() 
         }
-        def mssgCount = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
+        def mssgCount = getTableCount( sqlObject, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
      
         def theMessage = "The next meeting of the board of directors will be on Friday.\nStay Groovy\nJohn."
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
@@ -106,13 +106,13 @@ class MSSGCommandSpec extends Specification {
 	    then:
 	        mailResponse == "250 OK"
 	    when:
-	        def countResult = getTableCount( sql, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
+	        def countResult = getTableCount( sqlObject, 'select count(*) from mail_spool_in where from_address = ?', ( jackO + '@stargate.mil' ) )
 	    then:
 	        countResult == ( mssgCount + 1 )
 	}
 	
 	def "test getting the data"() {
-	    sql.eachRow( 'select * from mail_store' ) { mailItem ->
+	    sqlObject.eachRow( 'select * from mail_store' ) { mailItem ->
 	        println mailItem.id.toString()
             println "mailItem.text_body is a ${mailItem.text_body.getClass().getName()}"
             println "mailItem.text_body: ${mailItem.text_body}"

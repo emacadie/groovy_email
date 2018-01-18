@@ -18,7 +18,7 @@ class RCPTCommandSpec extends Specification {
     
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
+    static sqlObject
     static rcptCommand
     static rString  = getRandomString()
     static hamilton = 'alexander@shelfunit.info'
@@ -56,20 +56,20 @@ class RCPTCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         rcptCommand = new RCPTCommand( domainList )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, joString ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, joString ]
+        sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", joString, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", joString, 'somePassword' )
     }
     
 	def "test handling wrong command"() {

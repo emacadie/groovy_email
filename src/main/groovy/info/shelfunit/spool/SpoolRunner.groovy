@@ -7,15 +7,15 @@ import info.shelfunit.mail.ConfigHolder
 class SpoolRunner {
     
     private config
-    final Sql sql
+    final Sql sqlObject
     def iSW
     def clamavj
     
     SpoolRunner() {
         this.config = ConfigHolder.instance.getConfObject()
-        sql = ConfigHolder.instance.getSqlObject()
-        iSW = new InboundSpoolWorker()
-        clamavj = createClamAVClient( config.clamav.hostname, config.clamav.port )
+        sqlObject   = ConfigHolder.instance.getSqlObject()
+        iSW         = new InboundSpoolWorker()
+        clamavj     = createClamAVClient( config.clamav.hostname, config.clamav.port )
     }
     
     def createClamAVClient( host, port ) {
@@ -35,7 +35,7 @@ class SpoolRunner {
     
     def runClamInbound() {
         if ( checkClam() ) {
-            iSW.runClam( sql, clamavj )
+            iSW.runClam( sqlObject, clamavj )
         }
     }
 }

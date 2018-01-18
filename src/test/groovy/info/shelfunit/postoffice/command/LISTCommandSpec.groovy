@@ -26,7 +26,7 @@ class LISTCommandSpec extends Specification {
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static listCommand
-    static sql
+    static sqlObject
     static theTimestamp
     static rString = getRandomString()
     static gwLIST  = 'gw' + rString // @shelfunit.info'
@@ -50,31 +50,31 @@ class LISTCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        def conf = ConfigHolder.instance.getConfObject()
-        sql = ConfigHolder.instance.getSqlObject() 
+        def conf  = ConfigHolder.instance.getConfObject()
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        listCommand = new LISTCommand( sql )
+        listCommand = new LISTCommand( sqlObject )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ${gwLIST}, ${jaLIST}, ${joLIST} )"
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ${gwLIST}, ${jaLIST}, ${joLIST} )"
+        sqlObject.close()
     }   // run after the last feature method
 
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwLIST, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaLIST, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", joLIST, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwLIST, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaLIST, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", joLIST, 'somePassword' )
         
-        addMessage( sql, uuidA, gwLIST, msgA, domainList[ 0 ] )
-        addMessage( sql, uuidB, gwLIST, msgB, domainList[ 0 ] )
-        addMessage( sql, uuidC, gwLIST, msgC, domainList[ 0 ] )
+        addMessage( sqlObject, uuidA, gwLIST, msgA, domainList[ 0 ] )
+        addMessage( sqlObject, uuidB, gwLIST, msgB, domainList[ 0 ] )
+        addMessage( sqlObject, uuidC, gwLIST, msgC, domainList[ 0 ] )
         theTimestamp = Timestamp.create()
     }
 
     def "test uuid list"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
@@ -98,9 +98,9 @@ class LISTCommandSpec extends Specification {
         def toAddress = "${gwLIST}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwLIST, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwLIST ] )
+            def params = [ UUID.randomUUID(), gwLIST, gwLIST.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwLIST ] )
         then:
             messageCount == 4
         when:
@@ -149,9 +149,9 @@ class LISTCommandSpec extends Specification {
         def toAddress = "${gwLIST}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwLIST, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwLIST ] )
+            def params = [ UUID.randomUUID(), gwLIST, gwLIST.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwLIST ] )
         then:
             messageCount == 5
         

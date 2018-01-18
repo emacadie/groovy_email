@@ -30,7 +30,7 @@ class ModularSMTPSocketWorker {
     @Hidden rawCommandList
     @Hidden def bufferMap
     @Hidden def copyMap
-    @Hidden def sql
+    @Hidden def sqlObject
     @Hidden def domainList
     @Hidden def commandResultMap
     @Hidden def mssgUUID
@@ -45,7 +45,7 @@ class ModularSMTPSocketWorker {
         output = argOut
         
         def db     = ConfigHolder.instance.returnDbMap()         
-        sql        = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sqlObject  = Sql.newInstance( db.url, db.user, db.password, db.driver )
         domainList = []
         argDomainList.collect{ domainList << it.toLowerCase() }
         
@@ -129,9 +129,9 @@ class ModularSMTPSocketWorker {
     def commitIncomingMailLog(  ) {
       def sqlString = 'insert into mail_from_log( id, from_ip_address, from_username, from_domain, to_address_list, status_string, command_sequence ) values (?, ?, ?, ?, ?, ?, ?)'
       try {
-            sql.withTransaction {
+            sqlObject.withTransaction {
                 log.info "About to call sql to enter message"
-                def insertCounts = sql.withBatch( sqlString ) { stmt ->
+                def insertCounts = sqlObject.withBatch( sqlString ) { stmt ->
                     log.info "stmt is a ${stmt.class.name}"
                     stmt.addBatch( [ 
                         UUID.randomUUID(), // id, 
@@ -158,7 +158,7 @@ class ModularSMTPSocketWorker {
     } // def commitIncomingMailLog()
     
     def cleanup() {
-        sql.close()
+        sqlObject.close()
     }
 
     def updateVarsFromBufferMap() {
@@ -205,11 +205,11 @@ class ModularSMTPSocketWorker {
     def returnCurrentCommand( theMessage, isActualMessage ) {
         log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
         if ( isActualMessage ) {
-            return new MSSGCommand( this.mssgUUID, sql, domainList )
+            return new MSSGCommand( this.mssgUUID, sqlObject, domainList )
         } else if ( theMessage.isHelloCommand() ) {
             return new EHLOCommand()
         } else if ( theMessage.startsWith( 'MAIL' ) ) {
-            return new MAILCommand( sql, domainList )
+            return new MAILCommand( sqlObject, domainList )
         } else if ( theMessage.startsWith( 'RCPT' ) ) {
             return new RCPTCommand( domainList )
         } else if ( theMessage.startsWith( 'RSET' ) ) {
@@ -219,7 +219,7 @@ class ModularSMTPSocketWorker {
         } else if ( theMessage.startsWith( 'QUIT' ) ) {
             return new QUITCommand( domainList )
         } else if ( theMessage.startsWith( 'AUTH' ) ) {
-            return new AUTHCommand( sql, domainList )
+            return new AUTHCommand( sqlObject, domainList )
         }
     }
 

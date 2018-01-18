@@ -10,11 +10,11 @@ import org.apache.shiro.crypto.hash.Sha512Hash
 @Slf4j
 class PASSCommand {
     
-    final sql
+    final sqlObject
     
     PASSCommand( argSql ) {
         log.info "Starting new PASSCommand"
-        this.sql = argSql
+        this.sqlObject = argSql
     }
     
     static regex = '''^(PASS )(.*)$(?x)'''
@@ -69,7 +69,7 @@ class PASSCommand {
         def result = '250 OK'
         log.info "in changedLoggedInFlag with arg ${argUserid}"
         try {
-            sql.executeUpdate "UPDATE email_user set logged_in = ? where userid = ?", [ true, argUserid ]
+            sqlObject.executeUpdate "UPDATE email_user set logged_in = ? where userid = ?", [ true, argUserid ]
         } catch ( SQLException ex ) {
             result = '500 Something went wrong'
         }

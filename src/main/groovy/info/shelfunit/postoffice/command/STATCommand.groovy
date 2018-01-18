@@ -6,10 +6,10 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class STATCommand {
 
-    final Sql sql
+    final Sql sqlObject
     STATCommand( def argSql ) {
         log.info "Starting new STATCommand"
-        this.sql = argSql
+        this.sqlObject = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -27,7 +27,7 @@ class STATCommand {
             resultMap.resultString = "-ERR Command not in proper form"
         } else {
             if ( !bufferMap.hasSTATInfo() ) {
-                bufferMap.getSTATInfo( sql )
+                bufferMap.getSTATInfo( sqlObject )
             }
             def userInfo  = bufferMap.userInfo
             def timestamp = bufferMap.timestamp

@@ -25,7 +25,7 @@ class RETRCommandSpec extends Specification {
     
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
+    static sqlObject
     static retrCommand
     static theTimestamp
     static rString = getRandomString()
@@ -50,38 +50,38 @@ class RETRCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject()
+        sqlObject = ConfigHolder.instance.getSqlObject()
         this.addUsers()
-        retrCommand = new RETRCommand( sql )
+        retrCommand = new RETRCommand( sqlObject )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ${gwRETR}, ${jaRETR}, ${joRETR} )"
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ${gwRETR}, ${jaRETR}, ${joRETR} )"
+        sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwRETR, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaRETR, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", joRETR, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwRETR, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaRETR, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", joRETR, 'somePassword' )
         
-        addMessage( sql, uuidA, gwRETR, msgA, domainList[ 0 ] )
-        addMessage( sql, uuidB, gwRETR, msgB, domainList[ 0 ] )
-        addMessage( sql, uuidC, gwRETR, msgC, domainList[ 0 ] )
+        addMessage( sqlObject, uuidA, gwRETR, msgA, domainList[ 0 ] )
+        addMessage( sqlObject, uuidB, gwRETR, msgB, domainList[ 0 ] )
+        addMessage( sqlObject, uuidC, gwRETR, msgC, domainList[ 0 ] )
         
         theTimestamp = Timestamp.create()
     }
 
     def "test uuid list"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
         def userInfo = [:]
-	    userInfo.username = gwRETR
+	    userInfo.username        = gwRETR
         bufferInputMap.userInfo = userInfo
         sleep( 2.seconds() )
         when:
@@ -94,9 +94,9 @@ class RETRCommandSpec extends Specification {
         def toAddress = "${gwRETR}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwRETR, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRETR ] )
+            def params = [ UUID.randomUUID(), gwRETR, gwRETR.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwRETR ] )
         then:
             messageCount == 4
         when:
@@ -109,13 +109,13 @@ class RETRCommandSpec extends Specification {
 	
 	def "test individual messages"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
-        def bufferInputMap = [:]
+        def bufferInputMap       = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
-        def userInfo = [:]
+        def userInfo      = [:]
 	    userInfo.username = gwRETR
         bufferInputMap.userInfo = userInfo
         sleep( 2.seconds() )
@@ -139,12 +139,12 @@ class RETRCommandSpec extends Specification {
 
         
         def messageStringB = 'aw' * 11
-        def toAddress = "${gwRETR}@${domainList[ 0 ]}".toString()
+        def toAddress      = "${gwRETR}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwRETR, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount= getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRETR ] )
+            def params = [ UUID.randomUUID(), gwRETR, gwRETR.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwRETR ] )
         then:
             messageCount == 5
         

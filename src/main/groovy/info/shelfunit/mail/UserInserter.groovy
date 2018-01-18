@@ -26,7 +26,7 @@ class UserInserter {
                 ConfigHolder.instance.setConfObject( options.configPath )
                 
                 def db = ConfigHolder.instance.returnDbMap() 
-                def userMap = [ iterations: options.iterations, user: options.user, fName: options.fName, lName: options.lName, pass: options.pass ]
+                def userMap = [ iterations: options.iterations, user: options.user, userLc: options.user.toLowerCase(), fName: options.fName, lName: options.lName, pass: options.pass ]
                 createUser( db, userMap )
             }
             
@@ -41,7 +41,7 @@ class UserInserter {
     def createUser( dbMap, userMap ) {
         
         try {
-            def sql = Sql.newInstance( dbMap.url, dbMap.user, dbMap.password, dbMap.driver )
+            def sqlObject = Sql.newInstance( dbMap.url, dbMap.user, dbMap.password, dbMap.driver )
                 
             log.info "Here is userMap.iterations: ${userMap.iterations}"
             log.info "Here is userMap.user: ${userMap.user}"
@@ -50,11 +50,13 @@ class UserInserter {
             log.info "Here is userMap.pass: ${userMap.pass}"
             def numIterations = ( userMap.iterations.toInteger() ) * 1000
             def salt = options.user
-            def hashedPass = new Sha512Hash( userMap.pass, userMap.user, numIterations )
+            def hashedPass = new Sha512Hash( userMap.pass, userMap.user.toLowerCase(), numIterations )
             def base64Hash = "${Character.MIN_VALUE}${userMap.user}${Character.MIN_VALUE}${userMap.pass}".bytes.encodeBase64().toString()
-            def params = [ userMap.user, hashedPass.toBase64(), 'SHA-512', numIterations, base64Hash, userMap.fName, userMap.lName, 0 ]
+            def params = [ userMap.user, userMap.user.toLowerCase(), hashedPass.toBase64(), 'SHA-512', numIterations, base64Hash, userMap.fName, userMap.lName, 0 ]
             log.info "params: ${params}"
-            sql.execute 'insert into  email_user( username, password_hash, password_algo, iterations, base_64_hash, first_name, last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ? )', params
+            sqlObject.execute "insert into email_user( username, username_lc, password_hash, " +
+                "password_algo, iterations, base_64_hash, first_name, " +
+                "last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )", params
            
         } catch ( Exception pe ) {
             pe.printStackTrace()

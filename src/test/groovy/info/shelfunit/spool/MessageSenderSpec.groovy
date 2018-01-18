@@ -26,7 +26,7 @@ class MessageSenderSpec extends Specification {
     TestName name = new TestName()
     
     def crlf = "\r\n"
-    static sql
+    static sqlObject
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static rString    = getRandomString()
     static gwString   = 'gw' + rString
@@ -38,7 +38,7 @@ class MessageSenderSpec extends Specification {
     static uuidList = []
     static params = []
     static mSender = new MessageSender()
-    static sqlCountString = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
+    static sqlCountString      = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
     static sqlCountStoreString = 'select count(*) from mail_store where from_address = ?'
     
     
@@ -51,23 +51,23 @@ class MessageSenderSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject() 
+        sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         config = ConfigHolder.instance.getConfObject()
 
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        sql.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
-        sql.execute "DELETE FROM mail_spool_out where from_address in (?, ?, ?, ?)", [ fromString, gwString, jaString, tjString ]
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
+        sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
+        sqlObject.execute "DELETE FROM mail_spool_out where from_address in (?, ?, ?, ?)", [ fromString, gwString, jaString, tjString ]
+        sqlObject.close()
     }   // run after the last feature method
     
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", tjString, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", tjString, 'somePassword' )
     }
     
     /*
@@ -79,7 +79,7 @@ class MessageSenderSpec extends Specification {
         params << message
         params << 'ENTERED'
         params << gwBase64Hash
-        sql.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
+        sqlObject.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
     }
     */
     
@@ -93,11 +93,11 @@ class MessageSenderSpec extends Specification {
         params << message   // text_body,
         params << status    // status_string,  
         params << gwBase64Hash // base_64_hash
-        sql.execute 'insert into mail_spool_out( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
+        sqlObject.execute 'insert into mail_spool_out( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
     }
     
     def getMessage( uuid ) {
-        return sql.firstRow( 'select * from mail_spool_out where id = ?', [ uuid ] )
+        return sqlObject.firstRow( 'select * from mail_spool_out where id = ?', [ uuid ] )
     }
 
     def "first test"() {

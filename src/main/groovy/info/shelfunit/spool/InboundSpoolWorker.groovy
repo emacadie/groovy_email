@@ -10,20 +10,19 @@ class InboundSpoolWorker{
     // states of message: ENTERED, CLEAN (clean CalmAV scan) or UNCLEAN (unclean ClamAV scan)
     // TRANSFERRED: a clean message has been copied to mail_store for each user listed in the message
     
-    // final config
-    final sql
     ClamAVClient clamavj
-    static final QUERY_STATUS_STRING = 'select * from mail_spool_in where status_string = ?'
-    static final INSERT_STRING       = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
-    static final SELECT_USER_STRING  = 'select username from email_user where lower( username ) = ?'
+    static final QUERY_SPOOL_STATUS      = 'select * from mail_spool_in where status_string = ?'
+    static final INSERT_INTO_MAIL_STORE  = "insert into mail_store( id, username, username_lc, " +
+        "from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ?, ? )"
+    static final SELECT_USER_STRING      = 'select username_lc from email_user where username_lc = ?'
     
     InboundSpoolWorker( ) {
     }
     
-    def runClam( sql, clamavj ) {
+    def runClam( sqlObject, clamavj ) {
         def cleanUUIDs   = []
         def uncleanUUIDs = []
-        sql.eachRow( QUERY_STATUS_STRING, [ 'ENTERED' ] ) { row ->
+        sqlObject.eachRow( QUERY_SPOOL_STATUS, [ 'ENTERED' ] ) { row ->
             byte[] data = row[ 'text_body' ].getBytes()
             InputStream input = new ByteArrayInputStream( data )
             log.info "input is a ${input.getClass().name}"
@@ -33,33 +32,33 @@ class InboundSpoolWorker{
             } else {
                 uncleanUUIDs << row[ 'id' ]
             }
-        } // sql.eachRow
-       this.updateMessageStatus( sql, cleanUUIDs, 'CLEAN' )
+        } // sqlObject.eachRow
+       this.updateMessageStatus( sqlObject, cleanUUIDs, 'CLEAN' )
        if ( _not( uncleanUUIDs.isEmpty() ) ) { 
-           this.updateMessageStatus( sql, uncleanUUIDs, 'UNCLEAN' ) 
+           this.updateMessageStatus( sqlObject, uncleanUUIDs, 'UNCLEAN' ) 
        }
     } // runClam
     
-    def updateMessageStatus( sql, uuidList, status ) {
+    def updateMessageStatus( sqlObject, uuidList, status ) {
         try {
             log.info "here is idsToDelete: ${uuidList} and it is a ${uuidList.getClass().name}"
             def insertCounts 
-            def params = []
+            def params    = []
             def newObject = uuidList.plus( 0, status )
             log.info "newObject is a ${newObject.getClass().name}, here it is: ${newObject}"
             if ( _not( uuidList.isEmpty() ) ) { 
-                sql.withTransaction {
+                sqlObject.withTransaction {
                     params << status
                     params += uuidList // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
-                    sql.execute( "UPDATE mail_spool_in set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
+                    sqlObject.execute( "UPDATE mail_spool_in set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
                 }
             }
             if ( _not( uuidList.isEmpty() ) ) {
                 params = []
-                sql.withTransaction {
+                sqlObject.withTransaction {
                     params << status
                     params += uuidList // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
-                    sql.execute( "UPDATE mail_from_log set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
+                    sqlObject.execute( "UPDATE mail_from_log set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
                 }
             }
             
@@ -89,13 +88,13 @@ class InboundSpoolWorker{
         return messageIsClean
     }
     
-    def moveCleanMessages( sql ) {
+    def moveCleanMessages( sqlObject ) {
         def nameToCheck
         def rows
         def uuidsToDelete = []
         def toAddressList
-        sql.eachRow( QUERY_STATUS_STRING, [ 'CLEAN' ] ) { row ->
-            sql.withTransaction {
+        sqlObject.eachRow( QUERY_SPOOL_STATUS, [ 'CLEAN' ] ) { row ->
+            sqlObject.withTransaction {
                 log.info "---------------------------------------------------------------------------------------\n\n"
                 log.info "row['text_body'] is a ${row['text_body'].getClass().name}"
                 // in the database, the "list" is one field, so it's not quite a groovy list
@@ -103,35 +102,45 @@ class InboundSpoolWorker{
                 
                 toAddressList.each { address ->
                     nameToCheck = address.replaceFirst( '@.*', '' )
-                    rows = sql.rows( SELECT_USER_STRING, nameToCheck.toLowerCase() )
+                    log.info "Here is nameToCheck: ${nameToCheck}"
+                    rows = sqlObject.rows( SELECT_USER_STRING, nameToCheck.toLowerCase() )
                     def newUUID = UUID.randomUUID()
                     if ( _not( rows.isEmpty() ) ) {
-                        sql.execute( INSERT_STRING, [ newUUID, nameToCheck, row[ 'from_address' ], address, row[ 'text_body' ], row[ 'msg_timestamp' ] ] )
+                        sqlObject.execute( INSERT_INTO_MAIL_STORE, 
+                             [ newUUID,                   // id
+                               nameToCheck,               // username
+                               nameToCheck.toLowerCase(), // username_lc
+                               row[ 'from_address' ],     // "from_address
+                               address,                   // to_address
+                               row[ 'text_body' ],        // text_body 
+                               row[ 'msg_timestamp' ]     // msg_timestamp
+                             ] 
+                        )
                         log.info "Entered ${newUUID} into mail_store from ${row[ 'id' ]} in mail_spool_in"
                     }
                 }
             }
             uuidsToDelete << row[ 'id' ]
-        } // sql.eachRow
-        this.updateMessageStatus( sql, uuidsToDelete, 'TRANSFERRED' )
+        } // sqlObject.eachRow
+        this.updateMessageStatus( sqlObject, uuidsToDelete, 'TRANSFERRED' )
     }
     
-    def deleteTransferredMessages( sql ) {
-        this.deleteMessages( sql, 'TRANSFERRED' )
+    def deleteTransferredMessages( sqlObject ) {
+        this.deleteMessages( sqlObject, 'TRANSFERRED' )
     }
     
-    def deleteUncleanMessages( sql ) {
-        this.deleteMessages( sql, 'UNCLEAN' )
+    def deleteUncleanMessages( sqlObject ) {
+        this.deleteMessages( sqlObject, 'UNCLEAN' )
     }
     
-    private deleteMessages( sql, status ) {
+    private deleteMessages( sqlObject, status ) {
         def uuidsToDelete = []
-        sql.eachRow( QUERY_STATUS_STRING, [ status ] ) { row ->
+        sqlObject.eachRow( QUERY_SPOOL_STATUS, [ status ] ) { row ->
             uuidsToDelete << row[ 'id' ]
         }
         if ( _not( uuidsToDelete.isEmpty() ) ) {
-            sql.withTransaction {
-                sql.execute "DELETE from mail_spool_in where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
+            sqlObject.withTransaction {
+                sqlObject.execute "DELETE from mail_spool_in where id in (${ uuidsToDelete.getQMarkString() })", uuidsToDelete
             }
         }
     }

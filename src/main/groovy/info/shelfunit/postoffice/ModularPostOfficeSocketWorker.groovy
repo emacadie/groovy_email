@@ -28,7 +28,7 @@ class ModularPostOfficeSocketWorker {
     @Hidden String serverName
     @Hidden prevCommandSet 
     @Hidden def bufferMap
-    @Hidden def sql
+    @Hidden def sqlObject
     @Hidden def serverList
     
     @Hidden def commandResultMap
@@ -38,7 +38,7 @@ class ModularPostOfficeSocketWorker {
         output = argOut
         
         def db = ConfigHolder.instance.returnDbMap()         
-        sql = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        sqlObject = Sql.newInstance( db.url, db.user, db.password, db.driver )
         log.info "argServerList is a ${argServerList.class.name}"
         serverList = []
         argServerList.collect{ serverList << it.toLowerCase() }
@@ -86,7 +86,7 @@ class ModularPostOfficeSocketWorker {
     } 
     
     def cleanup () {
-        sql.close()
+        sqlObject.close()
     }
     
     def handleMessage( theMessage, def isActualMessage = false ) {
@@ -118,21 +118,21 @@ class ModularPostOfficeSocketWorker {
         if ( isActualMessage ) {
             return mssgCommand
         } else if ( theMessage.startsWith( 'USER' ) ) {
-            return new USERCommand( sql )
+            return new USERCommand( sqlObject )
         } else if ( theMessage.startsWith( 'PASS' ) ) {
-            return new PASSCommand( sql )
+            return new PASSCommand( sqlObject )
         } else if ( theMessage.startsWith( 'RSET' ) ) {
-            return new RSETCommand( sql )
+            return new RSETCommand( sqlObject )
         } else if ( theMessage.startsWith( 'STAT' ) ) {
-            return new STATCommand( sql )
+            return new STATCommand( sqlObject )
         } else if ( theMessage.startsWith( 'RETR' ) ) {
-            return new RETRCommand( sql )
+            return new RETRCommand( sqlObject )
         } else if ( theMessage.startsWith( 'LIST' ) ) {
-            return new LISTCommand( sql )
+            return new LISTCommand( sqlObject )
         } else if ( theMessage.startsWith( 'QUIT' ) ) {
-            return new QUITCommand( sql, serverName )
+            return new QUITCommand( sqlObject, serverName )
         } else if ( theMessage.startsWith( 'DELE' ) ) {
-            return new DELECommand( sql )
+            return new DELECommand( sqlObject )
         }
     }
 } // line 156

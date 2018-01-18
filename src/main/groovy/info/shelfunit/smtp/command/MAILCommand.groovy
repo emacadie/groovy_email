@@ -12,12 +12,12 @@ import groovy.util.logging.Slf4j
 class MAILCommand {
     
     final List domainList
-    final sql
+    final sqlObject
     
     MAILCommand( argSql, argDomainList ) {
         log.info "Starting new MAILCommand"
         log.info "Here is argDomainList: ${argDomainList}"
-        this.sql = argSql
+        this.sqlObject  = argSql
         this.domainList = argDomainList
     }
     
@@ -58,7 +58,7 @@ class MAILCommand {
                 // get user info here
                 if ( !prevCommandSet.contains( 'AUTH' ) ) {
                     bufferMap.userInfo = 
-                    sql.firstRow( 'select * from email_user where base_64_hash=?', q.getUsernameInMAIL() )
+                    sqlObject.firstRow( 'select * from email_user where base_64_hash=?', q.getUsernameInMAIL() )
                 }
                 bufferMap.messageDirection = "outbound"
             } else {

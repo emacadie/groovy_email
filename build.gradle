@@ -1,7 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'maven'
 apply plugin: 'groovy'
-apply plugin: 'codenarc'
+// apply plugin: 'codenarc'
 apply plugin: 'com.github.tkruse.groovysh'
 apply plugin: 'application'
 
@@ -22,13 +22,15 @@ buildscript {
 allprojects {
     dependencies {
         testCompile 'junit:junit:4.10'
-        testCompile 'org.mockito:mockito-all:[1.8.5,)'
+        // testCompile 'org.mockito:mockito-all:[1.8.5,)'
+        testCompile 'org.mockito:mockito-all:1.9.0'
+        
         // From Maven, it's GroupId:ArtifactId:Version 
-        testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+        // testCompile 'org.spockframework:spock-core:1.0-groovy-2.4'
+        testCompile 'org.spockframework:spock-core:1.1-groovy-2.4'
         testCompile 'cglib:cglib-nodep:3.1'
         testCompile 'org.apache.directory.studio:org.apache.commons.io:2.4'
-        // dependencies used by examples in this project (not required for using Spock)
-        // testRuntime "com.h2database:h2:1.2.147"
+
     
         // logging
         // Using sfl4j allows us to replace different loggers later, if desired
@@ -36,10 +38,9 @@ allprojects {
         // sfl4j is just a facade for loggers. To get logging to work, tie it in with an implementation, e.g., logback
         compile group: 'ch.qos.logback', name:'logback-classic', version: '1.1.3'
         compile group: 'ch.qos.logback', name:'logback-core', version: '1.1.3'
-    
-        compile 'org.codehaus.groovy:groovy-all:2.4.0'
+            
+        compile 'org.codehaus.groovy:groovy-all:2.4.12'
         compile 'dnsjava:dnsjava:2.1.7'
-        // compile 'org.postgresql:postgresql:9.3-1101-jdbc41'
         compile 'org.postgresql:postgresql:42.1.4'
         compile 'org.apache.shiro:shiro-core:1.2.3'
         compile 'commons-cli:commons-cli:1.2'
@@ -115,7 +116,8 @@ task runJava( type: JavaExec ) {
     systemProperty 'sysProp', 'notUsed'
     println System.properties['iterations'] 
     // systemProperty 'iterations', System.getProperty('iterations')
-    systemProperty 'iterations', System.properties['iterations'] 
+    systemProperty 'iterations', System.properties[ 'iterations' ]
+
     // you can use this if nothing is set via command line
     // systemProperties = System.getProperties()
     jvmArgs '-server'
@@ -162,7 +164,7 @@ task( console, dependsOn: 'classes', type: JavaExec ) {
 groovysh {
     // groovyVersion determines the features of the shell and buildShell tasks.
     // groovyVersion = '2.4.0'
-        // false to disable the shell task
+    // false to disable the shell task
     enableAppShell = true
     // false to disable the shell task
     enableBuildShell = true
@@ -170,7 +172,7 @@ groovysh {
     enableBuildDevShell = true
     shell{ 
         System.properties[ 'dbname' ]        = 'gemail_test_db'
-        System.properties['host_and_port' ] = 'localhost:5432'
+        System.properties['host_and_port' ]  = 'localhost:5432'
         System.properties[ 'dbuser' ]        = 'gemail_test'
         System.properties[ 'dbpassword' ]    = 'dev-word-to-pass002'
     }

@@ -6,11 +6,11 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class RSETCommand {
 
-    final Sql sql
+    final Sql sqlObject
     
     RSETCommand( def argSql ) {
         log.info "Starting new RSETCommand"
-        this.sql = argSql
+        this.sqlObject = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -23,7 +23,7 @@ class RSETCommand {
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( !bufferMap.hasSTATInfo() ) {
-            bufferMap.getSTATInfo( sql )
+            bufferMap.getSTATInfo( sqlObject )
         }
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {

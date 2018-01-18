@@ -18,7 +18,7 @@ class MAILCommandSpec extends Specification {
     static response501 = "501 Command not in proper form"
     static domainList = [ 'shelfunit2.info', 'groovy-is-groovy2.org' ]
     static mailCommand
-    static sql
+    // static sqlObject
     static resultMap = [:]
     def crlf = "\r\n"
 
@@ -34,7 +34,7 @@ class MAILCommandSpec extends Specification {
         MetaProgrammer.runMetaProgramming()
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        // sql = ConfigHolder.instance.getSqlObject()
+        // sqlObject = ConfigHolder.instance.getSqlObject()
         mailCommand = new MAILCommand( ConfigHolder.instance.getSqlObject(), domainList )
     }     // run before the first feature method
     

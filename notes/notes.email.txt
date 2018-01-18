@@ -259,3 +259,10 @@ http://www.mailtester.com/showpage.php?name=download
 
 mail in a box installation: https://www.youtube.com/watch?v=9WOmkoEYMIg got to about 13:00
 
+https://www.fastmail.com/help/technical/ssltlsstarttls.html - ports
+http://blog.mailgun.com/25-465-587-what-port-should-i-use/
+https://en.wikipedia.org/wiki/Opportunistic_TLS - ports
+
+groovy_mail_db=> select from_domain, count(from_domain) as "the-count" from mail_from_log group by from_domain order by count(from_domain);
+groovy_mail_db=> select from_domain, count(from_domain) as "the-count" from mail_from_log group by from_domain order by count(from_domain) desc;
+

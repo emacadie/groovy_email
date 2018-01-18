@@ -7,11 +7,11 @@ import groovy.util.logging.Slf4j
 class RETRCommand {
 
     final def regex = "RETR\\s\\d+"
-    final Sql sql
+    final Sql sqlObject
     
     RETRCommand( def argSql ) {
         log.info "Starting new RETRCommand"
-        this.sql = argSql
+        this.sqlObject = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -23,7 +23,7 @@ class RETRCommand {
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( !bufferMap.hasSTATInfo() ) {
-            bufferMap.getSTATInfo( sql )
+            bufferMap.getSTATInfo( sqlObject )
         }
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {
@@ -39,7 +39,7 @@ class RETRCommand {
                 def uuid = bufferMap.uuidList[ messageNum - 1 ].id
                 log.info "here is bufferMap.uuidList: ${bufferMap.uuidList}"
                 log.info "uuid is a ${uuid.getClass().name}"
-                def ans = sql.firstRow( "select length( text_body ),text_body from mail_store where id = ?", [ uuid ] )
+                def ans = sqlObject.firstRow( "select length( text_body ),text_body from mail_store where id = ?", [ uuid ] )
                 if ( ans.isEmpty() ) {
                     resultMap.resultString = "-ERR no such message, only ${bufferMap.uuidList.size()} messages in maildrop"
                 } else {
@@ -49,7 +49,7 @@ class RETRCommand {
                     sBuff << "\r\n"
                     sBuff << "."
                     resultMap.resultString = sBuff.toString() 
-                    // def result = sql.execute( "delete from mail_store where id = ?", [ uuid ] )
+                    // def result = sqlObject.execute( "delete from mail_store where id = ?", [ uuid ] )
                 }
             }
         }

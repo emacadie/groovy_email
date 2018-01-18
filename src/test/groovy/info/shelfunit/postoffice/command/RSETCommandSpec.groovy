@@ -25,7 +25,7 @@ class RSETCommandSpec extends Specification {
     
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static sql
+    static sqlObject
     static rsetCommand
     static theTimestamp
     static rString = getRandomString()
@@ -50,29 +50,29 @@ class RSETCommandSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sql = ConfigHolder.instance.getSqlObject()
+        sqlObject = ConfigHolder.instance.getSqlObject()
         this.addUsers()
-        rsetCommand = new RSETCommand( sql )
+        rsetCommand = new RSETCommand( sqlObject )
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sql.execute "DELETE FROM email_user where username in ( ${gwRSET}, ${jaRSET}, ${joRSET} )"
-        sql.close()
+        sqlObject.execute "DELETE FROM email_user where username in ( ${gwRSET}, ${jaRSET}, ${joRSET} )"
+        sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sql, 'George', 'Washington', gwRSET, 'somePassword' )
-        addUser( sql, 'John', 'Adams', jaRSET, 'somePassword' )
-        addUser( sql, 'Jack', "O'Neill", joRSET, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwRSET, 'somePassword' )
+        addUser( sqlObject, 'John', 'Adams', jaRSET, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill", joRSET, 'somePassword' )
         
-        addMessage( sql, uuidA, gwRSET, msgA, domainList[ 0 ] )
-        addMessage( sql, uuidB, gwRSET, msgB, domainList[ 0 ] )
-        addMessage( sql, uuidC, gwRSET, msgC, domainList[ 0 ] )
+        addMessage( sqlObject, uuidA, gwRSET, msgA, domainList[ 0 ] )
+        addMessage( sqlObject, uuidB, gwRSET, msgB, domainList[ 0 ] )
+        addMessage( sqlObject, uuidC, gwRSET, msgC, domainList[ 0 ] )
         theTimestamp = Timestamp.create()
     }
     
     def createDeleteMap() {
-        def deleteMap = [:]
+        def deleteMap  = [:]
         deleteMap[ 1 ] = uuidA
         deleteMap[ 3 ] = uuidC
         deleteMap[ 2 ] = uuidB
@@ -82,15 +82,15 @@ class RSETCommandSpec extends Specification {
     // @Ignore
     def "test uuid list"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
-        def userInfo = [:]
+        def userInfo      = [:]
 	    userInfo.username = gwRSET
-        bufferInputMap.userInfo = userInfo
+        bufferInputMap.userInfo  = userInfo
         bufferInputMap.deleteMap = this.createDeleteMap()
         sleep( 2.seconds() )
         
@@ -101,16 +101,16 @@ class RSETCommandSpec extends Specification {
             resultMap.bufferMap.deleteMap.isEmpty()
 
         def messageStringB = 'aw' * 11
-        def toAddress = "${gwRSET}@${domainList[ 0 ]}".toString()
+        def toAddress      = "${gwRSET}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
             bufferInputMap.deleteMap = this.createDeleteMap()
         then:
             !bufferInputMap.deleteMap.isEmpty()
         when:
-            def params = [ UUID.randomUUID(), gwRSET, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRSET ] )
+            def params = [ UUID.randomUUID(), gwRSET, gwRSET.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwRSET ] )
         then:
             messageCount == 4
         when:
@@ -122,15 +122,15 @@ class RSETCommandSpec extends Specification {
 
 	def "test individual messages"() {
         def uuidList = []
-        def uuid = UUID.randomUUID()
+        def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
-        def bufferInputMap = [:]
+        def bufferInputMap       = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
-        def userInfo = [:]
+        def userInfo      = [:]
 	    userInfo.username = gwRSET
-        bufferInputMap.userInfo = userInfo
+        bufferInputMap.userInfo  = userInfo
         bufferInputMap.deleteMap = this.createDeleteMap()
         sleep( 2.seconds() )
         when:
@@ -140,7 +140,7 @@ class RSETCommandSpec extends Specification {
             resultMap.resultString == "-ERR Command not in proper form"  
             resultMap.bufferMap.deleteMap.containsKey( 1 ) == true
             resultMap.bufferMap.deleteMap.containsKey( 2 ) == true
-            resultMap.bufferMap.deleteMap[ 1 ].toString() == uuidA.toString()
+            resultMap.bufferMap.deleteMap[ 1 ].toString()  == uuidA.toString()
         
         when:
             resultMap = rsetCommand.process( 'RSET 3', [] as Set, bufferInputMap )
@@ -149,7 +149,7 @@ class RSETCommandSpec extends Specification {
             resultMap.resultString == "-ERR Command not in proper form"  
             resultMap.bufferMap.deleteMap.containsKey( 3 ) == true
             resultMap.bufferMap.deleteMap.containsKey( 2 ) == true
-            resultMap.bufferMap.deleteMap[ 3 ].toString() == uuidC.toString()
+            resultMap.bufferMap.deleteMap[ 3 ].toString()  == uuidC.toString()
             
         when:
             resultMap = rsetCommand.process( 'RSET 2', [] as Set, bufferInputMap )
@@ -157,15 +157,15 @@ class RSETCommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR Command not in proper form" 
             resultMap.bufferMap.deleteMap.containsKey( 2 ) == true
-            resultMap.bufferMap.deleteMap[ 2 ].toString() == uuidB.toString()
+            resultMap.bufferMap.deleteMap[ 2 ].toString()  == uuidB.toString()
         
         def messageStringB = 'aw' * 11
         def toAddress = "${gwRSET}@${domainList[ 0 ]}".toString()
         when:
             bufferInputMap = resultMap.bufferMap
-            def params = [ UUID.randomUUID(), gwRSET, 'hello@test.com', toAddress, messageStringB ]
-            sql.execute 'insert into mail_store(id, username, from_address, to_address, text_body) values (?, ?, ?, ?, ?)', params    
-            def messageCount = getTableCount( sql, 'select count(*) from mail_store where username = ?', [ gwRSET ] )
+            def params = [ UUID.randomUUID(), gwRSET, gwRSET.toLowerCase(), 'hello@test.com', toAddress, messageStringB ]
+            sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params    
+            def messageCount = getTableCount( sqlObject, 'select count(*) from mail_store where username = ?', [ gwRSET ] )
         then:
             messageCount == 5
         

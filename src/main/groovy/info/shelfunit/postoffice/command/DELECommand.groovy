@@ -7,11 +7,11 @@ import groovy.util.logging.Slf4j
 class DELECommand {
     
     final def regex = "DELE\\s\\d+"
-    final Sql sql
+    final Sql sqlObject
     
     DELECommand( def argSql ) {
         log.info "Starting new DELECommand"
-        this.sql = argSql
+        this.sqlObject = argSql
     }
     
     def process( theMessage, prevCommandSet, bufferMap ) {
@@ -24,7 +24,7 @@ class DELECommand {
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( !bufferMap.hasSTATInfo() ) {
-            bufferMap.getSTATInfo( sql )
+            bufferMap.getSTATInfo( sqlObject )
         }
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {
