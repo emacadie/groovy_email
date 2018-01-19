@@ -26,7 +26,13 @@ class UserInserter {
                 ConfigHolder.instance.setConfObject( options.configPath )
                 
                 def db = ConfigHolder.instance.returnDbMap() 
-                def userMap = [ iterations: options.iterations, user: options.user, userLc: options.user.toLowerCase(), fName: options.fName, lName: options.lName, pass: options.pass ]
+                def userMap = [ iterations: options.iterations, 
+                                user: options.user, 
+                                userLc: options.user.toLowerCase(), 
+                                fName: options.fName, 
+                                lName: options.lName, 
+                                pass: options.pass 
+                              ]
                 createUser( db, userMap )
             }
             
@@ -52,11 +58,20 @@ class UserInserter {
             def salt = options.user
             def hashedPass = new Sha512Hash( userMap.pass, userMap.user.toLowerCase(), numIterations )
             def base64Hash = "${Character.MIN_VALUE}${userMap.user}${Character.MIN_VALUE}${userMap.pass}".bytes.encodeBase64().toString()
-            def params = [ userMap.user, userMap.user.toLowerCase(), hashedPass.toBase64(), 'SHA-512', numIterations, base64Hash, userMap.fName, userMap.lName, 0 ]
+            def params = [ userMap.user, 
+                           userMap.user.toLowerCase(), 
+                           hashedPass.toBase64(), 
+                           'SHA-512', 
+                           numIterations, 
+                           base64Hash, 
+                           userMap.fName, 
+                           userMap.lName,
+                           0
+                         ]
             log.info "params: ${params}"
             sqlObject.execute "insert into email_user( username, username_lc, password_hash, " +
                 "password_algo, iterations, base_64_hash, first_name, " +
-                "last_name, version, logged_in ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )", params
+                "last_name, version ) values ( ?, ?, ?, ?, ?, ?, ?, ?, ? )", params
            
         } catch ( Exception pe ) {
             pe.printStackTrace()

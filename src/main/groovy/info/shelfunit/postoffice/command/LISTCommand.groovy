@@ -29,7 +29,9 @@ class LISTCommand {
         } else if ( !theMessage.startsWith( 'LIST' ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( theMessage == 'LIST' ) {
-            def rows = sqlObject.rows( 'select length( text_body ) from mail_store where username = ? and msg_timestamp < ? order by msg_timestamp', bufferMap.userInfo.username, bufferMap.timestamp )
+            def rows = sqlObject.rows( "select length( text_body ) from mail_store where username_lc = ? and msg_timestamp < ? order by msg_timestamp", 
+                                       bufferMap.userInfo.username.toLowerCase(), bufferMap.timestamp 
+            )
             def sBuff = new StringBuilder()
             sBuff << "+OK ${bufferMap.totalMessageSize}\r\n"
             rows.eachWithIndex { r, i ->
