@@ -10,12 +10,12 @@ import spock.lang.Stepwise
 import org.junit.Rule
 import org.junit.rules.TestName
 
-import de.mkammerer.argon2.Argon2
-import de.mkammerer.argon2.Argon2Factory
+// import de.mkammerer.argon2.Argon2
+// import de.mkammerer.argon2.Argon2Factory
 
-import com.lambdaworks.crypto.SCryptUtil
+// import com.lambdaworks.crypto.SCryptUtil
 
-import org.mindrot.jbcrypt.BCrypt
+// import org.mindrot.jbcrypt.BCrypt
 
 // import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
@@ -50,7 +50,7 @@ class ArgonSpec extends Specification {
 
     @Ignore
     def "ignore this"() {}
-
+/*
     def "try Some Argon"() {
         when:
             // Create instance
@@ -105,7 +105,8 @@ class ArgonSpec extends Specification {
         then:
             1 == 1
     }
-
+*/
+/*
     def "try some scrypt"() {
         when:
             def password = "correct horse battery staple"
@@ -142,7 +143,8 @@ class ArgonSpec extends Specification {
             1 == 1
     }
 
-
+*/
+/*
     def "try some jbcrypt"() {
         when:
             
@@ -178,5 +180,5 @@ class ArgonSpec extends Specification {
         then:
             1 == 1
     } // try some jbcrypt
-
+*/
 } // end class ArgonSpec

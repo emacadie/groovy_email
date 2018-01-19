@@ -67,7 +67,7 @@ create table mail_from_log (
     from_ip_address  character varying( 255 ) not null,
     from_username    character varying( 255 ),
     from_domain      character varying( 255 ) not null,
-    to_address_      text,
+    to_address_list  text,
     status_string    text,
     command_sequence text,
     msg_timestamp    TIMESTAMP WITH TIME ZONE default clock_timestamp() not null       

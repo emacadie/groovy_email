@@ -22,7 +22,7 @@ root( DEBUG, [ "STDOUT" ] )
 
 appender( "FILE-smtp", RollingFileAppender ) {
   rollingPolicy( TimeBasedRollingPolicy ) {
-    fileNamePattern = "log/smtp.%d{yyyy-MM-dd}.log"
+    fileNamePattern = "/usr/local/log/smtp.%d{yyyy-MM-dd}.log"
     maxHistory = 7
   }
   encoder( PatternLayoutEncoder ) {
@@ -33,7 +33,7 @@ logger( "info.shelfunit.smtp", INFO, [ "FILE-smtp" ] )
 
 appender( "FILE-postoffice", RollingFileAppender ) {
   rollingPolicy( TimeBasedRollingPolicy ) {
-    fileNamePattern = "log/post.office.%d{yyyy-MM-dd}.log"
+    fileNamePattern = "/usr/local/log/post.office.%d{yyyy-MM-dd}.log"
     maxHistory = 7
   }
   encoder( PatternLayoutEncoder ) {
@@ -45,7 +45,7 @@ logger( "info.shelfunit.postoffice", INFO, [ "FILE-postoffice" ] )
 
 appender( "FILE-spool", RollingFileAppender ) {
   rollingPolicy( TimeBasedRollingPolicy ) {
-    fileNamePattern = "log/spool.%d{yyyy-MM-dd}.log"
+    fileNamePattern = "/usr/local/log/spool.%d{yyyy-MM-dd}.log"
     maxHistory = 7
   }
   encoder( PatternLayoutEncoder ) {

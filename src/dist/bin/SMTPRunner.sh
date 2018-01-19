@@ -65,7 +65,8 @@ cd "`dirname \"$PRG\"`/.." >&-
 APP_HOME="`pwd -P`"
 cd "$SAVED" >&-
 
-CLASSPATH=$APP_HOME/lib/groovy_email.jar:$APP_HOME/lib/logback-classic-1.1.3.jar:$APP_HOME/lib/logback-core-1.1.3.jar:$APP_HOME/lib/groovy-all-2.4.0.jar:$APP_HOME/lib/dnsjava-2.1.7.jar:$APP_HOME/lib/postgresql-9.3-1101-jdbc41.jar:$APP_HOME/lib/shiro-core-1.2.3.jar:$APP_HOME/lib/commons-cli-1.2.jar:$APP_HOME/lib/commons-beanutils-1.8.3.jar:$APP_HOME/lib/slf4j-api-1.7.7.jar
+CLASSPATH=$APP_HOME/lib/groovy_email.jar:$APP_HOME/lib/logback-classic-1.1.3.jar:$APP_HOME/lib/shiro-core-1.2.3.jar:$APP_HOME/lib/slf4j-api-1.7.7.jar:$APP_HOME/lib/logback-core-1.1.3.jar:$APP_HOME/lib/groovy-all-2.4.12.jar:$APP_HOME/lib/dnsjava-2.1.7.jar:$APP_HOME/lib/postgresql-42.1.4.jar:$APP_HOME/lib/commons-cli-1.2.jar:$APP_HOME/lib/gpars-1.2.1.jar:$APP_HOME/lib/clamav-client-1.0.0.jar:$APP_HOME/lib/commons-beanutils-1.8.3.jar:$APP_HOME/lib/multiverse-core-0.7.0.jar:$APP_HOME/lib/jsr166y-1.7.0.jar
+
 
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then

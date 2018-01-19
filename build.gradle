@@ -46,9 +46,9 @@ allprojects {
         compile 'commons-cli:commons-cli:1.2'
         compile 'org.codehaus.gpars:gpars:1.2.1'
         compile 'fi.solita.clamav:clamav-client:1.0.0'
-        compile 'de.mkammerer:argon2-jvm:2.2'
-        compile 'com.lambdaworks:scrypt:1.4.0'
-        compile 'org.mindrot:jbcrypt:0.4'
+        // compile 'de.mkammerer:argon2-jvm:2.2'
+        // compile 'com.lambdaworks:scrypt:1.4.0'
+        // compile 'org.mindrot:jbcrypt:0.4'
     }
     
     tasks.withType( GroovyCompile ) { GroovyCompile compile ->

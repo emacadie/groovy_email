@@ -33,12 +33,12 @@ class InboundSpoolWorkerSpec extends Specification {
     static gwString   = 'gw' + rString
     static jaString   = 'ja' + rString
     static tjString   = 'tj' + rString
+    static uuidList   = []
+    static params     = []
     static InboundSpoolWorker isw
     static config
     static realClamAVClient
-    static uuidList = []
     static fromString
-    static params = []
     static sqlCountString      = 'select count(*) from mail_spool_in where status_string = ? and from_address = ?'
     static sqlCountStoreString = 'select count(*) from mail_store where from_address = ?'
     
@@ -59,13 +59,15 @@ class InboundSpoolWorkerSpec extends Specification {
         def port = config.clamav.port
         realClamAVClient = this.createClamAVClient()
         fromString = getRandomString() + "@" + getRandomString() + ".com"
-        isw = new InboundSpoolWorker()
+        isw        = new InboundSpoolWorker()
         
     }     // run before the first feature method
     
     def cleanupSpec() {
         // sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
-        // sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
+        sqlObject.execute "DELETE FROM email_user where username_lc like ( ? )", [ "%${fromString}%".toString() ]
+        sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
+        sqlObject.execute "DELETE FROM mail_store where from_address = ?", [ fromString ]
         sqlObject.close()
     }   // run after the last feature method
     
@@ -263,8 +265,8 @@ class InboundSpoolWorkerSpec extends Specification {
 
     def "test with different case"() {
         when:
-            addUser( sqlObject, 'George', 'Warshington', 'davidbruce', 'somePassword' )
-            insertIntoMailSpoolIn( 'CLEAN', 'DavidBruce' + '@' + domainList[ 0 ] )
+            addUser( sqlObject, 'George', 'Warshington', "davidbruce${rString}".toString(), 'somePassword' )
+            insertIntoMailSpoolIn( 'CLEAN', "DavidBruce${rString.toUpperCase()}".toString() + '@' + domainList[ 0 ] )
 	        def transferredCount = getTableCount( sqlObject, sqlCountString, [ 'TRANSFERRED', fromString ] )
 	        def cleanCount       = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', fromString ] )
 	        def storeCount       = getTableCount( sqlObject, sqlCountStoreString, [ fromString ] )
