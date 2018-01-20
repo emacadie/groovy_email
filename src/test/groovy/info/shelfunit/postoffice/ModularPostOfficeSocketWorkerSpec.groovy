@@ -1,7 +1,9 @@
 package info.shelfunit.postoffice
 
-import spock.lang.Specification
+
 import spock.lang.Ignore
+import spock.lang.Specification
+import spock.lang.Stepwise
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -15,18 +17,21 @@ import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.addMessage
 // import info.shelfunit.smtp.command.EHLOCommand
 
+@Stepwise
 class ModularPostOfficeSocketWorkerSpec extends Specification {
     @Rule 
     TestName name = new TestName()
     
     def crlf = "\r\n"
     static sqlObject
-    static rString    = getRandomString()
-    static gwString   = 'gw' + rString
-    static jaString   = 'ja' + rString
-    static tjString   = 'tj' + rString
-    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    
+    static rString     = getRandomString()
+    static gwString    = 'gw' + rString
+    static jaString    = 'ja' + rString
+    static tjString    = 'tj' + rString
+    static domainList  = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    static numMess     = 0
+    static totMessSize = 0
+
     def setup() {
         println "\n--- Starting test ${name.methodName}"
     }          // run before every feature method
@@ -71,7 +76,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	    then:
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
                 "+OK ${gwString} is a valid mailbox\r\n" +
-                "+OK ${gwString} authenticated\r\n" +
+                "+OK ${gwString} authenticated\r\n"      +
                 "+OK 0 null\r\n" +
                 "+OK shelfunit.info POP3 server signing off\r\n"
 	}
@@ -79,12 +84,15 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	def "test one message"() {
 	    when:
 	        def theMess = getRandomString() * 12
+            numMess     = numMess + 1
+            totMessSize = totMessSize + theMess.size()
+            println "here is the message we will use for this test: ${theMess}"
 	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
             def domain  = "hot-groovy.com"
             def bString = "USER ${jaString}${crlf}" + 
             "PASS somePassword${crlf}" +
             "STAT${crlf}" +
-            "RETR 1${crlf}" +
+            "RETR ${numMess}${crlf}"   +
             "QUIT${crlf}"
             byte[] data = bString.getBytes()
     
@@ -98,9 +106,9 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	    then:
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
                 "+OK ${jaString} is a valid mailbox\r\n" +
-                "+OK ${jaString} authenticated\r\n" +
-                "+OK 1 ${theMess.size()}\r\n" +
-                "+OK ${theMess.size()} octets\r\n" +
+                "+OK ${jaString} authenticated\r\n"      +
+                "+OK ${numMess} ${theMess.size()}\r\n"   +
+                "+OK ${totMessSize} octets\r\n"          +
                 "${theMess}\r\n" +
                 ".\r\n" +
                 "+OK shelfunit.info POP3 server signing off\r\n"
@@ -109,13 +117,16 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     // @Ignore
 	def "test one message with lower case commands"() {
 	    when:
-	        def theMess = getRandomString() * 12
+	        def theMess = getRandomString() // * 12
+            numMess     = numMess + 1
+            totMessSize = totMessSize + theMess.size()
+            println "here is the message we will use for this test: ${theMess}"
 	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
             def domain  = "hot-groovy.com"
             def bString = "user ${jaString}${crlf}" + 
             "pass somePassword${crlf}" +
             "stat${crlf}"   +
-            "retr 1${crlf}" +
+            "retr ${numMess}${crlf}"   +
             "quit${crlf}"
             byte[] data = bString.getBytes()
     
@@ -130,8 +141,8 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
                 "+OK ${jaString} is a valid mailbox\r\n" +
                 "+OK ${jaString} authenticated\r\n" +
-                "+OK 1 ${theMess.size()}\r\n" +
-                "+OK ${theMess.size()} octets\r\n" +
+                "+OK ${numMess} ${totMessSize}\r\n" + 
+                "+OK ${theMess.size()} octets\r\n"  + 
                 "${theMess}\r\n" +
                 ".\r\n" +
                 "+OK shelfunit.info POP3 server signing off\r\n"
@@ -143,7 +154,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
             def domain  = "hot-groovy.com"
             def bString = "USER erer${crlf}" + 
-            "PASS somePassword${crlf}" +
+            "PASS somePassword${crlf}"       +
             "STAT${crlf}" +
             "QUIT${crlf}"
             byte[] data = bString.getBytes()

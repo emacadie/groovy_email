@@ -70,7 +70,7 @@ class STATCommandSpec extends Specification {
         bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = Timestamp.create()
         def userInfo             = [:]
-	    userInfo.username        = gwSTAT
+        userInfo.username        = gwSTAT
         bufferInputMap.userInfo  = userInfo
         sleep( 2.seconds() )
         when:
