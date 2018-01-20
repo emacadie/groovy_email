@@ -6,7 +6,7 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class DELECommand {
     
-    final def regex = "DELE\\s\\d+"
+    final def regex = "(?i)DELE\\s\\d+"
     final Sql sqlObject
     
     DELECommand( def argSql ) {
@@ -23,13 +23,13 @@ class DELECommand {
         def deleteMap = bufferMap.deleteMap ?: [:]
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
-        if ( !bufferMap.hasSTATInfo() ) {
+        if ( _not( bufferMap.hasSTATInfo() ) ) {
             bufferMap.getSTATInfo( sqlObject )
         }
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {
             resultMap.resultString = "-ERR Not in TRANSACTION state"
-        } else if ( !theMessage.matches( regex ) ) {
+        } else if ( _not( theMessage.matches( regex ) ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( theMessage.matches( regex ) ) {
             log.info "in the reg ex part"

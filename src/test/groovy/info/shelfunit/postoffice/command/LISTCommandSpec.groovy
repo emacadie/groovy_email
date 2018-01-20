@@ -63,8 +63,8 @@ class LISTCommandSpec extends Specification {
 
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwLIST, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jaLIST, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", joLIST, 'somePassword' )
+        addUser( sqlObject, 'John',   'Adams',      jaLIST, 'somePassword' )
+        addUser( sqlObject, 'Jack',   "O'Neill",    joLIST, 'somePassword' )
         
         addMessage( sqlObject, uuidA, gwLIST, msgA, domainList[ 0 ] )
         addMessage( sqlObject, uuidB, gwLIST, msgB, domainList[ 0 ] )
@@ -78,11 +78,11 @@ class LISTCommandSpec extends Specification {
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
-        def userInfo = [:]
-	    userInfo.username = gwLIST
-        bufferInputMap.userInfo = userInfo
+        def userInfo             = [:]
+	    userInfo.username        = gwLIST
+        bufferInputMap.userInfo  = userInfo
         sleep( 2.seconds() )
         when:
             def resultMap = listCommand.process( 'LIST', [] as Set, bufferInputMap )
@@ -121,11 +121,11 @@ class LISTCommandSpec extends Specification {
         def totalMessageSizeTest = msgA.size() + msgB.size() + msgC.size()
         def bufferInputMap = [:]
         def timestamp
-        bufferInputMap.state = 'TRANSACTION'
+        bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = theTimestamp
-        def userInfo = [:]
-	    userInfo.username = gwLIST
-        bufferInputMap.userInfo = userInfo
+        def userInfo             = [:]
+	    userInfo.username        = gwLIST
+        bufferInputMap.userInfo  = userInfo
         sleep( 2.seconds() )
         when:
             def resultMap = listCommand.process( 'LIST 1', [] as Set, bufferInputMap )
@@ -161,8 +161,9 @@ class LISTCommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR no such message, only 3 messages in maildrop"
             
+        // go crazy! go case-insensitive!
         when:
-            resultMap = listCommand.process( 'LIST', [] as Set, bufferInputMap )
+            resultMap = listCommand.process( 'LisT', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK ${totalMessageSizeTest}\r\n" +

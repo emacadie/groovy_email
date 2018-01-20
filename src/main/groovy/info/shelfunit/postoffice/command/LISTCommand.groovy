@@ -26,9 +26,9 @@ class LISTCommand {
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {
             resultMap.resultString = "-ERR Not in TRANSACTION state"
-        } else if ( !theMessage.startsWith( 'LIST' ) ) {
+        } else if ( _not( theMessage.toUpperCase().startsWith( 'LIST' ) ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
-        } else if ( theMessage == 'LIST' ) {
+        } else if ( theMessage.toUpperCase() == 'LIST' ) {
             def rows = sqlObject.rows( 
                 "select length( text_body ) from mail_store where username_lc = ? " +
                 "and msg_timestamp < ? order by msg_timestamp", 

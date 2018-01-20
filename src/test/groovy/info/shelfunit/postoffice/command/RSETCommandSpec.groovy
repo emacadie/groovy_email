@@ -175,8 +175,9 @@ class RSETCommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR Command not in proper form" 
             
+        // try case-insensitive
         when:
-            resultMap = rsetCommand.process( 'RSET 1', [] as Set, bufferInputMap )
+            resultMap = rsetCommand.process( 'RsEt 1', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR Command not in proper form" 

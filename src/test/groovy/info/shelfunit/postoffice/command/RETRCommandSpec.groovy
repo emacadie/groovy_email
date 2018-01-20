@@ -137,7 +137,6 @@ class RETRCommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK ${msgB.size()} octets${crlf}" + "${msgB}${crlf}" + "." 
 
-        
         def messageStringB = 'aw' * 11
         def toAddress      = "${gwRETR}@${domainList[ 0 ]}".toString()
         when:
@@ -154,8 +153,9 @@ class RETRCommandSpec extends Specification {
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR no such message, only 3 messages in maildrop"
             
+        // try case-sensitive
         when:
-            resultMap = retrCommand.process( 'RETR 1', [] as Set, bufferInputMap )
+            resultMap = retrCommand.process( 'ReTr 1', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK ${msgA.size()} octets${crlf}" + "${msgA}${crlf}" + "." 

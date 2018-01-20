@@ -28,9 +28,9 @@ class RSETCommand {
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         if ( bufferMap.state != 'TRANSACTION' ) {
             resultMap.resultString = "-ERR Not in TRANSACTION state"
-        } else if ( theMessage != 'RSET' ) {
+        } else if ( theMessage.toUpperCase() != 'RSET' ) {
             resultMap.resultString = "-ERR Command not in proper form"
-        } else if ( theMessage == 'RSET' ) {
+        } else if ( theMessage.toUpperCase() == 'RSET' ) {
             log.info "in the reg ex part"
             bufferMap.each { k, v ->
                 log.info "k is $k, here it is toString: ${k.toString()}"

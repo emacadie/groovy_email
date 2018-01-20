@@ -1,7 +1,7 @@
 package info.shelfunit.postoffice
 
 import spock.lang.Specification
-// import spock.lang.Ignore
+import spock.lang.Ignore
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -47,24 +47,24 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", tjString, 'somePassword' )
+        addUser( sqlObject, 'John',   'Adams',      jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack',   "O'Neill",    tjString, 'somePassword' )
     }
     
     def "test basic session"() {
         
 	    when:
-            def domain = "hot-groovy.com"
+            def domain  = "hot-groovy.com"
             def bString = "USER ${gwString}${crlf}" + 
             "PASS somePassword${crlf}" +
             "STAT${crlf}" +
             "QUIT${crlf}"
             byte[] data = bString.getBytes()
     
-            InputStream input = new ByteArrayInputStream( data )
+            InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) // , sqlObject )
+            def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) 
             ssWorker.doWork()
             ssWorker.cleanup()
             
@@ -75,12 +75,12 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
                 "+OK 0 null\r\n" +
                 "+OK shelfunit.info POP3 server signing off\r\n"
 	}
-
-	 def "test one message"() {
+    
+	def "test one message"() {
 	    when:
 	        def theMess = "dkke" * 12
 	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
-            def domain = "hot-groovy.com"
+            def domain  = "hot-groovy.com"
             def bString = "USER ${jaString}${crlf}" + 
             "PASS somePassword${crlf}" +
             "STAT${crlf}" +
@@ -88,10 +88,41 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
             "QUIT${crlf}"
             byte[] data = bString.getBytes()
     
-            InputStream input = new ByteArrayInputStream( data )
+            InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) // , sqlObject )
+            def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) 
+            ssWorker.doWork()
+            ssWorker.cleanup()
+            
+	    then:
+	        output.toString() == "+OK POP3 server ready <shelfunit.info>\r\n" +
+                "+OK ${jaString} is a valid mailbox\r\n" +
+                "+OK ${jaString} authenticated\r\n" +
+                "+OK 1 ${theMess.size()}\r\n" +
+                "+OK ${theMess.size()} octets\r\n" +
+                "${theMess}\r\n" +
+                ".\r\n" +
+                "+OK shelfunit.info POP3 server signing off\r\n"
+	}
+
+    @Ignore
+	def "test one message with lower case commands"() {
+	    when:
+	        def theMess = "dkke" * 12
+	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
+            def domain  = "hot-groovy.com"
+            def bString = "user ${jaString}${crlf}" + 
+            "pass somePassword${crlf}" +
+            "stat${crlf}"   +
+            "retr 1${crlf}" +
+            "quit${crlf}"
+            byte[] data = bString.getBytes()
+    
+            InputStream input   = new ByteArrayInputStream( data )
+            OutputStream output = new ByteArrayOutputStream() 
+            
+            def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList )
             ssWorker.doWork()
             ssWorker.cleanup()
             
@@ -110,14 +141,14 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	    when:
 	        def theMess = "dkke" * 12
 	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
-            def domain = "hot-groovy.com"
+            def domain  = "hot-groovy.com"
             def bString = "USER erer${crlf}" + 
             "PASS somePassword${crlf}" +
             "STAT${crlf}" +
             "QUIT${crlf}"
             byte[] data = bString.getBytes()
     
-            InputStream input = new ByteArrayInputStream( data )
+            InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
             def ssWorker = new ModularPostOfficeSocketWorker( input, output, domainList ) // , sqlObject )
@@ -131,6 +162,12 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
 	        "-ERR Not in TRANSACTION state\r\n" +
 	        "+OK shelfunit.info  POP3 server signing off\r\n"
 	}
+
+    @Ignore
+	def "always ignore"() {
+	    expect:
+	        1 == 1
+}
 
 } // line 338
 

@@ -21,12 +21,12 @@ class STATCommand {
         
         if ( bufferMap.state != 'TRANSACTION' ) {
             resultMap.resultString = "-ERR Not in TRANSACTION state"
-        } else if ( theMessage != 'STAT' ) {
+        } else if ( theMessage.toUpperCase() != 'STAT' ) {
             resultMap.resultString = "-ERR Command not in proper form"
-        } else if ( !bufferMap.userInfo ) {
+        } else if ( !bufferMap.userInfo  ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else {
-            if ( !bufferMap.hasSTATInfo() ) {
+            if ( _not( bufferMap.hasSTATInfo() ) ) {
                 bufferMap.getSTATInfo( sqlObject )
             }
             def userInfo  = bufferMap.userInfo

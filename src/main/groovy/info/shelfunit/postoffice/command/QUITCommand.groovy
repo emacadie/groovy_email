@@ -6,8 +6,6 @@ import java.sql.SQLException
 
 @Slf4j
 class QUITCommand {
-
-    final def regex = "RETR\\s\\d+"
     
     final Sql sqlObject
     final serverName
@@ -27,13 +25,13 @@ class QUITCommand {
         log.info "Here is bufferMap: ${bufferMap}"
         log.info "Does bufferMap.hasSTATInfo() sez the lolcat ? let's find out: ${bufferMap.hasSTATInfo()}"
         
-        if ( theMessage != 'QUIT' ) {
+        if ( theMessage.toUpperCase() != 'QUIT' ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( bufferMap.state == 'AUTHORIZATION' ) {
             bufferMap.clear()
             resultMap.resultString = "+OK ${serverName}  POP3 server signing off"
         } else if ( bufferMap.state == 'TRANSACTION' ) {
-            if ( !bufferMap.hasSTATInfo() && !bufferMap.userInfo ) {
+            if ( _not( bufferMap.hasSTATInfo() ) && !bufferMap.userInfo ) {
                 bufferMap.getSTATInfo( sqlObject )
             }
             log.info "in the reg ex part"

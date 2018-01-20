@@ -17,7 +17,7 @@ class PASSCommand {
         this.sqlObject = argSql
     }
     
-    static regex = '''^(PASS )(.*)$(?x)'''
+    static regex = '''^(?i)(PASS )(.*)$(?x)'''
     
     static pattern = ~regex
     
@@ -33,11 +33,11 @@ class PASSCommand {
         bufferMap.timestamp = null
         if ( bufferMap.state != 'AUTHORIZATION' ) {
             resultMap.resultString = "-ERR Not in AUTHORIZATION state"
-        } else if ( !theMessage.startsWith( 'PASS ' ) ) {
+        } else if ( _not( theMessage.toUpperCase().startsWith( 'PASS ' ) ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
-        } else if ( !regexResult ) {
+        } else if ( _not( regexResult ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
-        } else if ( !( theMessage ==~ pattern ) ) {
+        } else if ( _not( theMessage ==~ pattern ) ) {
             resultMap.resultString = "-ERR Command not in proper form"
         } else if ( !bufferMap.userInfo ) {
             resultMap.resultString = "-ERR Command not in proper form - No user sent"

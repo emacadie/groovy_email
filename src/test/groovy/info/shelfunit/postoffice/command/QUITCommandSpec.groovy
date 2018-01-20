@@ -216,7 +216,7 @@ class QUITCommandSpec extends Specification {
             messageCount == 2 
 
         when:
-            def resultMap = quitCommand.process( 'QUIT', [] as Set, bufferInputMap )
+            def resultMap = quitCommand.process( 'Quit', [] as Set, bufferInputMap )
         then:
             resultMap.resultString == "+OK ${domainList[ 0 ]} POP3 server signing off"
         when:

@@ -52,16 +52,16 @@ class STATCommandSpec extends Specification {
    
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwSTAT, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jaSTAT, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", joSTAT, 'somePassword' )
+        addUser( sqlObject, 'John',   'Adams',      jaSTAT, 'somePassword' )
+        addUser( sqlObject, 'Jack',   "O'Neill",    joSTAT, 'somePassword' )
     }
 
     def "test uuid list"() {
         def uuidList = []
         def uuid     = UUID.randomUUID()
         def totalMessageSizeTest = 0
-        def messageString = 'aq' * 10
-        totalMessageSizeTest = messageString.size()
+        def messageString        = 'aq' * 10
+        totalMessageSizeTest     = messageString.size()
         def toAddress = "${gwSTAT}@${domainList[ 0 ]}".toString()
         def params = [ uuid, gwSTAT, gwSTAT.toLowerCase(), 'hello@test.com', toAddress, messageString ]
         sqlObject.execute 'insert into mail_store(id, username, username_lc, from_address, to_address, text_body) values (?, ?, ?, ?, ?, ?)', params
@@ -69,9 +69,9 @@ class STATCommandSpec extends Specification {
         def timestamp
         bufferInputMap.state     = 'TRANSACTION'
         bufferInputMap.timestamp = Timestamp.create()
-        def userInfo = [:]
-	    userInfo.username = gwSTAT
-        bufferInputMap.userInfo = userInfo
+        def userInfo             = [:]
+	    userInfo.username        = gwSTAT
+        bufferInputMap.userInfo  = userInfo
         sleep( 2.seconds() )
         when:
             def resultMap = statCommand.process( 'STAT', [] as Set, bufferInputMap )
@@ -90,6 +90,12 @@ class STATCommandSpec extends Specification {
             messageCount == 2
         when:
             resultMap = statCommand.process( 'STAT', [] as Set, bufferInputMap )
+        then:
+            resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
+            resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"
+        // case sensitive
+        when:
+            resultMap = statCommand.process( 'sTAt', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "+OK 1 ${totalMessageSizeTest}"

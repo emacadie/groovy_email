@@ -32,8 +32,8 @@ class DELECommandSpec extends Specification {
     static theTimestamp
     static rString = getRandomString()
     static gwDELE  = 'gw' + rString // 'gwdele' // @shelfunit.info'
-    static jaDELE  = 'ja' + rString //  'jadele' // @shelfunit.info'
-    static joDELE  = 'jo' + rString //'jodele' // @shelfunit.info'
+    static jaDELE  = 'ja' + rString // 'jadele' // @shelfunit.info'
+    static joDELE  = 'jo' + rString // 'jodele' // @shelfunit.info'
     static uuidA   = UUID.randomUUID()
     static uuidB   = UUID.randomUUID()
     static uuidC   = UUID.randomUUID()
@@ -154,8 +154,9 @@ class DELECommandSpec extends Specification {
         then:
             messageCount == 5
         
+        // try something case-insensitive
         when:
-            resultMap = deleCommand.process( 'DELE 4', [] as Set, bufferInputMap )
+            resultMap = deleCommand.process( 'delE 4', [] as Set, bufferInputMap )
         then:
             resultMap.bufferMap.totalMessageSize == totalMessageSizeTest
             resultMap.resultString == "-ERR no such message, only 3 messages in maildrop"
