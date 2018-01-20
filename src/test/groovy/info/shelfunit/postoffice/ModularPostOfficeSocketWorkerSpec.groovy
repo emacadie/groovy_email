@@ -78,7 +78,7 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
     
 	def "test one message"() {
 	    when:
-	        def theMess = "dkke" * 12
+	        def theMess = getRandomString() * 12
 	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
             def domain  = "hot-groovy.com"
             def bString = "USER ${jaString}${crlf}" + 
@@ -106,10 +106,10 @@ class ModularPostOfficeSocketWorkerSpec extends Specification {
                 "+OK shelfunit.info POP3 server signing off\r\n"
 	}
 
-    @Ignore
+    // @Ignore
 	def "test one message with lower case commands"() {
 	    when:
-	        def theMess = "dkke" * 12
+	        def theMess = getRandomString() * 12
 	        addMessage( sqlObject, UUID.randomUUID(), jaString, theMess, domainList[ 0 ] )
             def domain  = "hot-groovy.com"
             def bString = "user ${jaString}${crlf}" + 

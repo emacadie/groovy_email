@@ -65,6 +65,7 @@ class InboundSpoolWorkerSpec extends Specification {
     
     def cleanupSpec() {
         // sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
+        println "here is rString: ${rString}"
         sqlObject.execute "DELETE FROM email_user where username like ( ? )", [ "%${rString}%".toString() ]
 
         sqlObject.execute "DELETE FROM email_user where username_lc like ( ? )", [ "%${fromString}%".toString() ]

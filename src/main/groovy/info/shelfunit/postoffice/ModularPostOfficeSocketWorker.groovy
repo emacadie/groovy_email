@@ -34,11 +34,11 @@ class ModularPostOfficeSocketWorker {
     @Hidden def commandResultMap
     
     ModularPostOfficeSocketWorker( argIn, argOut, argServerList ) {
-        input = argIn
+        input  = argIn
         output = argOut
         
-        def db = ConfigHolder.instance.returnDbMap()         
-        sqlObject = Sql.newInstance( db.url, db.user, db.password, db.driver )
+        def db     = ConfigHolder.instance.returnDbMap()         
+        sqlObject  = Sql.newInstance( db.url, db.user, db.password, db.driver )
         log.info "argServerList is a ${argServerList.class.name}"
         serverList = []
         argServerList.collect{ serverList << it.toLowerCase() }
@@ -69,7 +69,7 @@ class ModularPostOfficeSocketWorker {
             
             if ( newString == null ) { 
                 responseString = "+OK\r\n"
-            } else if ( newString.startsWith( 'QUIT' ) ) {
+            } else if ( newString.toUpperCase().startsWith( 'QUIT' ) ) {
                 log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
                 responseString = this.handleMessage( newString )
                 gotQuitCommand = true
@@ -93,12 +93,14 @@ class ModularPostOfficeSocketWorker {
         theResponse = ""
         log.info "Incoming message: ${theMessage}"
         if ( theMessage.isOptionalPostOfficeCommand() ) {
+            log.info "it's an optional command"
             theResponse = '-ERR Command not implemented'
-        } else if ( theMessage.startsWith( 'NOOP' ) ) { // This is in POP3
+        } else if ( theMessage.toUpperCase().startsWith( 'NOOP' ) ) { // This is in POP3
             theResponse = '+OK'
-        } else if ( theMessage.isRFC5034Command() ) { 
+        } else if ( theMessage.toUpperCase().isRFC5034Command() ) {
+            log.info "it's an RFC5034 command"
             theResponse = '-ERR Command not implemented'
-        } else if ( theMessage.isEncapsulated( ) || isActualMessage ) {
+        } else if ( theMessage.toUpperCase().isEncapsulated( ) || isActualMessage ) {
             def commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
             log.info "returned a command object that is a ${commandObject.class.name}"
             commandResultMap.clear()
@@ -108,6 +110,7 @@ class ModularPostOfficeSocketWorker {
             theResponse      = commandResultMap.resultString
         
         } else {
+            log.info "In the else, returning"
             theResponse = '-ERR Command not implemented'
         }
         theResponse + "\r\n"
@@ -115,23 +118,24 @@ class ModularPostOfficeSocketWorker {
     
     def returnCurrentCommand( theMessage, isActualMessage ) {
         log.info "in returnCurrentCommand, here is value of isActualMessage: ${isActualMessage}"
+        def upperCaseMessage = theMessage.toUpperCase()
         if ( isActualMessage ) {
             return mssgCommand
-        } else if ( theMessage.startsWith( 'USER' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'USER' ) ) {
             return new USERCommand( sqlObject )
-        } else if ( theMessage.startsWith( 'PASS' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'PASS' ) ) {
             return new PASSCommand( sqlObject )
-        } else if ( theMessage.startsWith( 'RSET' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'RSET' ) ) {
             return new RSETCommand( sqlObject )
-        } else if ( theMessage.startsWith( 'STAT' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'STAT' ) ) {
             return new STATCommand( sqlObject )
-        } else if ( theMessage.startsWith( 'RETR' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'RETR' ) ) {
             return new RETRCommand( sqlObject )
-        } else if ( theMessage.startsWith( 'LIST' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'LIST' ) ) {
             return new LISTCommand( sqlObject )
-        } else if ( theMessage.startsWith( 'QUIT' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'QUIT' ) ) {
             return new QUITCommand( sqlObject, serverName )
-        } else if ( theMessage.startsWith( 'DELE' ) ) {
+        } else if ( upperCaseMessage.startsWith( 'DELE' ) ) {
             return new DELECommand( sqlObject )
         }
     }
