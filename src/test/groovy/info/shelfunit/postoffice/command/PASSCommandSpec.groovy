@@ -231,7 +231,7 @@ class PASSCommandSpec extends Specification {
         when:
             resultMap = passCommand.process( "PAss ${password}", [] as Set, bufferMap )
         then:
-            resultMap.resultString == "-ERR ${onPASS} not authenticated"
+            resultMap.resultString == "-ERR ${moPASS} not authenticated"
         when:
             bufferMap.userInfo = getUserInfo( sqlObject, moPASS )
         then:
