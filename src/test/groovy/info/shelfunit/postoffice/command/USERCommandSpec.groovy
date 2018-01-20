@@ -28,6 +28,7 @@ class USERCommandSpec extends Specification {
     static gwGroovy    = 'gw' + rString // @groovy-is-groovy.org'
     static jaGroovy    = 'ja' + rString // @groovy-is-groovy.org'
     static jackGroovy  = 'on' + rString // @groovy-is-groovy.org'
+    static caseName    = 'caseNameDude' + rString
 
     @Rule 
     TestName name = new TestName()
@@ -46,14 +47,15 @@ class USERCommandSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ?)", [ gwShelf, jAdamsShelf, jackShelf ]
+        sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ?, ?)", [ gwShelf, jAdamsShelf, jackShelf, caseName ]
         sqlObject.close()
     }   // run after the last feature method
    
     def addUsers() {
-        addUser( sqlObject, 'George', 'Washington', gwShelf, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jAdamsShelf, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", jackShelf, 'somePassword' )
+        addUser( sqlObject, 'George', 'Washington', gwShelf,     'somePassword' )
+        addUser( sqlObject, 'John', 'Adams',        jAdamsShelf, 'somePassword' )
+        addUser( sqlObject, 'Jack', "O'Neill",      jackShelf,   'somePassword' )
+        addUser( sqlObject, 'Case', 'Name',         caseName,    'somePassword' )
     }
 
 
@@ -79,6 +81,38 @@ class USERCommandSpec extends Specification {
             jackGroovy   | "+OK ${jackGroovy} is a valid mailbox"
 	}
 	
+    @Unroll( "Mixing cases with #inputAddress gives #value" )
+    def "Mixing cases with #inputAddress gives #value"() {
+        def resultMap
+        def resultString
+        // 
+        when:
+            resultMap = userCommand.process( "USER ${inputAddress}", [] as Set,  [ state: 'AUTHORIZATION' ] )
+        then:
+            resultMap.resultString == value
+        where:
+            inputAddress | value    
+            'caseNameDude' + rString | "+OK ${caseName} is a valid mailbox"
+            'CASENAMEDUDE' + rString | "+OK ${"CASENAMEDUDE" + rString} is a valid mailbox"
+            'casenamedude' + rString | "+OK ${"casenamedude" + rString} is a valid mailbox"
+    }
+
+    @Unroll( "Mixing cases with #inputAddress and lower-case user command gives #value" )
+    def "Mixing cases with #inputAddress and lower-case user command gives #value"() {
+        def resultMap
+        def resultString
+        
+        when:
+            resultMap = userCommand.process( "user ${inputAddress}", [] as Set,  [ state: 'AUTHORIZATION' ] )
+        then:
+            resultMap.resultString == value
+        where:
+            inputAddress | value    
+            'casENamEDudE' + rString | "+OK ${"casENamEDudE" + rString} is a valid mailbox"
+            'CASENAMEDUDE' + rString | "+OK ${"CASENAMEDUDE" + rString} is a valid mailbox"
+            'casenamedude' + rString | "+OK ${"casenamedude" + rString} is a valid mailbox"
+    }
+    
 	@Unroll( "#someState gives #value" )
 	def "#someState gives #value"() {
 	    def resultMap

@@ -163,7 +163,9 @@ class MetaProgrammer {
     static runJavaObjectMetaProgramming() {
         /**
         I decided to use metaprogramming to do something other that ! to mean "not".
-        The issue is that in Groovy, "not" is already taken in groovy.xml.Entity and org.codehaus.groovy.ast.builder.AstSpecificationCompiler. So I tried isNot, doesNot, doNot, haveNot. It was kind of awkward. So I just decided to add a "_" in front of "not" and be done with it.
+        The issue is that in Groovy, "not" is already taken in groovy.xml.Entity and org.codehaus.groovy.ast.builder.AstSpecificationCompiler. 
+        So I tried isNot, doesNot, doNot, haveNot. It was kind of awkward. 
+        So I just decided to add a "_" in front of "not" and be done with it.
         */
         java.lang.Object.metaClass.static._not = { boolean arg ->
             if ( arg == true ) { 
@@ -172,36 +174,6 @@ class MetaProgrammer {
                 return true 
             }
         }
-        /*
-        java.lang.Object.metaClass.static.isNot = { boolean arg ->
-            if ( arg == true ) { 
-                return false 
-            } else { 
-                return true 
-            }
-        }
-        java.lang.Object.metaClass.static.doesNot = { boolean arg ->
-            if ( arg == true ) { 
-                return false 
-            } else { 
-                return true 
-            }
-        }
-        java.lang.Object.metaClass.static.doNot = { boolean arg ->
-            if ( arg == true ) { 
-                return false 
-            } else { 
-                return true 
-            }
-        }
-        java.lang.Object.metaClass.static.haveNot = { boolean arg ->
-            if ( arg == true ) { 
-                return false 
-            } else { 
-                return true 
-            }
-        }
-        */
         
     }
 } // line 231
