@@ -44,7 +44,7 @@ class PASSCommand {
         } else {
             def userInfo  = bufferMap.userInfo
             def password  = q.getPasswordInPASS()
-            def rawHash   = new Sha512Hash( password, userInfo.username, userInfo.iterations.toInteger() ) 
+            def rawHash   = new Sha512Hash( password, userInfo.username.toLowerCase(), userInfo.iterations.toInteger() ) 
             def finalHash = rawHash.toBase64()
             log.info "here is bufferMap.userInfo.userid: ${bufferMap.userInfo.userid} and it's a ${bufferMap.userInfo.userid.getClass().name}"
             if ( ( userInfo.password_hash == finalHash ) && 

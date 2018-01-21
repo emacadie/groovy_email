@@ -1,12 +1,9 @@
 package info.shelfunit.mail
 
-// import info.shelfunit.mail.ConfigHolder
-
 import groovy.sql.Sql
 import org.apache.shiro.crypto.hash.Sha512Hash
 
 class GETestUtils {
-    
     
     static {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
@@ -31,10 +28,9 @@ class GETestUtils {
         "${Character.MIN_VALUE}${username.toLowerCase()}${Character.MIN_VALUE}${password}".bytes.encodeBase64().toString()
     }
     
-    static def alphabet =  ( 'a'..'z' ).join()
+    static def alphabet =  ( 'a'..'z' ).join() + ( 'A'..'Z' ).join()
     
-    static def getRandomString = { int n = 9 ->
-        
+    static def getRandomString = { int n = 12 ->
         new Random().with {
             ( 1..n ).collect { 
                 alphabet[ nextInt( alphabet.length() ) ] 
@@ -45,7 +41,8 @@ class GETestUtils {
     static iterations = 10000
     
     static addUser( sqlObject, firstName, lastName, userName, password, loggedIn = false ) {
-        def params = [ userName, userName.toLowerCase(), ( new Sha512Hash( password, userName.toLowerCase(), iterations ).toBase64() ), 
+        def params = [ userName, userName.toLowerCase(), 
+                       ( new Sha512Hash( password, userName.toLowerCase(), iterations ).toBase64() ), 
                        'SHA-512', iterations, getBase64Hash( userName.toLowerCase(), password ), firstName, lastName, 0, loggedIn 
         ]
         sqlObject.execute "insert into  email_user( username, username_lc, password_hash, " +
@@ -58,7 +55,7 @@ class GETestUtils {
         def params = [ uuid, userName, userName.toLowerCase(), fromAddress, toAddress, messageString ]
         sqlObject.execute "insert into mail_store(id, username, username_lc, " +
             "from_address, to_address, text_body) " +
-            "values (?, ?, ?, ?, ?, ?)", params
+            "values ( ?, ?, ?, ?, ?, ? )", params
     }
     
     static getUserId( sqlObject, userName ) {

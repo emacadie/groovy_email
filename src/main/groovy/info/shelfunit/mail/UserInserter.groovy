@@ -27,11 +27,11 @@ class UserInserter {
                 
                 def db = ConfigHolder.instance.returnDbMap() 
                 def userMap = [ iterations: options.iterations, 
-                                user: options.user, 
-                                userLc: options.user.toLowerCase(), 
-                                fName: options.fName, 
-                                lName: options.lName, 
-                                pass: options.pass 
+                                user:       options.user, 
+                                userLc:     options.user.toLowerCase(), 
+                                fName:      options.fName, 
+                                lName:      options.lName, 
+                                pass:       options.pass 
                               ]
                 createUser( db, userMap )
             }
@@ -57,7 +57,7 @@ class UserInserter {
             def numIterations = ( userMap.iterations.toInteger() ) * 1000
             def salt = options.user
             def hashedPass = new Sha512Hash( userMap.pass, userMap.user.toLowerCase(), numIterations )
-            def base64Hash = "${Character.MIN_VALUE}${userMap.user}${Character.MIN_VALUE}${userMap.pass}".bytes.encodeBase64().toString()
+            def base64Hash = "${Character.MIN_VALUE}${userMap.user.toLowerCase()}${Character.MIN_VALUE}${userMap.pass}".bytes.encodeBase64().toString()
             def params = [ userMap.user, 
                            userMap.user.toLowerCase(), 
                            hashedPass.toBase64(), 
