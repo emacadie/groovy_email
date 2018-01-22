@@ -23,8 +23,8 @@ import info.shelfunit.spool.InboundSpoolWorker
 class MailRunner {
 
     def buildServerList( def argConfig ) {
-        def tempServerList = [ config.smtp.server.name ]
-        config.smtp.other.domains.isEmpty() ?: ( tempServerList += config.smtp.other.domains )
+        def tempServerList = [ argConfig.smtp.server.name ]
+        argConfig.smtp.other.domains.isEmpty() ?: ( tempServerList += argConfig.smtp.other.domains )
         def returnList = []
         tempServerList.collect{ returnList << it.toLowerCase() }
         return returnList
@@ -33,7 +33,7 @@ class MailRunner {
     def runWithActors( def path ) {
         ConfigHolder.instance.setConfObject( path )
         def config     = ConfigHolder.instance.getConfObject()
-        def serverList = this.buildServerlist( config )
+        def serverList = this.buildServerList( config )
         log.info "here is config.watch.dir: ${config.watch.dir}"
         log.info "config.watch.dir is a ${config.watch.dir.getClass().name}"
         log.info "here is config.watch.dir.toString(): ${config.watch.dir.toString()}"
