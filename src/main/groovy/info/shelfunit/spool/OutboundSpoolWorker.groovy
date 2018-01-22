@@ -19,9 +19,11 @@ class OutboundSpoolWorker {
     // final sqlObject
     ClamAVClient clamavj
     static final QUERY_STATUS_STRING          = 'select * from mail_spool_out where status_string = ?'
-    static final INSERT_STRING                = 'insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )'
+    static final INSERT_STRING                = "insert into mail_store( id, username, from_address, to_address, " +
+        "text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )"
     static final SELECT_USER_STRING           = 'select username from email_user where lower( username ) = ?'
-    static final SELECT_INVALID_USER_STRING   = 'select id, from_username from mail_spool_out where from_username not in (select username from email_user)'
+    static final SELECT_INVALID_USER_STRING   = "select id, from_username from mail_spool_out where " +
+        "from_username not in (select username from email_user)"
     static final SELECT_INVALID_DOMAIN_STRING = 'select id, from_domain from mail_spool_out where from_domain not in '
     
     OutboundSpoolWorker( ) {
@@ -31,7 +33,7 @@ class OutboundSpoolWorker {
         def cleanUUIDs   = []
         def uncleanUUIDs = []
         sqlObject.eachRow( QUERY_STATUS_STRING, [ 'ENTERED' ] ) { row ->
-            byte[] data = row[ 'text_body' ].getBytes()
+            byte[] data       = row[ 'text_body' ].getBytes()
             InputStream input = new ByteArrayInputStream( data )
             println "input is a ${input.getClass().name}"
             def isClean = this.runClamOnMessage( input, clamavj )
@@ -59,7 +61,10 @@ class OutboundSpoolWorker {
                 sqlObject.withTransaction {
                     params << status
                     params += uuidList // you can do this, or uuidList.plus( 0, status ) which adds status to front of list
-                    sqlObject.execute( "UPDATE mail_spool_out set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
+                    sqlObject.execute( 
+                        "UPDATE mail_spool_out set status_string = ? where id in (${uuidList.getQMarkString()}) ", 
+                        uuidList.plus( 0, status ) 
+                    )
                 }
             }
             
@@ -128,8 +133,17 @@ class OutboundSpoolWorker {
                         sqlObject.withTransaction {
                             def userList = v
                             userList.each { user ->
-                                sqlObject.execute "insert into mail_store( id, username, from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ? )",
-                                [ UUID.randomUUID(), user, row[ 'from_address' ], user + '@' + k , row[ 'text_body' ], row[ 'msg_timestamp' ] ]
+                                sqlObject.execute "insert into mail_store( id, username, username_lc, " +
+                                    "from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ?, ? )",
+                                [ 
+                                    UUID.randomUUID(), 
+                                    user, 
+                                    user.toLowerCase(),
+                                    row[ 'from_address' ], 
+                                    user + '@' + k , 
+                                    row[ 'text_body' ], 
+                                    row[ 'msg_timestamp' ] 
+                                ]
                             }
                         }
                         outgoingMap.remove( k )
@@ -183,11 +197,16 @@ class OutboundSpoolWorker {
             idsToDelete << row[ 'id' ]
             log.info "invalid user ${row[ 'from_username' ]} with id ${row[ 'id' ]}"
         } // sqlObject.eachRow
-        sqlObject.eachRow( "SELECT id, from_domain from mail_spool_out where from_domain not in (${domainList.getQMarkString() })", domainList ) { row ->
+        this.updateMessageStatus( sqlObject, idsToDelete, 'INVALID_USER' )
+    }
+
+    def findInvalidDomains( sqlObject, domainList ) {
+        def idsToDelete = []
+        sqlObject.eachRow( "SELECT id, from_domain from mail_spool_out where lower( from_domain ) not in (${domainList.getQMarkString() })", domainList ) { row ->
             idsToDelete << row[ 'id' ]
             log.info "invalid domain ${row[ 'from_domain' ]} with id ${row[ 'id' ]}"
         }
-        this.updateMessageStatus( sqlObject, idsToDelete, 'INVALID_USER' )
+        this.updateMessageStatus( sqlObject, idsToDelete, 'INVALID_DOMAIN' )
     }
     
     def deleteTransferredMessages( sqlObject ) {
@@ -200,6 +219,10 @@ class OutboundSpoolWorker {
     
     def deleteInvalidUserMessages( sqlObject ) {
         this.deleteOutboundMessages( sqlObject, 'INVALID_USER' )
+    }
+
+    def deleteInvalidDomainMessages( sqlObject ) {
+        this.deleteOutboundMessages( sqlObject, 'INVALID_DOMAIN' )
     }
     
     private deleteOutboundMessages( sqlObject, status ) {

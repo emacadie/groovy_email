@@ -23,7 +23,7 @@ class InboundSpoolWorker{
         def cleanUUIDs   = []
         def uncleanUUIDs = []
         sqlObject.eachRow( QUERY_SPOOL_STATUS, [ 'ENTERED' ] ) { row ->
-            byte[] data = row[ 'text_body' ].getBytes()
+            byte[] data       = row[ 'text_body' ].getBytes()
             InputStream input = new ByteArrayInputStream( data )
             log.info "input is a ${input.getClass().name}"
             def isClean = this.runClamOnMessage( input, clamavj )

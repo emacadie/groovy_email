@@ -75,24 +75,20 @@ class MetaProgrammer {
             }
         }
         java.util.Map.metaClass.getSTATInfo = { Sql sqlObject ->
-            def userName = delegate.userInfo.username
+            def userNameLC = delegate.userInfo.username.toLowerCase()
             def totalSize
-            def uuidList = []
+            def uuidList   = []
             delegate.timestamp ?: java.sql.Timestamp.create() // ( new java.util.Date().getTime() )
             def rows = sqlObject.rows( 
                 'select sum( length( text_body ) ) from mail_store where username_lc = ? and msg_timestamp < ?', 
-                [ userName.toLowerCase(), delegate.timestamp ] 
+                [ userNameLC, delegate.timestamp ] 
             )
             if ( rows.size() != 0 ) { 
                 delegate.totalMessageSize = rows[ 0 ].sum
             } 
             rows.clear()
-            /*
-            sqlObject.eachRow( 'select id from mail_store where username = ?', [ userName ] ) { nextRow ->
-                uuidList << nextRow.id
-            }
-            */
-            uuidList = sqlObject.rows( 'select id from mail_store where username = ? and msg_timestamp < ?', [ userName, delegate.timestamp ] )
+            
+            uuidList = sqlObject.rows( 'select id from mail_store where username_lc = ? and msg_timestamp < ?', [ userNameLC, delegate.timestamp ] )
             delegate.uuidList = uuidList
         }
         

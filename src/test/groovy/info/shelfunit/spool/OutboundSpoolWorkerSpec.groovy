@@ -69,14 +69,14 @@ class OutboundSpoolWorkerSpec extends Specification {
     
     def cleanupSpec() {
         sqlObject.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
-        sqlObject.execute "DELETE FROM mail_spool_out where from_username = ?", [ gwString ]
+        sqlObject.execute "DELETE FROM mail_spool_out where from_username like ?", [ '%' + rString ] 
         sqlObject.close()
     }   // run after the last feature method
     
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", tjString, 'somePassword' )
+        addUser( sqlObject, 'John',   'Adams',      jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack',   "O'Neill",    tjString, 'somePassword' )
     }
     
     def createClamAVClient() {
@@ -115,7 +115,6 @@ class OutboundSpoolWorkerSpec extends Specification {
     @Requires({ properties[ 'clam.live.daemon' ] == 'true' })
 	def "test with actual clam client running - default to ignore"() {
 	    when:
-	        
 	        def enteredCount = getTableCount( sqlObject, sqlCountString, [ 'ENTERED', fromString ] )
 	        def cleanCount   = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
@@ -135,9 +134,9 @@ class OutboundSpoolWorkerSpec extends Specification {
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
 	def "test cleaning messages with mocks"() {
 	    println "\n--- Starting test ${name.methodName}"
-	    def clamavMock = Mock( ClamAVClient )
-	    def inputStreamMock = Mock( InputStream )
-	    byte[] outputMock   = "OK".getBytes()
+	    def clamavMock       = Mock( ClamAVClient )
+	    def inputStreamMock  = Mock( InputStream )
+	    byte[] outputMock    = "OK".getBytes()
 	    def numTimes = 7
 	    when:
 	        def enteredCount = getTableCount( sqlObject, sqlCountString, [ 'ENTERED', fromString ] )
@@ -172,7 +171,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    def clamavMock      = Mock( ClamAVClient )
 	    def inputStreamMock = Mock( InputStream )
 	    byte[] outputMock   = "FOUND".getBytes()
-	    def numTimes = 6
+	    def numTimes        = 6
 	    when:
 	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' ) }
 	        def enteredCount = getTableCount( sqlObject, sqlCountString, [ 'ENTERED', fromString ] )
@@ -196,7 +195,7 @@ class OutboundSpoolWorkerSpec extends Specification {
 	}
 	
 	def "test delete unclean messages"() {
-	    def numUnclean = 5
+	    def numUnclean      = 5
 	    def uncleanMessages = 0
 	    when:
 	        numUnclean.times { 
@@ -295,16 +294,16 @@ class OutboundSpoolWorkerSpec extends Specification {
         then:
             newCleanCount == badDomainCount + cleanCountStart
         when:
-            osw.findInvalidUsers( sqlObject, domainList ) 
+            osw.findInvalidDomains( sqlObject, domainList ) 
             def invalidCount = getTableCount( 
-                sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_USER' ] 
+                sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_DOMAIN' ] 
             )
         then:
             invalidCount == badDomainCount
         when:
-            osw.deleteInvalidUserMessages( sqlObject )
+            osw.deleteInvalidDomainMessages( sqlObject )
             invalidCount = getTableCount( 
-                sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_USER' ] 
+                sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_DOMAIN' ] 
             )
         then:
             invalidCount == 0
@@ -312,6 +311,59 @@ class OutboundSpoolWorkerSpec extends Specification {
             def cleanCountEnd = getTableCount( sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
         then:
             cleanCountStart == cleanCountEnd
+  
+	} // "test if outgoing messages with invalid domains are deleted"
+
+	def "test domain of different case"() {
+	    def cleanCountStart = getTableCount( sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
+        println "domainList[ 0 ]: ${domainList[ 0 ]}"
+        println "domainList[ 0 ].toUpperCase(): ${domainList[ 0 ].toUpperCase()}"
+	    println "cleanCountStart: ${cleanCountStart}"
+	    sqlObject.eachRow( 'select from_address from mail_spool_out where status_string = ?', [ 'CLEAN' ] ) { row ->
+            println "here is user name of clean message: ${row[ 'from_address' ]}"
+        } // sqlObject.eachRow
+        when:
+            def f = 0
+        then:
+            1 == 1
+        def badDomainCount = 5
+        badDomainCount.times {
+            insertIntoMailSpoolOut( 
+                'CLEAN',     // status, 
+                'rr@rr.com', // toAddress, 
+                gwString,    // userName = gwString, 
+                getRandomString( 500 ), // message = getRandomString( 500 ), 
+                UUID.randomUUID(), // uuid = UUID.randomUUID(), 
+                domainList[ 0 ].toUpperCase()     // userDomain = domainList[ 0 ] 
+            )
+            println "Inserted outward spool with domain name ${domainList[ 0 ].toUpperCase()}"
+        }
+        when:
+            def newCleanCount = getTableCount( 
+                sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] 
+            )
+            println "newCleanCount: ${newCleanCount}"
+        then:
+            newCleanCount == badDomainCount + cleanCountStart
+        when:
+            osw.findInvalidDomains( sqlObject, domainList ) 
+            def invalidCount = getTableCount( 
+                sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_DOMAIN' ] 
+            )
+            println "invalidCount: ${invalidCount}"
+        then:
+            invalidCount == 0
+        when:
+            osw.deleteInvalidDomainMessages( sqlObject )
+            invalidCount = getTableCount( 
+                sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'INVALID_DOMAIN' ] 
+            )
+        then:
+            invalidCount == 0
+        when:
+            def cleanCountEnd = getTableCount( sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
+        then:
+            ( badDomainCount ) + cleanCountStart == cleanCountEnd
   
 	} // "test if outgoing messages with invalid domains are deleted"
 

@@ -58,12 +58,12 @@ class ModularSMTPSocketWorker {
         bufferMap        = [:]
         copyMap          = [:]
         // bufferMap.rawCommandList = rawCommandList
-        bufferMap.fromIPAddress  = argFromAddress
-        bufferMap.fromHostName = argFromHost
-        fromIPAddress = argFromAddress
-        fromHostName  = argFromHost
-        mssgUUID               = UUID.randomUUID()
-        bufferMap.mssgUUID     = mssgUUID
+        bufferMap.fromIPAddress = argFromAddress
+        bufferMap.fromHostName  = argFromHost
+        fromIPAddress           = argFromAddress
+        fromHostName            = argFromHost
+        mssgUUID                = UUID.randomUUID()
+        bufferMap.mssgUUID      = mssgUUID
     }
     
     def doWork() {

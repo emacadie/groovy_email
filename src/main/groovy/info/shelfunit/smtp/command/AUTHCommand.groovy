@@ -34,9 +34,9 @@ class AUTHCommand {
         def regexResult = ( theMessage ==~ pattern )
         if ( prevCommandSet.contains( 'AUTH' ) ) {
             resultMap.resultString = "503 Bad sequence of commands"
-        } else if ( !theMessage.startsWith( 'AUTH PLAIN' ) ) {
+        } else if ( _not( theMessage.startsWith( 'AUTH PLAIN' ) ) ) {
             resultMap.resultString = "501 Command not in proper form"
-        } else if ( !regexResult ) {
+        } else if ( _not( regexResult ) ) {
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
             resultMap.resultString = "501 Command not in proper form"
@@ -57,7 +57,7 @@ class AUTHCommand {
         
         }
         resultMap.prevCommandSet = prevCommandSet
-        resultMap.bufferMap = bufferMap
+        resultMap.bufferMap      = bufferMap
         // resultMap.rawCommandList << theMessage
         log.info "here is resultMap: ${resultMap.toString()}"
         resultMap

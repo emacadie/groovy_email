@@ -33,7 +33,7 @@ class MSSGCommand {
         def resultMap = [:]
         resultMap.clear()
         
-        if ( !prevCommandSet.lastSMTPCommandPrecedesMSSG() ) {
+        if ( _not( prevCommandSet.lastSMTPCommandPrecedesMSSG() ) ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
             resultMap.resultString =  this.addMessageToDatabase( theMessage, bufferMap )

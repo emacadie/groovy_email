@@ -17,9 +17,9 @@ class DATACommand {
         resultMap.bufferMap = bufferMap
         if ( theMessage.length() > 4 ) {
             resultMap.resultString = "501 Command not in proper form"
-        } else if ( !theMessage.startsWith( 'DATA' )  ) {
+        } else if ( _not( theMessage.startsWith( 'DATA' ) )  ) {
             resultMap.resultString = "503 Bad sequence of commands"
-        } else if ( !prevCommandSet.lastSMTPCommandPrecedesDATA() ) {
+        } else if ( _not ( prevCommandSet.lastSMTPCommandPrecedesDATA() ) ) {
             resultMap.resultString = "503 Bad sequence of commands"
         } else {
             prevCommandSet << "DATA"

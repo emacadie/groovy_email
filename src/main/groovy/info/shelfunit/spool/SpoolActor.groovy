@@ -37,6 +37,8 @@ class SpoolActor extends DynamicDispatchActor {
                     log.info "here is message.serverList: ${message.serverList}"
                     osw.findInvalidUsers( sqlObject, message.serverList )
                     osw.deleteInvalidUserMessages( sqlObject )
+                    osw.findInvalidDomains( sqlObject, message.serverList )
+                    osw.deleteInvalidDomainMessages( sqlObject )
                     
                     log.info "About to call osw.deliverMessages( sqlObject, ${message.serverList}, ${message.port} )"
                     osw.deliverMessages( sqlObject, message.serverList, message.port )

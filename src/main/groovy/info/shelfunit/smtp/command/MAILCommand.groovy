@@ -34,9 +34,9 @@ class MAILCommand {
         def resultString
         def resultMap = [:]
         resultMap.clear()
-        if ( !prevCommandSet.lastSMTPCommandPrecedesMail() ) {
+        if ( _not( prevCommandSet.lastSMTPCommandPrecedesMail() ) ) {
             resultMap.resultString = "503 Bad sequence of commands"
-        } else if ( !theMessage.startsWith( 'MAIL FROM:' ) ) {
+        } else if ( _not( theMessage.startsWith( 'MAIL FROM:' ) ) ) {
             resultMap.resultString = "501 Command not in proper form"
         } else if ( !( theMessage ==~ pattern ) ) {
             log.info "The message is not equal to the pattern"
@@ -56,7 +56,7 @@ class MAILCommand {
             bufferMap.reversePath =  q.getEmailAddressInMAIL()
             if ( domainList.containsIgnoreCase( q.getDomainInMAIL() ) ) {
                 // get user info here
-                if ( !prevCommandSet.contains( 'AUTH' ) ) {
+                if ( _not( prevCommandSet.contains( 'AUTH' ) ) ) {
                     bufferMap.userInfo = 
                     sqlObject.firstRow( 'select * from email_user where base_64_hash=?', q.getUsernameInMAIL() )
                 }
