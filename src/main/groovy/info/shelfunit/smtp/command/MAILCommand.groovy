@@ -25,12 +25,15 @@ class MAILCommand {
     static mailFrom  = '''^(MAIL FROM):<'''
     static localPart = '''(([\\w!#$%&’*+/=?`{|}~^-]+(?:\\.[\\w!#$%&’*+/=?`{|}~^-]+)*)@'''
     static domain    = '''((?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,6}))>'''
-    static eightBitRuntime = '''(\\s{0,}BODY=8BITMIME)?$(?x)'''
+    static eightBitRuntime = '''.*?$(?x)'''
+    // static eightBitRuntime = '''(\\s{0,}BODY=8BITMIME)?$(?x)''' // orig
+    // static eightBitRuntime = '''.*(\\s{0,}BODY=8BITMIME)?.*$(?x)''' 
     static regex = mailFrom + localPart + domain + eightBitRuntime
     
     static pattern = ~regex
     
     def process( theMessage, prevCommandSet, bufferMap ) {
+        log.info "Here is the message: ${theMessage}"
         def resultString
         def resultMap = [:]
         resultMap.clear()
@@ -53,7 +56,7 @@ class MAILCommand {
             
             // bufferMap?.clear()
             bufferMap.forwardPath = [] // for RCPT command
-            bufferMap.reversePath =  q.getEmailAddressInMAIL()
+            bufferMap.reversePath = q.getEmailAddressInMAIL()
             if ( domainList.containsIgnoreCase( q.getDomainInMAIL() ) ) {
                 // get user info here
                 if ( _not( prevCommandSet.contains( 'AUTH' ) ) ) {
@@ -64,10 +67,12 @@ class MAILCommand {
             } else {
                 bufferMap.messageDirection = "inbound"
             }
-            if ( q.handles8BitInMAIL() ) {
+            // if ( q.handles8BitInMAIL() ) {
+            if ( theMessage.contains( "BODY=8BITMIME" ) ) {
                 bufferMap.handles8bit  = "true"
                 resultMap.resultString = "250 <${bufferMap.reversePath}> Sender and 8BITMIME OK"
             } else {
+                log.info( "theMessage does not contain BODY=8BITMIME; see for yourself: ${theMessage}" )
                 resultMap.resultString = '250 OK'
             }
             log.info "here is reverse path: ${bufferMap.reversePath}"

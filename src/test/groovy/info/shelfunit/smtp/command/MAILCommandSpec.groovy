@@ -2,6 +2,7 @@ package info.shelfunit.smtp.command
 
 import spock.lang.Ignore
 import spock.lang.Specification
+import spock.lang.Stepwise
 import spock.lang.Unroll
 
 import org.junit.Rule
@@ -10,17 +11,18 @@ import org.junit.rules.TestName
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.mail.meta.MetaProgrammer
 
+@Stepwise
 class MAILCommandSpec extends Specification {
     
     // if pre-defined, responses/inputs in unrolled tests must be defined here, not in method they are used
     static response250With8Bit = "250 <oneill@stargate.mil> Sender and 8BITMIME OK"
-    static response503 = "503 Bad sequence of commands"
-    static response501 = "501 Command not in proper form"
-    static domainList = [ 'shelfunit2.info', 'groovy-is-groovy2.org' ]
+    static response250OK = "250 OK"
+    static response503   = "503 Bad sequence of commands"
+    static response501   = "501 Command not in proper form"
+    static domainList    = [ 'shelfunit2.info', 'groovy-is-groovy2.org' ]
+    static resultMap     = [:]
+    def crlf             = "\r\n"
     static mailCommand
-    // static sqlObject
-    static resultMap = [:]
-    def crlf = "\r\n"
 
     @Rule 
     TestName name = new TestName()
@@ -32,9 +34,7 @@ class MAILCommandSpec extends Specification {
     def cleanup() {}        // run after every feature method
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
-        MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        // sqlObject = ConfigHolder.instance.getSqlObject()
         mailCommand = new MAILCommand( ConfigHolder.instance.getSqlObject(), domainList )
     }     // run before the first feature method
     
@@ -61,9 +61,9 @@ class MAILCommandSpec extends Specification {
             'VRFY'  | response503
             'NOOP'  | response503
             'RCPT'  | response503
-            'EHLO'  | "250 OK"
-            'HELO'  | "250 OK"
-            'RSET'  | "250 OK"
+            'EHLO'  | response250OK
+            'HELO'  | response250OK
+            'RSET'  | response250OK
 	}
 	
 	@Unroll( "#command gives #value with address #resultAddress" )
@@ -78,9 +78,9 @@ class MAILCommandSpec extends Specification {
             resultMap.bufferMap?.reversePath == resultAddress
         where:
             command | value         | resultAddress
-            'EHLO'  | "250 OK"      | 'oneill@stargate.mil'
-            'HELO'  | "250 OK"      | 'oneill@stargate.mil'
-            'RSET'  | "250 OK"      | 'oneill@stargate.mil'
+            'EHLO'  | response250OK | 'oneill@stargate.mil'
+            'HELO'  | response250OK | 'oneill@stargate.mil'
+            'RSET'  | response250OK | 'oneill@stargate.mil'
             'MAIL'  | response503   | null
             'EXPN'  | response503   | null
             'VRFY'  | response503   | null
@@ -109,6 +109,52 @@ class MAILCommandSpec extends Specification {
             'NOOP'  | response503           | null
             'RCPT'  | response503           | null
 	}
+
+// MAIL FROM:<shelfunit@outlook.com> AUTH=<>
+    @Unroll( "#command gives #value with address #resultAddress with AUTH=<> BODY=7BIT at the end" )
+    def "#command gives #value with address #resultAddress with AUTH=<> BODY=7BIT at the end"() {
+	    def resultString
+
+        when:
+            resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil> AUTH=<> BODY=7BIT", [ command ] as Set, [:] )
+        then:
+            println "command was ${command}, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.bufferMap?.reversePath == resultAddress
+        where:
+            command | value         | resultAddress
+            'EHLO'  | response250OK | 'oneill@stargate.mil'
+            'HELO'  | response250OK | 'oneill@stargate.mil'
+            'RSET'  | response250OK | 'oneill@stargate.mil'
+            'MAIL'  | response503   | null
+            'EXPN'  | response503   | null
+            'VRFY'  | response503   | null
+            'NOOP'  | response503   | null
+            'RCPT'  | response503   | null
+	}
+
+// MAIL FROM:<shelfunit@outlook.com> AUTH=<>
+    @Unroll( "#command gives #value with address #resultAddress with AUTH=<> at the end" )
+    def "#command gives #value with address #resultAddress with AUTH=<>  at the end"() {
+	    def resultString
+
+        when:
+            resultMap = mailCommand.process( "MAIL FROM:<oneill@stargate.mil> AUTH=<>", [ command ] as Set, [:] )
+        then:
+            println "command was ${command}, resultString is ${resultMap.resultString}"
+            resultMap.resultString == value
+            resultMap.bufferMap?.reversePath == resultAddress
+        where:
+            command | value         | resultAddress
+            'EHLO'  | response250OK | 'oneill@stargate.mil'
+            'HELO'  | response250OK | 'oneill@stargate.mil'
+            'RSET'  | response250OK | 'oneill@stargate.mil'
+            'MAIL'  | response503   | null
+            'EXPN'  | response503   | null
+            'VRFY'  | response503   | null
+            'NOOP'  | response503   | null
+            'RCPT'  | response503   | null
+	}
 	
 	@Unroll( "#inputAddress gives #value with result Address the same" )
 	def "#inputAddress gives #value with result Address the same"() {
@@ -123,37 +169,37 @@ class MAILCommandSpec extends Specification {
             resultMap.prevCommandSet == [ 'EHLO', 'MAIL' ] as Set
             resultMap.bufferMap?.messageDirection == direction
         where:
-            inputAddress                | value     | direction
-            'mkyong@yahoo.com'          | "250 OK"  | "inbound"
-            'mkyong-100@yahoo.com'      | "250 OK"  | "inbound" 
-            'mkyong.100@yahoo.com'      | "250 OK"  | "inbound" 
-            'mkyong111@mkyong.com'      | "250 OK"  | "inbound"
-            'mkyong-100@mkyong.net'     | "250 OK"  | "inbound"
-            'mkyong.100@mkyong.com.au'  | "250 OK"  | "inbound"
-            'mkyong@1.com'              | "250 OK"  | "inbound" 
-            'mkyong@gmail.com.com'      | "250 OK"  | "inbound" 
-            'mkyong+100@gmail.com'      | "250 OK"  | "inbound" 
-            'mkyong-100@yahoo-test.com' | "250 OK"  | "inbound" 
-            'howTuser@domain.com'       | "250 OK"  | "inbound" 
-            'user@domain.co.in'         | "250 OK"  | "inbound" 
-            'user1@domain.com'          | "250 OK"  | "inbound" 
-            'user.name@domain.com'      | "250 OK"  | "inbound" 
-            'user_name@domain.co.in'    | "250 OK"  | "inbound" 
-            'user-name@domain.co.in'    | "250 OK"  | "inbound" 
-            // 'user@domaincom'            | "250 OK" 
-            'user@domain.com'           | "250 OK"  | "inbound" 
-            'user@domain.co.in'         | "250 OK"  | "inbound" 
-            'user.name@domain.com'      | "250 OK" | "inbound" 
-            // "user'name@domain.co.in"    | "250 OK"
-            'user@domain.com'           | "250 OK"  | "inbound" 
-            'user@domain.co.in'         | "250 OK"  | "inbound" 
-            'user.name@domain.com'      | "250 OK"  | "inbound" 
-            'user_name@domain.com'      | "250 OK"  | "inbound" 
-            'username@yahoo.corporate.in'  | "250 OK"  | "inbound" 
-            'mkyong@shelfunit2.info'       | "250 OK"  | "outbound"
-            'mkyong-100@shelfunit.info'    | "250 OK"  | "inbound" 
-            'mkyong@groovy-is-groovy2.org' | "250 OK"  | "outbound" 
-            'mkyong@groovy-is-groovy3.org' | "250 OK"  | "inbound"
+            inputAddress                | value         | direction
+            'mkyong@yahoo.com'          | response250OK | "inbound"
+            'mkyong-100@yahoo.com'      | response250OK | "inbound" 
+            'mkyong.100@yahoo.com'      | response250OK | "inbound" 
+            'mkyong111@mkyong.com'      | response250OK | "inbound"
+            'mkyong-100@mkyong.net'     | response250OK | "inbound"
+            'mkyong.100@mkyong.com.au'  | response250OK | "inbound"
+            'mkyong@1.com'              | response250OK | "inbound" 
+            'mkyong@gmail.com.com'      | response250OK | "inbound" 
+            'mkyong+100@gmail.com'      | response250OK | "inbound" 
+            'mkyong-100@yahoo-test.com' | response250OK | "inbound" 
+            'howTuser@domain.com'       | response250OK | "inbound" 
+            'user@domain.co.in'         | response250OK | "inbound" 
+            'user1@domain.com'          | response250OK | "inbound" 
+            'user.name@domain.com'      | response250OK | "inbound" 
+            'user_name@domain.co.in'    | response250OK | "inbound" 
+            'user-name@domain.co.in'    | response250OK | "inbound" 
+            // 'user@domaincom'            | response250OK 
+            'user@domain.com'           | response250OK | "inbound" 
+            'user@domain.co.in'         | response250OK | "inbound" 
+            'user.name@domain.com'      | response250OK | "inbound" 
+            // "user'name@domain.co.in"    | response250OK
+            'user@domain.com'           | response250OK | "inbound" 
+            'user@domain.co.in'         | response250OK | "inbound" 
+            'user.name@domain.com'      | response250OK | "inbound" 
+            'user_name@domain.com'      | response250OK | "inbound" 
+            'username@yahoo.corporate.in'  | response250OK | "inbound" 
+            'mkyong@shelfunit2.info'       | response250OK | "outbound"
+            'mkyong-100@shelfunit.info'    | response250OK | "inbound" 
+            'mkyong@groovy-is-groovy2.org' | response250OK | "outbound" 
+            'mkyong@groovy-is-groovy3.org' | response250OK | "inbound"
 	}
 	
 	@Unroll( "invalid address #inputAddress gives #value" )

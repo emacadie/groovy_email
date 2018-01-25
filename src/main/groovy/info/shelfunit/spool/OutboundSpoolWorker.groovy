@@ -14,9 +14,8 @@ class OutboundSpoolWorker {
     // states of message: ENTERED, CLEAN (clean CalmAV scan) or UNCLEAN (unclean ClamAV scan)
     // TRANSFERRED: a clean message has been copied to mail_store for each user listed in the message
     // INVALID_USER: An outgoing user with proper domain name, but not in the user table
+    // INVALID_DOMAIN
     
-    // final config
-    // final sqlObject
     ClamAVClient clamavj
     static final QUERY_STATUS_STRING          = 'select * from mail_spool_out where status_string = ?'
     static final INSERT_STRING                = "insert into mail_store( id, username, from_address, to_address, " +
@@ -112,10 +111,7 @@ class OutboundSpoolWorker {
                 toAddressList.each { address ->
                     log.info "Here is addr: ${address}"
                     def q = address =~ regex
-                    log.info "here is q[ 0 ][ 0 ]: ${q[ 0 ][ 0 ]}"
-                    log.info "here is q[ 0 ][ 1 ]: ${q[ 0 ][ 1 ]}"
-                    log.info "here is q[ 0 ][ 2 ]: ${q[ 0 ][ 2 ]}"
-                    log.info "here is q[ 0 ][ 3 ]: ${q[ 0 ][ 3 ]}"
+                    this.logRegEx( q )
                     q.each { match ->
                         match.eachWithIndex { group, n ->
                             log.info "${n}, <$group>"
@@ -189,6 +185,13 @@ class OutboundSpoolWorker {
         } catch ( Exception e ) {
             log.error "Exception ${e.getClass().name}", e
         }
+    }
+
+    def logRegEx( theRegEx ) {
+        log.info "here is theRegEx[ 0 ][ 0 ]: ${theRegEx[ 0 ][ 0 ]}"
+        log.info "here is theRegEx[ 0 ][ 1 ]: ${theRegEx[ 0 ][ 1 ]}"
+        log.info "here is theRegEx[ 0 ][ 2 ]: ${theRegEx[ 0 ][ 2 ]}"
+        log.info "here is theRegEx[ 0 ][ 3 ]: ${theRegEx[ 0 ][ 3 ]}"
     }
     
     def findInvalidUsers( sqlObject, domainList ) {

@@ -34,9 +34,11 @@ class RCPTCommandSpec extends Specification {
     static jackGroovy   = joString + '@groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
     static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set
-    static response550 = "550 No such user"
-    static response250 = "250 OK"
-    static otherDomains = [ 'mkyong@yahoo.com', 'mkyong-100@yahoo.com',
+    static response550  = "550 No such user"
+    static response250  = "250 OK"
+    static otherUsersDomainA = [] 
+    static otherUsersDomainB = []
+    static otherDomains      = [ 'mkyong@yahoo.com', 'mkyong-100@yahoo.com',
 	    'mkyong.100@yahoo.com', 'mkyong111@mkyong.com', 'mkyong-100@mkyong.net', 'mkyong.100@mkyong.com.au',
 	    'mkyong@1.com', 'mkyong@gmail.com.com', 'mkyong+100@gmail.com', 'mkyong-100@yahoo-test.com',
 	    'howTuser@domain.com', 'user@domain.co.in', 'user1@domain.com', 'user.name@domain.com',
@@ -59,6 +61,10 @@ class RCPTCommandSpec extends Specification {
         sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
         rcptCommand = new RCPTCommand( domainList )
+        5.times {
+            otherUsersDomainA << getRandomString() + rString + '@' + domainList[ 0 ]
+            otherUsersDomainB << getRandomString() + rString + '@' + domainList[ 1 ]
+        }
     }     // run before the first feature method
     
     def cleanupSpec() {
@@ -68,17 +74,17 @@ class RCPTCommandSpec extends Specification {
    
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", joString, 'somePassword' )
+        addUser( sqlObject, 'John',   'Adams',      jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack',   "O'Neill",    joString, 'somePassword' )
     }
     
 	def "test handling wrong command"() {
 	    
 	    when:
-	        def resultMap = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  [ hamilton ] ] )
+	        def resultMap    = rcptCommand.process( "MAIL FROM:<oneill@stargate.mil>", [ 'RCPT' ] as Set, [ forwardPath:  [ hamilton ] ] )
 	        def mailResponse = resultMap.resultString + crlf 
 	    then:
-	        mailResponse == "501 Command not in proper form\r\n"
+	        mailResponse             == "501 Command not in proper form\r\n"
 	        resultMap.prevCommandSet == [ "RCPT" ] as Set
 	}
 
@@ -116,16 +122,16 @@ class RCPTCommandSpec extends Specification {
             resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEMR, [ forwardPath:  hamilton ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
+            resultMap.resultString   == value
             resultMap.prevCommandSet == resultSetEMR
         where:
-            inputAddress    | value    
-            gwShelf         | response250
-            jAdamsShelf     | response250
-            jackShell       | response250
-            gwGroovy        | response250
-            jaGroovy        | response250
-            jackGroovy      | response250
+            inputAddress | value    
+            gwShelf      | response250
+            jAdamsShelf  | response250
+            jackShell    | response250
+            gwGroovy     | response250
+            jaGroovy     | response250
+            jackGroovy   | response250
 	}
 	
 	@Unroll( "#inputAddress with prev command sequence gives #value" )
@@ -137,23 +143,23 @@ class RCPTCommandSpec extends Specification {
             resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [ forwardPath: [ hamilton ] ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEMR
+            resultMap.resultString          == value
+            resultMap.prevCommandSet        == resultSetEMR
             resultMap.bufferMap.forwardPath == forwardList
         where:
-            inputAddress    | prevCommandSet | value     | forwardList    
-            gwShelf         | resultSetEMR   | response250  | [ hamilton, gwShelf ]
-            jAdamsShelf     | resultSetEMR   | response250  | [ hamilton, jAdamsShelf ]
-            jackShell       | resultSetEMR   | response250  | [ hamilton, jackShell ]
-            gwGroovy        | resultSetEMR   | response250  | [ hamilton, gwGroovy ]
-            jaGroovy        | resultSetEMR   | response250  | [ hamilton, jaGroovy ]
-            jackGroovy      | resultSetEMR   | response250  | [ hamilton, jackGroovy ]
-            gwShelf         | resultSetEM    | response250  | [ hamilton, gwShelf ]
-            jAdamsShelf     | resultSetEM    | response250  | [ hamilton, jAdamsShelf ]
-            jackShell       | resultSetEM    | response250  | [ hamilton, jackShell ]
-            gwGroovy        | resultSetEM    | response250  | [ hamilton, gwGroovy ]
-            jaGroovy        | resultSetEM    | response250  | [ hamilton, jaGroovy ]
-            jackGroovy      | resultSetEM    | response250  | [ hamilton, jackGroovy ]
+            inputAddress | prevCommandSet | value        | forwardList    
+            gwShelf      | resultSetEMR   | response250  | [ hamilton, gwShelf ]
+            jAdamsShelf  | resultSetEMR   | response250  | [ hamilton, jAdamsShelf ]
+            jackShell    | resultSetEMR   | response250  | [ hamilton, jackShell ]
+            gwGroovy     | resultSetEMR   | response250  | [ hamilton, gwGroovy ]
+            jaGroovy     | resultSetEMR   | response250  | [ hamilton, jaGroovy ]
+            jackGroovy   | resultSetEMR   | response250  | [ hamilton, jackGroovy ]
+            gwShelf      | resultSetEM    | response250  | [ hamilton, gwShelf ]
+            jAdamsShelf  | resultSetEM    | response250  | [ hamilton, jAdamsShelf ]
+            jackShell    | resultSetEM    | response250  | [ hamilton, jackShell ]
+            gwGroovy     | resultSetEM    | response250  | [ hamilton, gwGroovy ]
+            jaGroovy     | resultSetEM    | response250  | [ hamilton, jaGroovy ]
+            jackGroovy   | resultSetEM    | response250  | [ hamilton, jackGroovy ]
 	}
 	
 	@Unroll( "#inputAddress with wrong prev command sequence gives #value" )
@@ -165,12 +171,12 @@ class RCPTCommandSpec extends Specification {
             resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", prevCommandSet, [:] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
+            resultMap.resultString   == value
             resultMap.prevCommandSet == prevCommandSet
         where:
-            inputAddress    | prevCommandSet | value    
-            gwShelf         | [ 'EHLO' ] as Set | "503 Bad sequence of commands"
-            jAdamsShelf     | [ 'RSET' ] as Set | "503 Bad sequence of commands"
+            inputAddress | prevCommandSet | value    
+            gwShelf      | [ 'EHLO' ] as Set | "503 Bad sequence of commands"
+            jAdamsShelf  | [ 'RSET' ] as Set | "503 Bad sequence of commands"
 
 	}
 
@@ -183,8 +189,8 @@ class RCPTCommandSpec extends Specification {
             resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: "${direction}" ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEM
+            resultMap.resultString          == value
+            resultMap.prevCommandSet        == resultSetEM
             resultMap.bufferMap.forwardPath == forwardList
         where:
             inputAddress       | direction  | value       | forwardList
@@ -217,8 +223,8 @@ class RCPTCommandSpec extends Specification {
             otherDomains[ 26 ] | 'inbound'  | response550 | [ hamilton ]
 	}
 	
-	@Unroll( "#inputAddress with wrong domain in outbound message gives #value" )
-	def "#inputAddress with wrong domain in outbound message gives #value"() {
+	@Unroll( "#inputAddress with different domain in outbound message gives #value" )
+	def "#inputAddress with different domain in outbound message gives #value"() {
 	    def resultMap
 	    def resultString
 
@@ -226,8 +232,8 @@ class RCPTCommandSpec extends Specification {
             resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: "${direction}" ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
-            resultMap.prevCommandSet == resultSetEM
+            resultMap.resultString          == value
+            resultMap.prevCommandSet        == resultSetEM
             resultMap.bufferMap.forwardPath == forwardList
         where:
             inputAddress       | direction  | value       | forwardList
@@ -271,9 +277,9 @@ class RCPTCommandSpec extends Specification {
             resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  hamilton ] )
         then:
             println "command was EHLO, resultString is ${resultMap.resultString}"
-            resultMap.resultString == value
+            resultMap.resultString           == value
             resultMap.bufferMap?.reversePath == resultAddress
-            resultMap.prevCommandSet == resultSetEM
+            resultMap.prevCommandSet         == resultSetEM
         where:
             inputAddress               | value                            | resultAddress
             'mkyong'                   | "501 Command not in proper form" | null 
@@ -301,52 +307,78 @@ class RCPTCommandSpec extends Specification {
 	
 	def "test happy path"() {
 	    when:
-	        def resultMap = rcptCommand.process( "RCPT TO:<${jackShell}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
+	        def resultMap    = rcptCommand.process( "RCPT TO:<${jackShell}>", resultSetEM, [ forwardPath:  [ hamilton ] ] )
 	        def mailResponse = resultMap.resultString + crlf 
-	        def bMap = resultMap.bufferMap
+	        def bMap         = resultMap.bufferMap
 	    then:
-	        mailResponse == "250 OK\r\n"
+	        mailResponse             == "250 OK\r\n"
 	        resultMap.prevCommandSet == resultSetEMR
-	        bMap.forwardPath == [ hamilton, jackShell ]
+	        bMap.forwardPath         == [ hamilton, jackShell ]
 	}
 	
 	def "test upper and lower mized case inbound"() {
 	    
 	    when:
-	        def resultMap = rcptCommand.process( "RCPT TO:<${gwString}@shelfunit.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        def resultMap    = rcptCommand.process( "RCPT TO:<${gwString}@shelfunit.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
 	        def mailResponse = resultMap.resultString + crlf 
-	        def bMap = resultMap.bufferMap
+	        def bMap         = resultMap.bufferMap
 	    then:
-	        mailResponse == "250 OK\r\n"
+	        mailResponse             == "250 OK\r\n"
 	        resultMap.prevCommandSet == resultSetEMR
-	        bMap.forwardPath == [ hamilton, ( gwString + '@shelfunit.info' ) ]
+	        bMap.forwardPath         == [ hamilton, ( gwString + '@shelfunit.info' ) ]
 	        
 	    when:
-	        resultMap = rcptCommand.process( "RCPT TO:<${gwString}@ShelfUnit.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        resultMap    = rcptCommand.process( "RCPT TO:<${gwString}@ShelfUnit.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
 	        mailResponse = resultMap.resultString + crlf 
-	        bMap = resultMap.bufferMap
+	        bMap         = resultMap.bufferMap
 	    then:
-	        mailResponse == "250 OK\r\n"
+	        mailResponse             == "250 OK\r\n"
 	        resultMap.prevCommandSet == resultSetEMR
-	        bMap.forwardPath == [ hamilton, ( gwString + '@ShelfUnit.info' ) ]
+	        bMap.forwardPath         == [ hamilton, ( gwString + '@ShelfUnit.info' ) ]
 	        
 	    when:
-	        resultMap = rcptCommand.process( "RCPT TO:<${gwString}@SHELFUNITA.INFO>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        resultMap    = rcptCommand.process( "RCPT TO:<${gwString}@SHELFUNITA.INFO>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
 	        mailResponse = resultMap.resultString + crlf 
-	        bMap = resultMap.bufferMap
+	        bMap         = resultMap.bufferMap
 	    then:
-	        mailResponse == "550 No such user\r\n"
+	        mailResponse             == "550 No such user\r\n"
 	        resultMap.prevCommandSet == resultSetEMR
-	        bMap.forwardPath == [ hamilton ]
+	        bMap.forwardPath         == [ hamilton ]
 	        
 	    when:
-	        resultMap = rcptCommand.process( "RCPT TO:<${gwString}@ShelfUnitA.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
+	        resultMap    = rcptCommand.process( "RCPT TO:<${gwString}@ShelfUnitA.info>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: 'inbound' ] )
 	        mailResponse = resultMap.resultString + crlf 
-	        bMap = resultMap.bufferMap
+	        bMap         = resultMap.bufferMap
 	    then:
-	        mailResponse == "550 No such user\r\n"
+	        mailResponse             == "550 No such user\r\n"
 	        resultMap.prevCommandSet == resultSetEMR
-	        bMap.forwardPath == [ hamilton ]
+	        bMap.forwardPath         == [ hamilton ]
+	}
+
+	@Unroll( "#inputAddress with different user in inbound message gives #value" )
+	def "#inputAddress with different user in inbound message gives #value"() {
+	    def resultMap
+	    def resultString
+        
+        when:
+            resultMap = rcptCommand.process( "RCPT TO:<${inputAddress}>", resultSetEM, [ forwardPath:  [ hamilton ], messageDirection: "${direction}" ] )
+        then:
+            println "command was EHLO, resultString is ${resultMap.resultString}"
+            resultMap.resultString          == value
+            resultMap.prevCommandSet        == resultSetEM
+            resultMap.bufferMap.forwardPath == forwardList
+        where:
+            inputAddress           | direction  | value       | forwardList
+            otherUsersDomainA[ 0 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainA[ 0 ] ]
+            otherUsersDomainA[ 1 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainA[ 1 ] ]
+            otherUsersDomainA[ 2 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainA[ 2 ] ]
+            otherUsersDomainA[ 3 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainA[ 3 ] ]
+            otherUsersDomainA[ 4 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainA[ 4 ] ]
+            otherUsersDomainB[ 0 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainB[ 0 ] ]
+            otherUsersDomainB[ 1 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainB[ 1 ] ]
+            otherUsersDomainB[ 2 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainB[ 2 ] ]
+            otherUsersDomainB[ 3 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainB[ 3 ] ]
+            otherUsersDomainB[ 4 ] | 'inbound'  | response250 | [ hamilton, otherUsersDomainB[ 4 ] ]
 	}
 
 } // line 271
