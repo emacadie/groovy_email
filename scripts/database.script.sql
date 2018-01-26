@@ -4,6 +4,7 @@ drop table email_user;
 drop table mail_spool_in;
 drop table mail_spool_out;  
 drop table mail_from_log;
+drop table bad_mail_store;
 
 -- to create tables
 CREATE TABLE email_user (
@@ -32,6 +33,18 @@ create table mail_store (
     text_body     text                     not null,
     msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null,
     FOREIGN KEY ( username_lc ) REFERENCES email_user ( username_lc ) on delete cascade
+);
+
+-- change this name later
+create table bad_mail_store (
+    id UUID PRIMARY KEY NOT NULL unique,
+    username      character varying( 64 )  not null,
+    username_lc   character varying( 64 )  not null,
+    from_address  character varying( 255 ) not null,
+    to_address    character varying( 255 ) not null,
+    message       bytea,
+    text_body     text                     not null,
+    msg_timestamp TIMESTAMP WITH TIME ZONE default clock_timestamp() not null
 );
 
 create table mail_spool_in (

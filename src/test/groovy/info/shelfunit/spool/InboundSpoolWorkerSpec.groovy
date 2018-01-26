@@ -17,7 +17,7 @@ import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.getTableCount
 
 import info.shelfunit.mail.meta.MetaProgrammer
-// import info.shelfunit.smtp.command.EHLOCommand
+
 
 import fi.solita.clamav.ClamAVClient
 
@@ -35,6 +35,7 @@ class InboundSpoolWorkerSpec extends Specification {
     static tjString   = 'tj' + rString
     static uuidList   = []
     static params     = []
+    static fromArray  = [] as List
     static InboundSpoolWorker isw
     static config
     static realClamAVClient
@@ -58,26 +59,29 @@ class InboundSpoolWorkerSpec extends Specification {
         def host = config.clamav.hostname
         def port = config.clamav.port
         realClamAVClient = this.createClamAVClient()
-        fromString = getRandomString() + "@" + getRandomString() + ".com"
-        isw        = new InboundSpoolWorker()
+        fromString       = getRandomString() + "@" + getRandomString() + ".com"
+        isw              = new InboundSpoolWorker()
         
     }     // run before the first feature method
     
     def cleanupSpec() {
-        // sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
+        
         println "here is rString: ${rString}"
-        sqlObject.execute "DELETE FROM email_user where username like ( ? )", [ "%${rString}%".toString() ]
+        def fromArrayQMarkString = fromArray.getQMarkString()
 
+        sqlObject.execute "DELETE FROM email_user where username like ( ? )", [ "%${rString}%".toString() ]
         sqlObject.execute "DELETE FROM email_user where username_lc like ( ? )", [ "%${fromString}%".toString() ]
-        sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
-        sqlObject.execute "DELETE FROM mail_store where from_address = ?", [ fromString ]
+        sqlObject.execute "DELETE FROM mail_spool_in where from_address in ( ${fromArrayQMarkString} )",  fromArray 
+        sqlObject.execute "DELETE FROM mail_store where from_address in (${ fromArrayQMarkString })",  fromArray 
+        sqlObject.execute "DELETE FROM bad_mail_store where from_address in (${ fromArrayQMarkString })",  fromArray 
+
         sqlObject.close()
     }   // run after the last feature method
     
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", tjString, 'somePassword' )
+        addUser( sqlObject, 'John',   'Adams',      jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack',   "O'Neill",    tjString, 'somePassword' )
     }
     
     def createClamAVClient() {
@@ -87,11 +91,11 @@ class InboundSpoolWorkerSpec extends Specification {
         return new ClamAVClient( host, port.toInt() )
     }
     
-    def insertIntoMailSpoolIn( status, toAddress = gwString + '@' + domainList[ 0 ]  ) {
+    def insertIntoMailSpoolIn( status, toAddress = gwString + '@' + domainList[ 0 ], fromAddress = fromString  ) {
         params.clear()
         def uuid = UUID.randomUUID()
         params << uuid // id
-        params << fromString // from_address
+        params << fromAddress // from_address
         params << " "        // from_username
         params << " "        // from_domain,
         params << toAddress  // to_address_list,
@@ -99,7 +103,10 @@ class InboundSpoolWorkerSpec extends Specification {
         params << status // status_string,
         params << "" //  base_64_hash
         
-        sqlObject.execute 'insert into mail_spool_in( id, from_address, from_username, from_domain, to_address_list,  text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
+        sqlObject.execute "insert into mail_spool_in( id, from_address, from_username, " +
+            "from_domain, to_address_list, text_body, status_string, base_64_hash ) " +
+            "values (?, ?, ?, ?, ?, ?, ?, ?)", 
+            params
         println "Entered ${uuid} with ${fromString}"
     }
     
@@ -267,6 +274,8 @@ class InboundSpoolWorkerSpec extends Specification {
 	}
 
     def "test with different case"() {
+        def fromStringB = getRandomString() + rString + "@" + getRandomString() + ".com"
+        fromArray << fromStringB
         when:
             addUser( sqlObject, 'George', 'Warshington', "davidbruce${rString}".toString(), 'somePassword' )
             insertIntoMailSpoolIn( 'CLEAN', "DavidBruce${rString.toUpperCase()}".toString() + '@' + domainList[ 0 ] )
@@ -287,6 +296,74 @@ class InboundSpoolWorkerSpec extends Specification {
             transferredCount == 1
 	        cleanCount       == 0
             storeCount       == 1
+            
+        // 'select count(*) from mail_spool_in where status_string = ? and from_address = ?'
+    }
+
+    def "test transferring a message with valid and non-existent user in different messages"() {
+        def diffMessFromString = getRandomString() + rString + "@" + getRandomString() + ".com"
+        fromArray << diffMessFromString
+        when:
+            def nonExistUser = getRandomString() + "@" + domainList[ 0 ]
+            insertIntoMailSpoolIn( 'CLEAN', nonExistUser, diffMessFromString  )
+            insertIntoMailSpoolIn( 'CLEAN', gwString + '@' + domainList[ 0 ], diffMessFromString  )
+	        def transferredCount = getTableCount( sqlObject, sqlCountString, [ 'TRANSFERRED', diffMessFromString ] )
+	        def cleanCount       = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', diffMessFromString ] )
+            def storeCount       = getTableCount( sqlObject, sqlCountStoreString, [ diffMessFromString ] )
+            def invalidCount     = getTableCount( sqlObject, sqlCountString, [ 'INBOUND_INVALID_USER', diffMessFromString ] )
+	       
+	    then:
+	        transferredCount == 0
+	        cleanCount       == 2
+            invalidCount     == 0
+            storeCount       == 0
+        
+        when:
+            isw.moveCleanMessages( sqlObject )
+	        transferredCount = getTableCount( sqlObject, sqlCountString, [ 'TRANSFERRED', diffMessFromString ] )
+	        cleanCount       = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', diffMessFromString ] )
+            invalidCount     = getTableCount( sqlObject, sqlCountString, [ 'INBOUND_INVALID_USER', diffMessFromString ] )
+            storeCount       = getTableCount( sqlObject, sqlCountStoreString, [ diffMessFromString ] )
+            
+        then:
+            transferredCount == 1
+	        cleanCount       == 0
+            storeCount       == 1
+            invalidCount     == 1
+            
+        // 'select count(*) from mail_spool_in where status_string = ? and from_address = ?'
+    }
+
+    def "test transferring a message with valid and non-existent user in same messge"() {
+        def newFromString = getRandomString() + rString + "@" + getRandomString() + ".com"
+        println "Here is newFromString: ${newFromString}"
+        fromArray << newFromString
+        when:
+            def nonExistUser = getRandomString() + "@" + domainList[ 0 ]
+            insertIntoMailSpoolIn( 'CLEAN', nonExistUser + "," + gwString + '@' + domainList[ 0 ], newFromString  )
+	        def transferredCount = getTableCount( sqlObject, sqlCountString, [ 'TRANSFERRED', newFromString ] )
+	        def cleanCount       = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', newFromString ] )
+            def storeCount       = getTableCount( sqlObject, sqlCountStoreString, [ newFromString ] )
+            def invalidCount     = getTableCount( sqlObject, sqlCountString, [ 'INBOUND_INVALID_USER', newFromString ] )
+	       
+	    then:
+	        transferredCount == 0
+	        cleanCount       == 1
+            invalidCount     == 0
+            storeCount       == 0
+        
+        when:
+            isw.moveCleanMessages( sqlObject )
+	        transferredCount = getTableCount( sqlObject, sqlCountString, [ 'TRANSFERRED', newFromString ] )
+	        cleanCount       = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', newFromString ] )
+            invalidCount     = getTableCount( sqlObject, sqlCountString, [ 'INBOUND_INVALID_USER', newFromString ] )
+            storeCount       = getTableCount( sqlObject, sqlCountStoreString, [ newFromString ] )
+            
+        then:
+            transferredCount == 0
+	        cleanCount       == 0
+            storeCount       == 1
+            invalidCount     == 1
             
         // 'select count(*) from mail_spool_in where status_string = ? and from_address = ?'
     }

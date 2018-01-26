@@ -11,10 +11,12 @@ class InboundSpoolWorker{
     // TRANSFERRED: a clean message has been copied to mail_store for each user listed in the message
     
     ClamAVClient clamavj
-    static final QUERY_SPOOL_STATUS      = 'select * from mail_spool_in where status_string = ?'
-    static final INSERT_INTO_MAIL_STORE  = "insert into mail_store( id, username, username_lc, " +
+    static final QUERY_SPOOL_STATUS          = 'select * from mail_spool_in where status_string = ?'
+    static final INSERT_INTO_MAIL_STORE      = "insert into mail_store( id, username, username_lc, " +
         "from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ?, ? )"
-    static final SELECT_USER_STRING      = 'select username_lc from email_user where username_lc = ?'
+    static final INSERT_INTO_BAD_MAIL_STORE  = "insert into bad_mail_store( id, username, username_lc, " +
+        "from_address, to_address, text_body, msg_timestamp ) values ( ?, ?, ?, ?, ?, ?, ? )"
+    static final SELECT_USER_STRING          = 'select username_lc from email_user where username_lc = ?'
     
     InboundSpoolWorker( ) {
     }
@@ -50,15 +52,11 @@ class InboundSpoolWorker{
                 sqlObject.withTransaction {
                     params << status
                     params += uuidList // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
-                    sqlObject.execute( "UPDATE mail_spool_in set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
-                }
-            }
-            if ( _not( uuidList.isEmpty() ) ) {
-                params = []
-                sqlObject.withTransaction {
-                    params << status
-                    params += uuidList // you can do this, or UUIDs.plus( 0, status ) which adds status to front of list
-                    sqlObject.execute( "UPDATE mail_from_log set status_string = ? where id in (${uuidList.getQMarkString()}) ", uuidList.plus( 0, status ) )
+                    sqlObject.execute( 
+                        "UPDATE mail_spool_in set status_string = ? " +
+                            "where id in (${uuidList.getQMarkString()}) ", 
+                        uuidList.plus( 0, status ) 
+                    )
                 }
             }
             
@@ -91,20 +89,23 @@ class InboundSpoolWorker{
     def moveCleanMessages( sqlObject ) {
         def nameToCheck
         def rows
-        def uuidsToDelete = []
+        def uuidsToTransfer   = []
+        def uuidsInvalidUsers = []
         def toAddressList
+        def theUUID
         sqlObject.eachRow( QUERY_SPOOL_STATUS, [ 'CLEAN' ] ) { row ->
             sqlObject.withTransaction {
                 log.info "---------------------------------------------------------------------------------------\n\n"
                 log.info "row['text_body'] is a ${row['text_body'].getClass().name}"
                 // in the database, the "list" is one field, so it's not quite a groovy list
                 toAddressList = row[ 'to_address_list' ].split( ',' )
-                
+                def newUUID = UUID.randomUUID()
                 toAddressList.each { address ->
                     nameToCheck = address.replaceFirst( '@.*', '' )
                     log.info "Here is nameToCheck: ${nameToCheck}"
                     rows = sqlObject.rows( SELECT_USER_STRING, nameToCheck.toLowerCase() )
-                    def newUUID = UUID.randomUUID()
+                    println "Here is row[ 'id' ]: ${row[ 'id' ]}"
+                    theUUID = row[ 'id' ]
                     if ( _not( rows.isEmpty() ) ) {
                         sqlObject.execute( INSERT_INTO_MAIL_STORE, 
                              [ newUUID,                   // id
@@ -117,16 +118,35 @@ class InboundSpoolWorker{
                              ] 
                         )
                         log.info "Entered ${newUUID} into mail_store from ${row[ 'id' ]} in mail_spool_in"
-                    }
-                }
+                        uuidsToTransfer << row[ 'id' ]
+                    } else {
+                        sqlObject.execute( INSERT_INTO_BAD_MAIL_STORE, 
+                             [ newUUID,                   // id
+                               nameToCheck,               // username
+                               nameToCheck.toLowerCase(), // username_lc
+                               row[ 'from_address' ],     // "from_address
+                               address,                   // to_address
+                               row[ 'text_body' ],        // text_body 
+                               row[ 'msg_timestamp' ]     // msg_timestamp
+                             ] 
+                        )
+                        log.info "Entered ${newUUID} into bad_mail_store from ${row[ 'id' ]} in mail_spool_in"
+                        uuidsInvalidUsers << theUUID // row[ 'id ']
+                    } // add a list of uuids for invalid users here
+                } // toAddressList.each
             }
-            uuidsToDelete << row[ 'id' ]
+            
         } // sqlObject.eachRow
-        this.updateMessageStatus( sqlObject, uuidsToDelete, 'TRANSFERRED' )
+        this.updateMessageStatus( sqlObject, uuidsToTransfer,   'TRANSFERRED' )
+        this.updateMessageStatus( sqlObject, uuidsInvalidUsers, 'INBOUND_INVALID_USER' )
     }
     
     def deleteTransferredMessages( sqlObject ) {
         this.deleteMessages( sqlObject, 'TRANSFERRED' )
+    }
+
+    def deleteInvalidUserMessages( sqlObject ) {
+        this.deleteMessages( sqlObject, 'INBOUND_INVALID_USER' )
     }
     
     def deleteUncleanMessages( sqlObject ) {

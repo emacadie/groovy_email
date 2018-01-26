@@ -29,6 +29,8 @@ class SpoolActor extends DynamicDispatchActor {
                 isw.moveCleanMessages( sqlObject )
                 log.info "about to call deleteTransferredMessages"
                 isw.deleteTransferredMessages( sqlObject )
+                log.info "about to call deleteInvalidUserMessages"
+                isw.deleteInvalidUserMessages( sqlObject )
                 log.info "About to construct OutboundSpoolWorker"
                 try {
                     def osw = new OutboundSpoolWorker()
