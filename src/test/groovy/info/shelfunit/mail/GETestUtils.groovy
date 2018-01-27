@@ -72,7 +72,20 @@ class GETestUtils {
         return result.count
     }
 
-    
+    static sqlOutCountString  = "select count(*) from mail_spool_out where status_string = ? and from_address = ?"
+    static getOutEnteredCount = { Sql sqlObject, String closureFrom ->
+        getTableCount( sqlObject, sqlOutCountString, [ 'ENTERED', closureFrom ] )
+    }
+    static getOutCleanCount = { Sql sqlObject, String closureFrom ->
+        getTableCount( sqlObject, sqlOutCountString, [ 'CLEAN', closureFrom ] )
+    }
+    static getOutUncleanCount = { Sql sqlObject, String closureFrom ->
+        getTableCount( sqlObject, sqlOutCountString, [ 'UNCLEAN', closureFrom ] )
+    }
+
+    static getOUtInvalidUserCount = { Sql sqlObject, String closureFrom ->
+        getTableCount( sqlObject, sqlOutCountString, [ 'INVALID_USER', closureFrom ] )
+    }
 
 }
 

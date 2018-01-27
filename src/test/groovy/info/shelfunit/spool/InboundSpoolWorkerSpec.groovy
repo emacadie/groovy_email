@@ -376,5 +376,5 @@ class InboundSpoolWorkerSpec extends Specification {
 	        1 == 1
 	}
 	
-} // line 246
+} // line 246, 379
 

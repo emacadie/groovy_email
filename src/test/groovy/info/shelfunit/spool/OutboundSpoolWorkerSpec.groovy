@@ -16,7 +16,10 @@ import static info.shelfunit.mail.GETestUtils.addUser
 import static info.shelfunit.mail.GETestUtils.getBase64Hash
 import static info.shelfunit.mail.GETestUtils.getRandomString
 import static info.shelfunit.mail.GETestUtils.getTableCount
-
+import static info.shelfunit.mail.GETestUtils.getOutEnteredCount
+import static info.shelfunit.mail.GETestUtils.getOutCleanCount
+import static info.shelfunit.mail.GETestUtils.getOutUncleanCount
+import static info.shelfunit.mail.GETestUtils.getOUtInvalidUserCount
 import info.shelfunit.mail.meta.MetaProgrammer
 
 import fi.solita.clamav.ClamAVClient
@@ -109,21 +112,6 @@ class OutboundSpoolWorkerSpec extends Specification {
         insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' )
         insertIntoMailSpoolOut( 'ENTERED', 'rush@destiny.ancients.com,young@destiny.ancients.com' )
     }
-    
-    def getEnteredCount = { String closureFrom ->
-        getTableCount( sqlObject, sqlCountString, [ 'ENTERED', closureFrom ] )
-    }
-    def getCleanCount = { String closureFrom ->
-        getTableCount( sqlObject, sqlCountString, [ 'CLEAN', closureFrom ] )
-    }
-    def getUncleanCount = { String closureFrom ->
-        getTableCount( sqlObject, sqlCountString, [ 'UNCLEAN', closureFrom ] )
-    }
-
-    def getInvalidUserCount = { String closureFrom ->
-        getTableCount( sqlObject, sqlCountString, [ 'INVALID_USER', closureFrom ] )
-    }
-
     // in the closure for Requires, you can use "properties" instead of "System.properties"
     // -Dclam.live.daemon=true
 
@@ -141,8 +129,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        cleanCount   = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', fromString ] )
 	    then:
 	        1 == 1
-            getEnteredCount( fromString ) == 0
-	        getCleanCount( fromString )   == 7
+            getOutEnteredCount( fromString ) == 0
+	        getOutCleanCount( fromString )   == 7
 	}
 	
 	@Requires({ properties[ 'clam.live.daemon' ] != 'true' })
@@ -155,8 +143,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    when:
 	        println "numTimes = ${numTimes}"
 	    then:
-	        getEnteredCount( fromString ) == numTimes
-	        getCleanCount( fromString )   == 0
+	        getOutEnteredCount( sqlObject, fromString ) == numTimes
+	        getOutCleanCount( sqlObject, fromString )   == 0
 	    when:
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
@@ -164,8 +152,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    then:
 	        _ * ClamAVClient.isCleanReply( outputMock ) // subscriber.receive("hello")
 	        1 == 1
-	        getEnteredCount( fromString ) == 0
-	        getCleanCount( fromString )   == numTimes
+	        getOutEnteredCount( sqlObject, fromString ) == 0
+	        getOutCleanCount( sqlObject, fromString )   == numTimes
 	}
 	
 	@Ignore
@@ -184,8 +172,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    when:
 	        numTimes.times { insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' ) }
 	    then:
-	        getEnteredCount( fromString ) == numTimes
-	        getUncleanCount(fromString )  == 0
+	        getOutEnteredCount( sqlObject, fromString ) == numTimes
+	        getOutUncleanCount( sqlObject, fromString ) == 0
 	    when:
 	        clamavMock.scan( _ ) >> outputMock
 	        outputMock.toString() >> "Hello"
@@ -193,8 +181,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 	    then:
 	        _ * ClamAVClient.isCleanReply( outputMock ) 
 	        1 == 1
-	        getEnteredCount( fromString ) == 0
-	        getUncleanCount( fromString ) == numTimes
+	        getOutEnteredCount( sqlObject, fromString ) == 0
+	        getOutUncleanCount( sqlObject, fromString ) == numTimes
 	}
 	
 	def "test delete unclean messages"() {
@@ -206,12 +194,12 @@ class OutboundSpoolWorkerSpec extends Specification {
 	        }
 	        println "numUnclean == ${numUnclean}"
 	    then:
-	        numUnclean != getUncleanCount( fromString )
+	        numUnclean != getOutUncleanCount( sqlObject, fromString )
 	    when:
 	        osw.deleteUncleanMessages( sqlObject )
 	        println "numUnclean == ${numUnclean}"
 	    then:
-	        getUncleanCount( fromString ) == 0
+	        getOutUncleanCount( sqlObject, fromString ) == 0
 	        
 	}
 	
@@ -258,7 +246,7 @@ class OutboundSpoolWorkerSpec extends Specification {
             )
         then:
             invalidCount == 0
-            cleanCountStart == getCleanCount( fromString )
+            cleanCountStart == getOutCleanCount( sqlObject, fromString )
 	} // "test if outgoing messages from invalid users are deleted" 
 	
 	def "test if outgoing messages with invalid domains are deleted"() {
