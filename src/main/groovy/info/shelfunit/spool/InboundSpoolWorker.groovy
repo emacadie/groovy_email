@@ -99,7 +99,8 @@ class InboundSpoolWorker{
                 log.info "row['text_body'] is a ${row['text_body'].getClass().name}"
                 // in the database, the "list" is one field, so it's not quite a groovy list
                 toAddressList = row[ 'to_address_list' ].split( ',' )
-                def newUUID = UUID.randomUUID()
+                def newUUID
+                
                 toAddressList.each { address ->
                     nameToCheck = address.replaceFirst( '@.*', '' )
                     log.info "Here is nameToCheck: ${nameToCheck}"
@@ -107,6 +108,8 @@ class InboundSpoolWorker{
                     println "Here is row[ 'id' ]: ${row[ 'id' ]}"
                     theUUID = row[ 'id' ]
                     if ( _not( rows.isEmpty() ) ) {
+                        newUUID = UUID.randomUUID()
+                        println "Here is newUUID: ${newUUID}"
                         sqlObject.execute( INSERT_INTO_MAIL_STORE, 
                              [ newUUID,                   // id
                                nameToCheck,               // username
@@ -120,6 +123,8 @@ class InboundSpoolWorker{
                         log.info "Entered ${newUUID} into mail_store from ${row[ 'id' ]} in mail_spool_in"
                         uuidsToTransfer << row[ 'id' ]
                     } else {
+                        newUUID = UUID.randomUUID()
+                        println "Here is newUUID: ${newUUID}"
                         sqlObject.execute( INSERT_INTO_BAD_MAIL_STORE, 
                              [ newUUID,                   // id
                                nameToCheck,               // username

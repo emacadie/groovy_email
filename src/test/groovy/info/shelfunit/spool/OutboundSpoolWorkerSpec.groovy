@@ -29,20 +29,20 @@ class OutboundSpoolWorkerSpec extends Specification {
     
     def crlf = "\r\n"
     static sqlObject
-    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.com' ]
-    static rString    = getRandomString()
-    static gwString   = 'gw' + rString
-    static jaString   = 'ja' + rString
-    static tjString   = 'tj' + rString
-    static fromString = gwString + '@' + domainList[ 0 ]
+    static domainList   = [ 'shelfunit.info', 'groovy-is-groovy.com' ]
+    static rString      = getRandomString()
+    static gwString     = 'gw' + rString
+    static jaString     = 'ja' + rString
+    static tjString     = 'tj' + rString
+    static fromString   = gwString + '@' + domainList[ 0 ]
     static gwBase64Hash = getBase64Hash( gwString, 'somePassword' )
-    static OutboundSpoolWorker osw
+    static uuidList     = []
+    static params       = []
     static config
     static realClamAVClient
-    static uuidList = []
-    static params   = []
-    static sqlCountString      = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
-    static sqlCountStoreString = 'select count(*) from mail_store where from_address = ?'
+    static OutboundSpoolWorker osw  = new OutboundSpoolWorker()
+    static sqlCountString           = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
+    static sqlCountStoreString      = 'select count(*) from mail_store where from_address = ?'
     
     
     def setup() {
@@ -55,13 +55,12 @@ class OutboundSpoolWorkerSpec extends Specification {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sqlObject = ConfigHolder.instance.getSqlObject() 
-        this.addUsers()
-        config   = ConfigHolder.instance.getConfObject()
-        def host = config.clamav.hostname
-        def port = config.clamav.port
+        config    = ConfigHolder.instance.getConfObject()
+        def host  = config.clamav.hostname
+        def port  = config.clamav.port
         realClamAVClient = this.createClamAVClient()
-        
-        osw = new OutboundSpoolWorker()
+        this.addUsers()
+        // osw = new OutboundSpoolWorker()
         
         this.enterOutgoingMessages()
         
