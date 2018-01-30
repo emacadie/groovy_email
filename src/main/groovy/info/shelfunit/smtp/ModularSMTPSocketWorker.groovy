@@ -84,7 +84,7 @@ class ModularSMTPSocketWorker {
             def newString =  reader.readLine() 
             log.info "Here is newString: ${newString}"
             
-            if ( newString.startsWith( 'QUIT' ) ) {
+            if ( newString?.startsWith( 'QUIT' ) ) {
                 // QUITCommand clears the map, so I might want to call a method here to record the status
                 log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
                 responseString = this.handleMessage( newString )
@@ -127,19 +127,21 @@ class ModularSMTPSocketWorker {
     } 
 
     def commitIncomingMailLog(  ) {
-      def sqlString = 'insert into mail_from_log( id, from_ip_address, from_username, from_domain, to_address_list, status_string, command_sequence ) values (?, ?, ?, ?, ?, ?, ?)'
+      def sqlString = "insert into mail_from_log( id, from_ip_address, from_username, " +
+          "from_domain, to_address_list, status_string, command_sequence ) " +
+          "values (?, ?, ?, ?, ?, ?, ?)"
       try {
             sqlObject.withTransaction {
                 log.info "About to call sql to enter message"
                 def insertCounts = sqlObject.withBatch( sqlString ) { stmt ->
                     log.info "stmt is a ${stmt.class.name}"
                     stmt.addBatch( [ 
-                        UUID.randomUUID(), // id, 
-                        fromIPAddress,  // from_address, 
-                        fromUserName,   // from_username, 
-                        fromHostName, // from_domain, 
+                        UUID.randomUUID(),   // id, 
+                        fromIPAddress,       // from_address, 
+                        fromUserName,        // from_username, 
+                        fromHostName,        // from_domain, 
                         toAddressListString, // to_address_list, 
-                        statusString,  // status_string // I might need to change this
+                        statusString,        // status_string // I might need to change this
                         rawCommandList.toString() //command_sequence
                         
                     ] )
@@ -152,7 +154,6 @@ class ModularSMTPSocketWorker {
             SQLException ex = e.getNextException()
             // log.info "Next exception message: ${ex?.getMessage()}"
             // log.error "something went wrong", ex? 
-
         }
 
     } // def commitIncomingMailLog()
@@ -176,7 +177,7 @@ class ModularSMTPSocketWorker {
     def handleMessage( theMessage, def isActualMessage = false ) {
         theResponse = ""
         log.info "Incoming message: ${theMessage}"
-        if ( theMessage.isEncapsulated( ) || isActualMessage ) {
+        if ( theMessage?.isEncapsulated( ) || isActualMessage ) {
             def commandObject = this.returnCurrentCommand( theMessage.firstTen(), isActualMessage )
             log.info "returned a command object that is a ${commandObject.class.name}"
             commandResultMap.clear()
@@ -188,13 +189,13 @@ class ModularSMTPSocketWorker {
         } else if ( prevCommandSet.lastItem() == 'DATA' ) {
             log.info "prevCommand is DATA, here is the message: ${theMessage}"
             theResponse = '250 OK'
-        } else if ( theMessage.startsWith( 'EXPN' ) ) {
+        } else if ( theMessage?.startsWith( 'EXPN' ) ) {
             theResponse = '502 Command not implemented'
-        } else if ( theMessage.startsWith( 'NOOP' ) ) {
+        } else if ( theMessage?.startsWith( 'NOOP' ) ) {
             theResponse = '250 OK'
-        } else if ( theMessage.startsWith( 'VRFY' ) ) {
+        } else if ( theMessage?.startsWith( 'VRFY' ) ) {
             "252 VRFY Disabled, returning argument ${theMesssage.allButFirstFour()}"
-        } else if ( theMessage.isObsoleteCommand() ) { 
+        } else if ( theMessage?.isObsoleteCommand() ) { 
             theResponse = '502 Command not implemented'
         } else {
             theResponse = '250 OK'

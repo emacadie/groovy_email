@@ -12,13 +12,13 @@ class DATACommandSpec extends Specification {
     def crlf = "\r\n"
     static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static dataCommand
-    static hamilton = 'alexander@shelfunit.info'
-    static gwShelf  = 'george.washington@shelfunit.info'
-    static jAdamsShelf = 'john.adams@shelfunit.info'
-    static jackShell   = 'oneill@shelfunit.info'
-    static gwGroovy    = 'george.washington@groovy-is-groovy.org'
-    static jaGroovy    = 'john.adams@groovy-is-groovy.org'
-    static jackGroovy  = 'oneill@groovy-is-groovy.org'
+    static hamilton     = 'alexander@shelfunit.info'
+    static gwShelf      = 'george.washington@shelfunit.info'
+    static jAdamsShelf  = 'john.adams@shelfunit.info'
+    static jackShell    = 'oneill@shelfunit.info'
+    static gwGroovy     = 'george.washington@groovy-is-groovy.org'
+    static jaGroovy     = 'john.adams@groovy-is-groovy.org'
+    static jackGroovy   = 'oneill@groovy-is-groovy.org'
     static resultSetEMR = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
     static resultSetEM  = [ 'EHLO', 'MAIL' ] as Set 
 
@@ -39,48 +39,48 @@ class DATACommandSpec extends Specification {
     }   // run after the last feature method
    
     def "test command with extra stuff"() {
-        def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
+        def bufferMapArg      = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
         when:
             def resultMap = dataCommand.process( 'DATA hello', prevCommandSetArg, bufferMapArg )
         then:
             resultMap.prevCommandSet == prevCommandSetArg
-            resultMap.bufferMap == bufferMapArg
-            resultMap.resultString == "501 Command not in proper form"
+            resultMap.bufferMap      == bufferMapArg
+            resultMap.resultString   == "501 Command not in proper form"
     }
 
 	def "test handling wrong command"() {
-	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
+	    def bufferMapArg      = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
         when:
             def resultMap = dataCommand.process( 'RCPT', prevCommandSetArg, bufferMapArg )
         then:
             resultMap.prevCommandSet == prevCommandSetArg
-            resultMap.bufferMap == bufferMapArg
-            resultMap.resultString == "503 Bad sequence of commands"
+            resultMap.bufferMap      == bufferMapArg
+            resultMap.resultString   == "503 Bad sequence of commands"
 	}
 	
 	def "test commands in wrong order"() {
-	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
+	    def bufferMapArg      = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
         def prevCommandSetArg = [ 'EHLO', 'MAIL' ] as Set
         when:
             def resultMap = dataCommand.process( 'DATA', prevCommandSetArg, bufferMapArg )
         then:
             resultMap.prevCommandSet == prevCommandSetArg
-            resultMap.bufferMap == bufferMapArg
-            resultMap.resultString == "503 Bad sequence of commands"
+            resultMap.bufferMap      == bufferMapArg
+            resultMap.resultString   == "503 Bad sequence of commands"
 	}
 
 	def "test happy path"() {
 	    
-	    def bufferMapArg = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
+	    def bufferMapArg      = [ forwardPath:[ 'alexander@shelfunit.info', 'george.washington@shelfunit.info' ], reversePath: 'oneill@stargate.mil' ]
         def prevCommandSetArg = [ 'EHLO', 'MAIL', 'RCPT' ] as Set
         when:
             def resultMap = dataCommand.process( 'DATA', prevCommandSetArg, bufferMapArg )
         then:
             resultMap.prevCommandSet == [ 'EHLO', 'MAIL', 'RCPT', 'DATA' ] as Set
-            resultMap.bufferMap == bufferMapArg
-            resultMap.resultString == "354 Start mail input; end with <CRLF>.<CRLF>"
+            resultMap.bufferMap      == bufferMapArg
+            resultMap.resultString   == "354 Start mail input; end with <CRLF>.<CRLF>"
 	}
 
 }
