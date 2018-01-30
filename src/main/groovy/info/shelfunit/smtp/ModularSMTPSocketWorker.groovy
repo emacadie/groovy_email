@@ -73,6 +73,7 @@ class ModularSMTPSocketWorker {
         log.info "name of current thread: ${Thread.currentThread().getName()}, and it is number ${Thread.currentThread().getId()}"            
         log.info "available: ${input.available()}"
         def reader = input.newReader()
+        def gotNull = false
         log.info "reader is a ${reader.class.name}"
         output << "220 ${serverName} Simple Mail Transfer Service Ready\r\n"
         
@@ -95,6 +96,8 @@ class ModularSMTPSocketWorker {
             // } else if ( ( ( newString == null ) || newString?.startsWith( null ) ) ) {
             } else if ( ( newString == null ) ) {
                 log.info "in step newString == null"
+                gotNull        = true
+                gotQuitCommand = true
                 responseString = "501 Command not in proper form\r\n"
             } else if ( prevCommandSet?.lastItem() == 'DATA' ) {
                 def sBuffer = new StringBuilder()
@@ -117,9 +120,15 @@ class ModularSMTPSocketWorker {
                 responseString = this.handleMessage( newString )
                 rawCommandList << newString
             }
-            log.info "responseString: ${responseString}"
-            output << responseString
-        }
+            if ( gotNull == false ) {
+                log.info "responseString: ${responseString}"
+                output << responseString
+            } else {
+                log.info "gotNull: ${gotNull}"
+                output.close()
+            }
+
+        } // while ( _not( gotQuitCommand ) ) 
         log.info "Here is prevCommandSet: ${prevCommandSet}"
         log.info "here is rawCommandList: ${rawCommandList}"
         log.info "here is rawCommandList.length: ${rawCommandList.size}"
