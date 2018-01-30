@@ -91,6 +91,11 @@ class ModularSMTPSocketWorker {
                 gotQuitCommand = true
                 log.info "Processed QUIT, here is gotQuitCommand: ${gotQuitCommand}"
                 rawCommandList << newString
+            // } else if ( prevCommandSet?.isEmpty() && ( ( newString == null ) || newString?.startsWith( null ) ) ) {
+            // } else if ( ( ( newString == null ) || newString?.startsWith( null ) ) ) {
+            } else if ( ( newString == null ) ) {
+                log.info "in step newString == null"
+                responseString = "501 Command not in proper form\r\n"
             } else if ( prevCommandSet?.lastItem() == 'DATA' ) {
                 def sBuffer = new StringBuilder()
                 while ( _not( newString == "."  ) ) {
@@ -177,7 +182,7 @@ class ModularSMTPSocketWorker {
     def handleMessage( theMessage, def isActualMessage = false ) {
         theResponse = ""
         log.info "Incoming message: ${theMessage}"
-        if ( theMessage?.isEncapsulated( ) || isActualMessage ) {
+        if ( theMessage?.isValidCommand( ) || isActualMessage ) {
             def commandObject = this.returnCurrentCommand( theMessage.firstTen(), isActualMessage )
             log.info "returned a command object that is a ${commandObject.class.name}"
             commandResultMap.clear()

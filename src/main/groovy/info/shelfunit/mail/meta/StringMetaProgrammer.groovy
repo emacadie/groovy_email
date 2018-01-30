@@ -24,10 +24,10 @@ class StringMetaProgrammer {
             }
         }
         String.metaClass.startsWithEHLO = { ->
-            return delegate.startsWith( 'EHLO' )
+            return delegate.toUpperCase().startsWith( 'EHLO' )
         }
         String.metaClass.startsWithHELO = { ->
-            return delegate.startsWith( 'HELO' ) 
+            return delegate.toUpperCase().startsWith( 'HELO' ) 
         }
         String.metaClass.isHelloCommand = { ->
             ( delegate.startsWithEHLO() || delegate.startsWithHELO() )
@@ -47,10 +47,9 @@ class StringMetaProgrammer {
             ]
         }
        
-        // I REALLY need to come up with a better name than this
-        String.metaClass.isEncapsulated = { -> 
+        String.metaClass.isValidCommand = { -> 
             def returnValue = false
-            
+
             if ( delegate.isHelloCommand() ) { 
                 returnValue = true
             } 

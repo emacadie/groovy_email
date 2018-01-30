@@ -100,7 +100,7 @@ class ModularPostOfficeSocketWorker {
         } else if ( theMessage.toUpperCase().isRFC5034Command() ) {
             log.info "it's an RFC5034 command"
             theResponse = '-ERR Command not implemented'
-        } else if ( theMessage.toUpperCase().isEncapsulated( ) || isActualMessage ) {
+        } else if ( theMessage.toUpperCase().isValidCommand( ) || isActualMessage ) {
             def commandObject = this.returnCurrentCommand( theMessage, isActualMessage )
             log.info "returned a command object that is a ${commandObject.class.name}"
             commandResultMap.clear()

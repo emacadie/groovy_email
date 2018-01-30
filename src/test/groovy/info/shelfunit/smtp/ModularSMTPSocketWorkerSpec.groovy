@@ -248,19 +248,52 @@ class ModularSMTPSocketWorkerSpec extends Specification {
                 "221 shelfunit.info Service closing transmission channel\r\n"
 	}
 
-    // @Ignore
+    @Ignore
 	def "test common streams with empty message"() {
 	    when:
             def mIs    = Mock( InputStream )
             def mOs    = Mock( OutputStream )
             def domain = "hot-groovy.com"
             
-            def dataString = null +"${crlf}EHLO ${domain}${crlf}"  +
+            def dataString = null + "${crlf}EHLO ${domain}${crlf}"  +
             "MAIL FROM:<smtpnoauth@showboat.com>${crlf}" +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}"  +
             "JJJ${crlf}.${crlf}" +
             "QUIT${crlf}"
+            
+            byte[] data         = dataString.getBytes()
+            InputStream input   = new ByteArrayInputStream( data )
+            OutputStream output = new ByteArrayOutputStream() 
+            def msmtpw          = new ModularSMTPSocketWorker( input, output, domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
+            msmtpw.doWork()
+            msmtpw.cleanup()
+            
+	    then:
+            println "output to string: ++++\n${output.toString()}"
+            println "++++ end of output"
+            output.toString() == "250 OK${crlf}" +
+                "220 shelfunit.info Simple Mail Transfer Service Ready${crlf}"  +
+                "250 OK${crlf}" +
+                "250-Hello hot-groovy.com${crlf}"  +
+                "250-8BITMIME${crlf}"   +
+                "250-AUTH PLAIN${crlf}" +
+                "250 HELP${crlf}"       +
+                "250 OK${crlf}"         +
+                "250 OK${crlf}"         +
+                "354 Start mail input; end with <CRLF>.<CRLF>${crlf}"  +
+                "250 OK${crlf}"  +
+                "221 shelfunit.info Service closing transmission channel${crlf}" 
+	}
+
+    @Ignore
+    def "test common streams with one empty message"() {
+	    when:
+            def mIs    = Mock( InputStream )
+            def mOs    = Mock( OutputStream )
+            def domain = "hot-groovy.com"
+            
+            def dataString = null + "${crlf}QUIT${crlf}"
             
             byte[] data         = dataString.getBytes()
             InputStream input   = new ByteArrayInputStream( data )
