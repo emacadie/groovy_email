@@ -39,6 +39,9 @@ class ModularSMTPSocketWorker {
     @Hidden def fromUserName
     @Hidden def toAddressListString
     @Hidden def statusString
+    static def INCOMING_MAIL_LOG_SQL =  "insert into mail_from_log( " +
+          "id, from_ip_address, from_username, from_domain, " +
+          "to_address_list, status_string, command_sequence ) values (?, ?, ?, ?, ?, ?, ?)"
 
     ModularSMTPSocketWorker( argIn, argOut, argDomainList, argFromAddress, argFromHost ) {
         input  = argIn
@@ -127,11 +130,10 @@ class ModularSMTPSocketWorker {
     } 
 
     def commitIncomingMailLog(  ) {
-      def sqlString = 'insert into mail_from_log( id, from_ip_address, from_username, from_domain, to_address_list, status_string, command_sequence ) values (?, ?, ?, ?, ?, ?, ?)'
       try {
             sqlObject.withTransaction {
                 log.info "About to call sql to enter message"
-                def insertCounts = sqlObject.withBatch( sqlString ) { stmt ->
+                def insertCounts = sqlObject.withBatch( INCOMING_MAIL_LOG_SQL ) { stmt ->
                     log.info "stmt is a ${stmt.class.name}"
                     stmt.addBatch( [ 
                         UUID.randomUUID(), // id, 

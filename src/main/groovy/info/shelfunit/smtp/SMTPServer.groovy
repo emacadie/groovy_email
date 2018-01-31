@@ -31,6 +31,9 @@ class SMTPServer {
                     try {
                         sSockW = new ModularSMTPSocketWorker( input, output, serverList, socket.getInetAddress().toString(), socket.getInetAddress().getCanonicalHostName() )
                         sSockW.doWork(  )
+                    } catch ( Exception e ) {
+                        log.error "Exception: ${e.getClass().getName()}"
+                        log.error "Here is the stack trace: ", e
                     } finally {
                         sSockW.cleanup()
                     }
