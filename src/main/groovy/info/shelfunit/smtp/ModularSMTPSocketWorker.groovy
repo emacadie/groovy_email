@@ -88,8 +88,10 @@ class ModularSMTPSocketWorker {
             def newString =  reader.readLine() 
             log.info "Here is newString: ${newString}"
             if ( newString == null ) {
-                responseString << "501 Command not in proper form"
+                // responseString << "501 Command not in proper form"
+                responseString << "500 Syntax error, command unrecognized"
                 output << responseString.checkForCRLF()
+                output.flush()
                 throw new NullStringException()
             }
             if ( newString.startsWith( 'QUIT' ) ) {
@@ -142,12 +144,12 @@ class ModularSMTPSocketWorker {
                 def insertCounts = sqlObject.withBatch( INCOMING_MAIL_LOG_SQL ) { stmt ->
                     log.info "stmt is a ${stmt.class.name}"
                     stmt.addBatch( [ 
-                        UUID.randomUUID(), // id, 
-                        fromIPAddress,  // from_address, 
-                        fromUserName,   // from_username, 
-                        fromHostName, // from_domain, 
+                        UUID.randomUUID(),   // id, 
+                        fromIPAddress,       // from_address, 
+                        fromUserName,        // from_username, 
+                        fromHostName,        // from_domain, 
                         toAddressListString, // to_address_list, 
-                        statusString,  // status_string // I might need to change this
+                        statusString,        // status_string // I might need to change this
                         rawCommandList.toString() //command_sequence
                         
                     ] )
