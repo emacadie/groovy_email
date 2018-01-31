@@ -6,6 +6,7 @@ import java.sql.SQLException
 import groovy.sql.Sql
 import groovy.util.logging.Slf4j 
 
+import info.shelfunit.exception.NullStringException
 import info.shelfunit.mail.ConfigHolder
 import info.shelfunit.smtp.command.AUTHCommand
 import info.shelfunit.smtp.command.DATACommand
@@ -69,7 +70,7 @@ class ModularSMTPSocketWorker {
         bufferMap.mssgUUID      = mssgUUID
     }
     
-    def doWork() {
+    def doWork() throws NullStringException {
         String sCurrentLine
         def gotQuitCommand = false
         log.info "beginning doWork, input is a ${input.class.name}"
@@ -86,7 +87,11 @@ class ModularSMTPSocketWorker {
             log.info "Got the reader, and it's a ${reader.getClass().getName()}"
             def newString =  reader.readLine() 
             log.info "Here is newString: ${newString}"
-            
+            if ( newString == null ) {
+                responseString << "501 Command not in proper form"
+                output << responseString.checkForCRLF()
+                throw new NullStringException()
+            }
             if ( newString.startsWith( 'QUIT' ) ) {
                 // QUITCommand clears the map, so I might want to call a method here to record the status
                 log.info "got QUIT, here is prevCommandSet: ${prevCommandSet}, here is newString: ${newString}"
@@ -116,7 +121,8 @@ class ModularSMTPSocketWorker {
                 rawCommandList << newString
             }
             log.info "responseString: ${responseString}"
-            output << responseString
+            output << responseString.checkForCRLF()
+            output.flush()
         }
         log.info "Here is prevCommandSet: ${prevCommandSet}"
         log.info "here is rawCommandList: ${rawCommandList}"

@@ -112,7 +112,16 @@ class StringMetaProgrammer {
             }
             toIntResult
         }
-    }
+        
+        String.metaClass.checkForCRLF { ->
+            if ( delegate.endsWith( "\r\n" ) ) {
+                return delegate
+            } else {
+                return delegate + "\r\n"
+            }
+        }
+        
+    } // end static runStringMetaProgramming() {
 }
 
 
