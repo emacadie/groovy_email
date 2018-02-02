@@ -40,6 +40,7 @@ class SMTPServer {
                         sSockW.doWork(  )
                     } catch ( NullStringException nse ) {
                         log.info "New NullStringException"
+                        log.info "NSE on address ${socket.getInetAddress().toString()}, and name ${socket.getInetAddress().getCanonicalHostName()}"
                         log.info nse.printReducedStackTrace( "info.shelfunit" )
                     } catch ( Exception e ) {
                         log.error "Exception: ${e.getClass().getName()}"
