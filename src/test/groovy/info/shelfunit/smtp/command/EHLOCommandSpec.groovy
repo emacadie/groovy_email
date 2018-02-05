@@ -2,6 +2,8 @@ package info.shelfunit.smtp.command
 
 import spock.lang.Ignore
 import spock.lang.Specification
+import spock.lang.Stepwise
+import spock.lang.Unroll
 
 import org.junit.Rule
 import org.junit.rules.TestName
@@ -12,6 +14,7 @@ import org.xbill.DNS.Address
 
 import groovy.mock.interceptor.StubFor
 
+@Stepwise
 class EHLOCommandSpec extends Specification {
     
     def crlf = "\r\n"
@@ -34,7 +37,7 @@ class EHLOCommandSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${domain}", [] as Set, [:] )
+	        def resultMap    = ehloCommand.process( "EHLO ${domain}", [] as Set, [:] )
 	        def ehloResponse = resultMap.resultString + crlf 
 	    then:
 	        ehloResponse == "250-Hello ${domain}\r\n" +
@@ -50,7 +53,7 @@ class EHLOCommandSpec extends Specification {
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "HELO ${domain}", [] as Set, [:] )
+	        def resultMap    = ehloCommand.process( "HELO ${domain}", [] as Set, [:] )
 	        def ehloResponse = resultMap.resultString + crlf
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
@@ -58,45 +61,91 @@ class EHLOCommandSpec extends Specification {
 	
 	def "test handling domain more than 255 char"() {
 	    def ehloCommand = new EHLOCommand()
-	    
-	    def longString = ( "f" * 252 ) + '.com'
+	    def longString  = ( "f" * 252 ) + '.com'
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${longString}", [] as Set, [:] )
+	        def resultMap    = ehloCommand.process( "EHLO ${longString}", [] as Set, [:] )
 	        def ehloResponse = resultMap.resultString + crlf 
 	    then:
 	        ehloResponse == "501 Domain name length beyond 255 char limit per RFC 3696\r\n"
 	}
 	
 	def "test that command list and buffer map are cleared"() {
-	    def domain = "www.groovymail.org"
+	    def domain      = "www.groovymail.org"
 	    def ehloCommand = new EHLOCommand()
 	    
 	    when:
 	        def prevCommandSet = [ 'Get the hell off my ship', 'keep us under the radar, Wash' ] as Set
-	        def bufferMap = [ name:'Jayne', location: 'bunk' ]
+	        def bufferMap      = [ name:'Jayne', location: 'bunk' ]
 	    then:
 	        prevCommandSet.size() == 2
-	        bufferMap.size() == 2
+	        bufferMap.size()      == 2
 	    when:
-	        def resultMap = ehloCommand.process( "EHLO ${domain}", prevCommandSet, bufferMap )
+	        def resultMap    = ehloCommand.process( "EHLO ${domain}", prevCommandSet, bufferMap )
 	        def ehloResponse = resultMap.resultString + crlf 
-	        def newList = resultMap.prevCommandSet
-	        def newMap = resultMap.bufferMap
+	        def newList      = resultMap.prevCommandSet
+	        def newMap       = resultMap.bufferMap
 	    then:
 	        ehloResponse == "250-Hello ${domain}\r\n" +
-	        "250-8BITMIME\r\n" + 
+	        "250-8BITMIME\r\n"   + 
 	        "250-AUTH PLAIN\r\n" + 
 	        "250 HELP\r\n"
 	        newList.size() == 1
-	        newList[ 0 ] == "EHLO"
-	        newMap.size() == 0
+	        newList[ 0 ]   == "EHLO"
+	        newMap.size()  == 0
 	}
 
+	def "test 501 for bad domain"() {
+	    def domain      = "groovymail"
+	    def ehloCommand = new EHLOCommand()
+	    
+	    when:
+	        def prevCommandSet = [ 'Get the hell off my ship', 'keep us under the radar, Wash' ] as Set
+	        def bufferMap      = [ name:'Jayne', location: 'bunk' ]
+	    then:
+	        prevCommandSet.size() == 2
+	        bufferMap.size()      == 2
+	    when:
+	        def resultMap    = ehloCommand.process( "EHLO ${domain}", prevCommandSet, bufferMap )
+	        def ehloResponse = resultMap.resultString + crlf 
+	        def newList      = resultMap.prevCommandSet
+	        def newMap       = resultMap.bufferMap
+	    then:
+	        ehloResponse   == "501 Syntax error in parameters or arguments\r\n" 
+	        newList.size() == 1
+	        newList[ 0 ]   == "EHLO"
+	        newMap.size()  == 0
+	}
+
+    @Unroll( "test for valid domains returning #result for #testDomain" )
+    def "test for valid domains returning #result for #testDomain"() {
+       def ehloCommand = new EHLOCommand()
+        when:
+            def result = ehloCommand.isDomainValid( testDomain )
+        then:
+            println "domain was ${testDomain}, result is ${result}"
+            result == value
+            
+        where:
+            testDomain                              | value
+            'sonic309-13.consmr.mail.bf2.yahoo.com' | true
+            'o1.sendgrid.meetup.com'                | true
+            'spring-chicken-as.twitter.com'         | true
+            'some.domain'                           | true
+            'mail.some.domain'                      | true
+            'win-f0ciet00a57.domain'                | true
+            'USER'                                  | false
+            'ylmf-pc'                               | false // I see what you did there: https://serverfault.com/questions/667322/email-server-attack-from-telnet
+            'zg-1222a-16'                           | false
+            '533'                                   | false
+            '[1.2.3.4]'                             | true // allowed under RFC 5321 4.1.3
+
+    } // def "test for valid domains"
+
 	def "test getting address"() {
-	    def serverName = "www.groovymail.org"
+	    def serverName  = "www.groovymail.org"
 	    def ehloCommand = new EHLOCommand()
 	    def inetAddress = Stub( InetAddress )
-	    def address = GroovyStub( Address )
+	    def address     = GroovyStub( Address )
 	    address.getByName(_) >> inetAddress
 	    inetAddress.hostAddress >> 'X.X.X.X'
 	    def result = ehloCommand.processDomain( "XYZ" )

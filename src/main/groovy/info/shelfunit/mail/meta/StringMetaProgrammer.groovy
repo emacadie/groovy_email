@@ -29,6 +29,7 @@ class StringMetaProgrammer {
         String.metaClass.startsWithHELO = { ->
             return delegate.startsWith( 'HELO' ) 
         }
+        // used in info/shelfunit/smtp/ModularSMTPSocketWorker
         String.metaClass.isHelloCommand = { ->
             ( delegate.startsWithEHLO() || delegate.startsWithHELO() )
         }
@@ -115,8 +116,10 @@ class StringMetaProgrammer {
         
         String.metaClass.checkForCRLF { ->
             if ( delegate.endsWith( "\r\n" ) ) {
+                println "returning string which already has CRLF: ${delegate}"
                 return delegate
             } else {
+                println "returning string and adding CRLF: ${delegate}"
                 return delegate + "\r\n"
             }
         }

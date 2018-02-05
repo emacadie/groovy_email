@@ -27,17 +27,17 @@ class MessageSenderSpec extends Specification {
     
     def crlf = "\r\n"
     static sqlObject
-    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
-    static rString    = getRandomString()
-    static gwString   = 'gw' + rString
-    static jaString   = 'ja' + rString
-    static tjString   = 'tj' + rString
-    static fromString = gwString + '@' + domainList[ 0 ]
-    static gwBase64Hash = getBase64Hash( gwString, 'somePassword' )
     static config
-    static uuidList = []
-    static params = []
-    static mSender = new MessageSender()
+    static domainList   = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    static rString      = getRandomString()
+    static gwString     = 'gw' + rString
+    static jaString     = 'ja' + rString
+    static tjString     = 'tj' + rString
+    static fromString   = gwString + '@' + domainList[ 0 ]
+    static gwBase64Hash = getBase64Hash( gwString, 'somePassword' )
+    static uuidList     = []
+    static params       = []
+    static mSender      = new MessageSender()
     static sqlCountString      = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
     static sqlCountStoreString = 'select count(*) from mail_store where from_address = ?'
     
@@ -66,8 +66,8 @@ class MessageSenderSpec extends Specification {
     
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
-        addUser( sqlObject, 'John', 'Adams', jaString, 'somePassword' )
-        addUser( sqlObject, 'Jack', "O'Neill", tjString, 'somePassword' )
+        addUser( sqlObject, 'John',   'Adams',      jaString, 'somePassword' )
+        addUser( sqlObject, 'Jack',   "O'Neill",    tjString, 'somePassword' )
     }
     
     /*
@@ -89,9 +89,9 @@ class MessageSenderSpec extends Specification {
         params << gwString + '@' + domainList[ 0 ] // from_address, 
         params << gwString // from_username, 
         params << domainList[ 0 ] // from_domain,
-        params << toAddress // to_address_list
-        params << message   // text_body,
-        params << status    // status_string,  
+        params << toAddress    // to_address_list
+        params << message      // text_body,
+        params << status       // status_string,  
         params << gwBase64Hash // base_64_hash
         sqlObject.execute 'insert into mail_spool_out( id, from_address, from_username, from_domain, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)', params
     }
@@ -102,16 +102,16 @@ class MessageSenderSpec extends Specification {
 
     def "first test"() {
         setup:
-            def uuid = UUID.randomUUID()
+            def uuid          = UUID.randomUUID()
             def messageString = 'q' * 500
-            def message = this.insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil', messageString, uuid )
-            def row = this.getMessage( uuid )
+            def message       = this.insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil', messageString, uuid )
+            def row           = this.getMessage( uuid )
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
             "250-Hello ${domainList[ 0 ]}\r\n" +
-            "250-8BITMIME\r\n" +
+            "250-8BITMIME\r\n"   +
             "250-AUTH PLAIN\r\n" + 
-            "250 HELP\r\n" +
+            "250 HELP\r\n"  +
             "250 OK${crlf}" + // MAIL FROM
             "250 OK${crlf}" + // RCPT TO
             "354 cha-cha-cha${crlf}" + // DATA
@@ -119,7 +119,7 @@ class MessageSenderSpec extends Specification {
             "221 stargate.mil ending transmission${crlf}"
             byte[] data = bString.getBytes()
     
-            InputStream input = new ByteArrayInputStream( data )
+            InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
             mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 0 ] )

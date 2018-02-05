@@ -18,27 +18,49 @@ class EHLOCommand {
         bufferMap.clear()
         prevCommandSet.clear()
         resultMap.bufferMap = bufferMap
-        def domain = theMessage.getDomain()
+        def domain          = theMessage.getDomain()
         log.info "Here is the domain: ${domain} and it is a ${domain.class.name}"
         if ( domain.isMoreThan255Char() ) {
-            resultMap.resultString = "501 Domain name length beyond 255 char limit per RFC 3696"
+            resultMap.resultString   = "501 Domain name length beyond 255 char limit per RFC 3696"
+            resultMap.prevCommandSet = prevCommandSet
+        } else if ( _not( this.isDomainValid( domain ) ) ) {
+            resultMap.resultString   = "501 Syntax error in parameters or arguments"
             resultMap.prevCommandSet = prevCommandSet
         } else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithEHLO() ) ) {
             prevCommandSet.clear()
-            prevCommandSet << "EHLO"
+            // prevCommandSet << "EHLO"
             resultMap.resultString = "250-Hello ${domain}\r\n250-8BITMIME\r\n" +
             "250-AUTH PLAIN\r\n" +
             "250 HELP"
         } else if ( ( domain.is255CharOrLess() ) && ( theMessage.startsWithHELO() ) ) {
             prevCommandSet.clear()
-            prevCommandSet << "HELO"
+            // prevCommandSet << "HELO"
             resultMap.resultString = "250 Hello ${domain}"
         }
+        prevCommandSet << theMessage.firstFour()
         resultMap.prevCommandSet = prevCommandSet
         // resultMap.rawCommandList << theMessage
         log.info "here is resultMap: ${resultMap.toString()}"
         resultMap
-    }
+    } // def process
+
+    def isDomainValid( def domainString ) {
+/*
+        if ( domainString.contains( "." ) ) {
+            true
+        } else {
+            false
+        }
+*/
+
+        if ( _not( domainString.contains( "." ) ) ) {
+            return false
+        } else {
+            true
+        }
+
+
+    } // isDomainValid() 
     
     // RFC 5321, Section 4.1.4.: Order of Commands and Section 7.9.: Scope of Operation of SMTP Servers: 
     // Do not reject a message due to a bad address. The internet might stop working.
@@ -48,7 +70,7 @@ class EHLOCommand {
         try {
             // Some networks return '198.105.254.228' for IPAddress for invalid domains
             InetAddress addr = Address.getByName( domain )
-            hostAddress = addr.hostAddress
+            hostAddress      = addr.hostAddress
         } catch ( java.net.UnknownHostException uhEx ) {
             log.info "Got UnknownHostException in processDomain"
             log.error "UnknownHostException in EHLOCommand.processDomain", uhEx 
