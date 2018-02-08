@@ -172,6 +172,41 @@ class MessageSenderSpec extends Specification {
                 ".\r\n" +
                 "QUIT\r\n" 
     } // "test handle DSN"
+
+    def "test send lower case"() {
+        setup:
+            def uuid          = UUID.randomUUID()
+            def messageString = 'q' * 500
+            def message       = this.insertIntoMailSpoolOut( 'ENTERED', 'ONeill@stargate.mil'.toUpperCase(), messageString, uuid )
+            def row           = this.getMessage( uuid )
+        when:
+            def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
+            "250-Hello ${domainList[ 0 ]}\r\n" +
+            "250-DSN\r\n" +
+            "250-8BITMIME\r\n"   +
+            "250-AUTH PLAIN\r\n" + 
+            "250 HELP\r\n"  +
+            "250 OK${crlf}" +          // MAIL FROM
+            "250 OK${crlf}" +          // RCPT TO
+            "354 cha-cha-cha${crlf}" + // DATA
+            "250 OK${crlf}" +          // After DATA
+            "221 stargate.mil ending transmission${crlf}"
+            byte[] data = bString.getBytes()
+    
+            InputStream input   = new ByteArrayInputStream( data )
+            OutputStream output = new ByteArrayOutputStream() 
+            
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'ONeill' ], domainList[ 0 ] )
+            
+        then:
+	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n" +
+                "MAIL FROM:<${gwString}@${domainList[ 0 ]}>\r\n" +
+                "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
+                "DATA\r\n" +
+                "${messageString}\r\n" + 
+                ".\r\n" +
+                "QUIT\r\n" 
+    } // "test handle DSN"
 	
 	@Ignore
 	def "always ignore"() {

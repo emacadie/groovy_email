@@ -42,9 +42,12 @@ class MessageSender {
         log.info "Got response ${newString}"
         def got250ForRCPT = false
         def includeDSN = commandList.contains( 'DSN' )
+        log.info "includeDSN: ${includeDSN}"
         def rcptEnd = includeDSN ? " NOTIFY=NEVER\r\n" : "\r\n"
-        otherUserList.each { uName ->
-            log.info "About to send RCPT TO:<${uName}@${otherDomain}>"
+        
+        otherUserList.collect { oUser -> oUser.toLowerCase()
+        }.each { uName ->
+            log.info "About to send RCPT TO:<${uName}@${otherDomain}>${rcptEnd}"
             output << "RCPT TO:<${uName}@${otherDomain}>${rcptEnd}"
             newString = reader.readLine()
             log.info "Got response ${newString}"
