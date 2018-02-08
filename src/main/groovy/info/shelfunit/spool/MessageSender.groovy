@@ -9,7 +9,7 @@ class MessageSender {
         log.info "Starting new MessageSender"
     }
     
-    def doWork( input, output, row, otherDomain, otherUserList, outboundDomain ) {
+    def doWork( input, output, messageRow, otherDomain, otherUserList, outboundDomain ) {
         log.info "In doWork"
         def areWeDone = false
         def inputLine
@@ -18,8 +18,8 @@ class MessageSender {
         def outString
         def newString =  reader.readLine() 
         log.info "Here is newString: ${newString}"
-        // log.info "Here is row: it's a ${row.getClass().name}"
-        // log.info "here are the keys: ${row.keySet().toArray()}"
+        // log.info "Here is messageRow: it's a ${messageRow.getClass().name}"
+        // log.info "here are the keys: ${messageRow.keySet().toArray()}"
         log.info "About to send: EHLO ${outboundDomain}"
         output << "EHLO ${outboundDomain}\r\n"
         def doneWith250 = false
@@ -36,14 +36,16 @@ class MessageSender {
             log.info "doneWith250: ${doneWith250}"
         }
         log.info "Here is commandList: ${commandList}"
-        log.info "About to send MAIL FROM:<${row.from_address}>"
-        output << "MAIL FROM:<${row.from_address}>\r\n"
+        log.info "About to send MAIL FROM:<${messageRow.from_address}>"
+        output << "MAIL FROM:<${messageRow.from_address}>\r\n"
         newString = reader.readLine()
         log.info "Got response ${newString}"
         def got250ForRCPT = false
+        def includeDSN = commandList.contains( 'DSN' )
+        def rcptEnd = includeDSN ? " NOTIFY=NEVER\r\n" : "\r\n"
         otherUserList.each { uName ->
             log.info "About to send RCPT TO:<${uName}@${otherDomain}>"
-            output << "RCPT TO:<${uName}@${otherDomain}>\r\n"
+            output << "RCPT TO:<${uName}@${otherDomain}>${rcptEnd}"
             newString = reader.readLine()
             log.info "Got response ${newString}"
             if ( newString.startsWith( "250" ) ) {
@@ -57,7 +59,7 @@ class MessageSender {
             newString = reader.readLine()
             log.info "Here is response to DATA: ${newString}"
             if ( newString.startsWith( "354" ) ) {
-                output << row[ 'text_body' ]
+                output << messageRow[ 'text_body' ]
                 output << "\r\n.\r\n"
             }
             newString = reader.readLine()
@@ -73,5 +75,5 @@ class MessageSender {
         }
         */
     }
-}
+} // end class
 
