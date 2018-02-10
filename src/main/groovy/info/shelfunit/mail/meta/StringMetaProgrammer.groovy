@@ -114,12 +114,22 @@ class StringMetaProgrammer {
             toIntResult
         }
         
-        String.metaClass.checkForCRLF { ->
+        java.lang.String.metaClass.checkForCRLF { ->
             if ( delegate.endsWith( "\r\n" ) ) {
-                println "returning string which already has CRLF: ${delegate}"
+                println "in checkForCRLF, returning string which already has CRLF: ${delegate}"
                 return delegate
             } else {
-                println "returning string and adding CRLF: ${delegate}"
+                println "in checkForCRLF, returning string and adding CRLF: ${delegate}"
+                return delegate + "\r\n"
+            }
+        }
+
+        groovy.lang.GString.metaClass.checkForCRLF { ->
+            if ( delegate.endsWith( "\r\n" ) ) {
+                println "in checkForCRLF, returning string which already has CRLF: ${delegate}"
+                return delegate
+            } else {
+                println "in checkForCRLF, returning string and adding CRLF: ${delegate}"
                 return delegate + "\r\n"
             }
         }

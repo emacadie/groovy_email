@@ -55,6 +55,7 @@ class ModularSMTPSocketWorker {
         
         serverName = domainList[ 0 ]
         log.info "server name is ${serverName}"
+        log.info "output is a ${output.getClass().name}"
         statusString     = "ABORTED BY THEM"
         prevCommandSet   = [] as Set
         rawCommandList   = []
@@ -78,7 +79,7 @@ class ModularSMTPSocketWorker {
         log.info "available: ${input.available()}"
         def reader = input.newReader()
         log.info "reader is a ${reader.class.name}"
-        output << "220 ${serverName} Simple Mail Transfer Service Ready\r\n"
+        output.send "220 ${serverName} Simple Mail Transfer Service Ready".checkForCRLF()
         
         def responseString
         while ( _not( gotQuitCommand ) ) {
@@ -90,8 +91,8 @@ class ModularSMTPSocketWorker {
             if ( newString == null ) {
                 // responseString << "501 Command not in proper form"
                 responseString << "500 Syntax error, command unrecognized"
-                output << responseString.checkForCRLF()
-                output.flush()
+                output.send responseString.checkForCRLF()
+                // output.flush() // send should flush for us
                 throw new NullStringException()
             }
             if ( newString.startsWith( 'QUIT' ) ) {
@@ -123,8 +124,8 @@ class ModularSMTPSocketWorker {
                 rawCommandList << newString
             }
             log.info "responseString: ${responseString}"
-            output << responseString.checkForCRLF()
-            output.flush()
+            output.send responseString.checkForCRLF()
+            // output.flush()
         }
         log.info "Here is prevCommandSet: ${prevCommandSet}"
         log.info "here is rawCommandList: ${rawCommandList}"

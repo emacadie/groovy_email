@@ -137,6 +137,8 @@ http://www.cryptoworkshop.com/guide/
 http://www.mindrot.org/projects/jBCrypt/
 https://github.com/wg/scrypt
 http://www.jroller.com/dancruz/entry/send_smtp_auth_email_with
+
+https://mxtoolbox.com/ - interesting site; tests a lot of stuff
 -------
 POP3, RFC 1939:
 Minimal POP3 Commands:

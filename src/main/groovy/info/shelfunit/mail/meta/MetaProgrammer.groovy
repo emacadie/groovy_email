@@ -19,6 +19,7 @@ class MetaProgrammer {
         java.sql.Timestamp.metaClass.static.create = {
             return new java.sql.Timestamp( new java.util.Date().getTime() )
         }
+        runOutputStreamMetaProgramming()
         runJavaObjectMetaProgramming()
     }
     
@@ -156,6 +157,13 @@ class MetaProgrammer {
         }
         StringBuilder.metaClass.clear = { ->
             delegate.delete( 0, delegate.length() )
+        }
+    }
+
+    static runOutputStreamMetaProgramming() {
+        java.io.OutputStream.metaClass.send = { arg ->
+            delegate << arg
+            delegate.flush()
         }
     }
     
