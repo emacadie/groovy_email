@@ -52,7 +52,7 @@ class StringMetaProgrammerSpec extends Specification {
             secondString.endsWith( "\r\n\r\n" ) == false
     }
 
-    def "test getDomain"(){
+    def "test getDomain"() {
         when:
             def testString = 'EHLO this.is.a.domain'
         then:
@@ -60,5 +60,18 @@ class StringMetaProgrammerSpec extends Specification {
             testString.getDomain() == 'this.is.a.domain'
     }
 
-}
+    def "test safeSubString"() {
+        when:
+            def testString = "this is a string"
+        then:
+            testString.substring( 0, 5 )         == "this "
+            testString.safeSubstring( 0, 5 )     == "this "
+            testString.safeSubstring( -5, 5 )    == "this "
+            testString.safeSubstring( 0, 100 )   == "this is a string"
+            testString.safeSubstring( 100, 200 ) == "this is a string"
+        
+
+    }
+
+} // end class StringMetaProgrammerSpec
 

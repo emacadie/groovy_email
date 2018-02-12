@@ -3,25 +3,38 @@ package info.shelfunit.mail.meta
 class StringMetaProgrammer {
     
     static runStringMetaProgramming() {
+
+        String.metaClass.safeSubstring = { int begin, int end ->
+            if ( ( begin <  0 ) || ( begin > delegate.length() ) ) {
+                begin = 0
+            }
+            if ( end > delegate.length() ) {
+                end = delegate.length()
+            }
+            return delegate.substring( begin, end )
+        }
         
         String.metaClass.firstFour = { ->
-            return delegate.substring( 0, 4 )
+            return delegate.safeSubstring( 0, 4 )
         }
         // sometimes we need to pass the string, but not the WHOLE string
         String.metaClass.firstTen = { ->
             if ( delegate.length() < 10 ) {
                 return delegate
             } else {
-                return delegate.substring( 0, 10 )
+                return delegate.safeSubstring( 0, 10 )
             }
         }
         
         String.metaClass.allButFirstFour = { ->
+            /*
             if ( delegate.length() <= 4 ) {
                 return delegate
             } else { 
                 return delegate.substring( 4, delegate.length() )
             }
+            */
+            return delegate.safeSubstring( 4, delegate.length() )
         }
         String.metaClass.startsWithEHLO = { ->
             return delegate.startsWith( 'EHLO' )
@@ -78,6 +91,7 @@ class StringMetaProgrammer {
             }
         }
         // at some point these might be implemented
+        // only called for POP, so SMTP can still use AUTH
         String.metaClass.isRFC5034Command = { ->
             if ( delegate.length() >= 4 ) {
                 return delegate.firstFour().matches( "CAPA|AUTH" )

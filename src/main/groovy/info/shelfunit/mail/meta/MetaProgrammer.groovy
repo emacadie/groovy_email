@@ -9,13 +9,13 @@ class MetaProgrammer {
     
     static runMetaProgramming() {
         ExpandoMetaClass.enableGlobally()
+        StringMetaProgrammer.runStringMetaProgramming()
         runNumberMetaProgramming()
         runListMetaProgramming()
         runMapMetaProgramming()
         runSetMetaProgramming()
         MatcherMetaProgrammer.runMatcherMetaProgramming() 
         runStringBuilderMetaProgramming()
-        StringMetaProgrammer.runStringMetaProgramming()
         java.sql.Timestamp.metaClass.static.create = {
             return new java.sql.Timestamp( new java.util.Date().getTime() )
         }
@@ -79,7 +79,7 @@ class MetaProgrammer {
             def userNameLC = delegate.userInfo.username.toLowerCase()
             def totalSize
             def uuidList   = []
-            delegate.timestamp ?: java.sql.Timestamp.create() // ( new java.util.Date().getTime() )
+            delegate.timestamp ?: java.sql.Timestamp.create() 
             def rows = sqlObject.rows( 
                 'select sum( length( text_body ) ) from mail_store where username_lc = ? and msg_timestamp < ?', 
                 [ userNameLC, delegate.timestamp ] 
@@ -100,8 +100,10 @@ class MetaProgrammer {
         }
 
         java.util.Map.metaClass.addToListInMap = { Object key, Object value ->
-            if ( !delegate.containsKey( key ) ) { delegate[ key ] = [] }
-                        delegate[ key ] << value
+            if ( !delegate.containsKey( key ) ) { 
+                delegate[ key ] = [] 
+            }
+            delegate[ key ] << value
         }
         
     }
@@ -162,14 +164,22 @@ class MetaProgrammer {
 
     static runOutputStreamMetaProgramming() {
         java.io.OutputStream.metaClass.send = { arg ->
-            delegate << arg
-            delegate.flush()
+            try {
+                delegate << arg
+                delegate.flush()
+            } catch ( Exception ex ) {
+                // I think Outlook is closing the connection early
+                log.info "exception in OutputStream.send"
+                log.info "Here is arg: " + arg.toString()
+                log.info "here is stack trace: ", ex
+            }
         }
     }
     
     static runJavaObjectMetaProgramming() {
         /**
         I decided to use metaprogramming to do something other that ! to mean "not".
+        I like to avoid symbols if I can.
         The issue is that in Groovy, "not" is already taken in groovy.xml.Entity and org.codehaus.groovy.ast.builder.AstSpecificationCompiler. 
         So I tried isNot, doesNot, doNot, haveNot. It was kind of awkward. 
         So I just decided to add a "_" in front of "not" and be done with it.
