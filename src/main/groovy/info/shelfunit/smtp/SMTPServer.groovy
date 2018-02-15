@@ -48,11 +48,12 @@ class SMTPServer {
                     } finally {
                         sSockW.cleanup()
                     }
-                }
+                } // socket.withStreams
                 log.info "processing/thread complete......................"
-            }
-        }
+            } // server.accept
+            log.info "still in while, outside server.accept"
+        } // while
 
-    }
-}
+    } // doStuff
+} // end class
 

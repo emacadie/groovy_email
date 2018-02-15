@@ -40,8 +40,7 @@ class MessageSenderSpec extends Specification {
     static mSender      = new MessageSender()
     static sqlCountString      = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
     static sqlCountStoreString = 'select count(*) from mail_store where from_address = ?'
-    
-    
+   
     def setup() {
         println "\n--- Starting test ${name.methodName}"
     }          // run before every feature method
@@ -69,20 +68,7 @@ class MessageSenderSpec extends Specification {
         addUser( sqlObject, 'John',   'Adams',      jaString, 'somePassword' )
         addUser( sqlObject, 'Jack',   "O'Neill",    tjString, 'somePassword' )
     }
-    
-    /*
-    def insertIntoMailSpoolOut( uuid, status, toAddress, message ) {
-        params.clear()
-        params << uuid
-        params << gwString + '@' + domainList[ 0 ]
-        params << toAddress
-        params << message
-        params << 'ENTERED'
-        params << gwBase64Hash
-        sqlObject.execute 'insert into mail_spool_out( id, from_address, to_address_list, text_body, status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?)', params
-    }
-    */
-    
+        
     def insertIntoMailSpoolOut( status, toAddress, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
         params.clear()
         params << uuid // id
@@ -138,6 +124,7 @@ class MessageSenderSpec extends Specification {
                 "QUIT\r\n" 
     } // "first test"() 
 
+    @Ignore
     def "test handle DSN"() {
         setup:
             def uuid          = UUID.randomUUID()
@@ -164,7 +151,7 @@ class MessageSenderSpec extends Specification {
             mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 0 ] )
             
         then:
-	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n" +
+	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n"   + 
                 "MAIL FROM:<${gwString}@${domainList[ 0 ]}>\r\n" +
                 "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
                 "DATA\r\n" +
@@ -182,7 +169,7 @@ class MessageSenderSpec extends Specification {
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
             "250-Hello ${domainList[ 0 ]}\r\n" +
-            "250-DSN\r\n" +
+            // "250-DSN\r\n" +
             "250-8BITMIME\r\n"   +
             "250-AUTH PLAIN\r\n" + 
             "250 HELP\r\n"  +
@@ -199,9 +186,10 @@ class MessageSenderSpec extends Specification {
             mSender.doWork( input, output, row, 'stargate.mil', [ 'ONeill' ], domainList[ 0 ] )
             
         then:
-	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n" +
+	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n"   +
                 "MAIL FROM:<${gwString}@${domainList[ 0 ]}>\r\n" +
-                "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
+                // "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
+                "RCPT TO:<oneill@stargate.mil>\r\n" +
                 "DATA\r\n" +
                 "${messageString}\r\n" + 
                 ".\r\n" +

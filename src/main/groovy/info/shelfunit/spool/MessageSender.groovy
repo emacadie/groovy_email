@@ -43,6 +43,8 @@ class MessageSender {
         log.info "Got response ${newString}"
         def got250ForRCPT = false
         def includeDSN = commandList.contains( 'DSN' )
+        // try this and see if I can send to proton mail
+        includeDSN = false 
         log.info "includeDSN: ${includeDSN}"
         def rcptEnd = includeDSN ? " NOTIFY=NEVER\r\n" : "\r\n"
         
