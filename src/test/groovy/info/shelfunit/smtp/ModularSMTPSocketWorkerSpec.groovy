@@ -21,7 +21,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
     
     def crlf = "\r\n"
     static sqlObject
-    static domainList = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    static domainList = [ 'mail.shelfunit.info', 'shelfunit.info', 'mail.groovy-is-groovy.org' ]
     static rString    = getRandomString()
     static gwString   = 'gw' + rString
     static jaString   = 'ja' + rString
@@ -58,7 +58,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "shelfunit.info"
+	        ssWorker.serverName == "mail.shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:
@@ -66,22 +66,22 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250-Hello ${domain}\r\n" +
-	        "250-8BITMIME\r\n" + 
+	        "250-8BITMIME\r\n"   + 
 	        "250-AUTH PLAIN\r\n" + 
 	        "250 HELP\r\n"
 	        resultMap.prevCommandSet == ["EHLO"]
 	}
 	
 	def "test handling HELO"() {
-	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
+	    def ssWorker    = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "shelfunit.info"
+	        ssWorker.serverName == "mail.shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:
-	        def resultMap = ehloCommand.process( "HELO ${domain}", [], [:] )
+	        def resultMap    = ehloCommand.process( "HELO ${domain}", [], [:] )
 	        def ehloResponse = resultMap.resultString + "\r\n" // ssWorker.handleMessage(  )
 	    then:
 	        ehloResponse == "250 Hello ${domain}\r\n"
@@ -92,7 +92,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
 	    
 	    expect:
-	        ssWorker.serverName == "shelfunit.info"
+	        ssWorker.serverName == "mail.shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when: "Sending SAML"
@@ -115,7 +115,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	
 	def "test with a line containing two periods"() {
 	    when:
-            def domain = "hot-groovy.com"
+            def domain  = "hot-groovy.com"
             def bString = "EHLO ${domain}${crlf}" + 
             "MAIL FROM:<smtpnoauth@showboat.com>${crlf}" +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
@@ -123,7 +123,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             "Hello\n..\nMore stuff${crlf}.${crlf}QUIT${crlf}"
             byte[] data = bString.getBytes()
     
-            InputStream input = new ByteArrayInputStream( data )
+            InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
             def ssWorker = new ModularSMTPSocketWorker( input, output, domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
@@ -131,16 +131,16 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             ssWorker.cleanup()
             
 	    then:
-	        output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
+	        output.toString() == "220 mail.shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\r\n" +
-                "250-8BITMIME\r\n" +
+                "250-8BITMIME\r\n"   +
                 "250-AUTH PLAIN\r\n" + 
                 "250 HELP\r\n" +
-                "250 OK\r\n" +
-                "250 OK\r\n" +
+                "250 OK\r\n"   +
+                "250 OK\r\n"   +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
-                "250 OK\r\n" +
-                "221 shelfunit.info Service closing transmission channel\r\n"
+                "250 OK\r\n"   +
+                "221 mail.shelfunit.info Service closing transmission channel\r\n"
 	    
 	}
 	
@@ -148,9 +148,9 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    when:
             def mIs = Mock( InputStream )
             def mOs = Mock( OutputStream )
-            def domain = "hot-groovy.com"
+            def domain  = "hot-groovy.com"
             byte[] data = "EHLO ${domain}${crlf}SAML${crlf}SEND${crlf}SOML${crlf}TURN${crlf}QUIT${crlf}".getBytes()
-            InputStream input = new ByteArrayInputStream( data )
+            InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             def worker = new ModularSMTPSocketWorker( input, output, domainList, '/10.1.2.3', 'groovy-email-is-awesome.com' ) 
             worker.doWork()
@@ -159,16 +159,16 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    then:
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
-            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" + // opening
+            output.toString() == "220 mail.shelfunit.info Simple Mail Transfer Service Ready\r\n" + // opening
                 "250-Hello hot-groovy.com\r\n" +
-                "250-8BITMIME\r\n" +
+                "250-8BITMIME\r\n"   +
                 "250-AUTH PLAIN\r\n" + 
-                "250 HELP\r\n" + // DATA
+                "250 HELP\r\n"       + // DATA
                 "502 Command not implemented\r\n" + // SAML
                 "502 Command not implemented\r\n" + // SEND
                 "502 Command not implemented\r\n" + // SOML
                 "502 Command not implemented\r\n" + // TURN
-                "221 shelfunit.info Service closing transmission channel\r\n" // QUIT
+                "221 mail.shelfunit.info Service closing transmission channel\r\n" // QUIT
 	}
 
 	def "test common streams"() {
@@ -177,15 +177,15 @@ class ModularSMTPSocketWorkerSpec extends Specification {
             def mOs = Mock( OutputStream )
             def domain = "hot-groovy.com"
             
-            def dataString = "EHLO ${domain}${crlf}"  +
-            "MAIL FROM:<smtpnoauth@showboat.com>${crlf}" +
+            def dataString = "EHLO ${domain}${crlf}"      +
+            "MAIL FROM:<smtpnoauth@showboat.com>${crlf}"  +
             "RCPT TO:<${gwString}@shelfunit.info>${crlf}" +
             "DATA${crlf}"  +
             "JJJ${crlf}.${crlf}" +
             "QUIT${crlf}"
             
             byte[] data = dataString.getBytes()
-            InputStream input = new ByteArrayInputStream( data )
+            InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             def msmtpw = new ModularSMTPSocketWorker( input, output, domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
             msmtpw.doWork()
@@ -194,16 +194,16 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    then:
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
-            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready${crlf}"  +
+            output.toString() == "220 mail.shelfunit.info Simple Mail Transfer Service Ready${crlf}"  +
                "250-Hello hot-groovy.com${crlf}"  +
-               "250-8BITMIME${crlf}"  +
+               "250-8BITMIME${crlf}"    +
                "250-AUTH PLAIN${crlf}"  +
                "250 HELP${crlf}"  +
-               "250 OK${crlf}"  +
-               "250 OK${crlf}"  +
+               "250 OK${crlf}"    + // mail from
+               "250 OK${crlf}"    + // recpt to
                "354 Start mail input; end with <CRLF>.<CRLF>${crlf}"  +
-               "250 OK${crlf}"  +
-               "221 shelfunit.info Service closing transmission channel${crlf}" 
+               "250 OK${crlf}"    +
+               "221 mail.shelfunit.info Service closing transmission channel${crlf}" 
 	}
 	
 	def "test common streams with reader mocking"() {
@@ -223,7 +223,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    then:
             println "output to string: ++++\n${output.toString()}"
             println "++++ end of output"
-            output.toString() == "220 shelfunit.info Simple Mail Transfer Service Ready\r\n" +
+            output.toString() == "220 mail.shelfunit.info Simple Mail Transfer Service Ready\r\n" +
                 "250-Hello hot-groovy.com\r\n" +
                 "250-8BITMIME\r\n" +
                 "250-AUTH PLAIN\r\n" + 
@@ -232,7 +232,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
                 "250 OK\r\n" +
                 "354 Start mail input; end with <CRLF>.<CRLF>\r\n" +
                 "250 OK\r\n" +
-                "221 shelfunit.info Service closing transmission channel\r\n"
+                "221 mail.shelfunit.info Service closing transmission channel\r\n"
 	}
 } // line 246
 
