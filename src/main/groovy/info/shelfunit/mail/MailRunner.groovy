@@ -23,9 +23,11 @@ import info.shelfunit.spool.InboundSpoolWorker
 class MailRunner {
 
     def buildServerList( def argConfig ) {
-        def tempServerList = [ argConfig.smtp.server.name ]
+        def returnList     = []
+        def tempServerList = [ argConfig.smtp.fq.server.name ]
+        argConfig.smtp.server.name.isEmpty() ?: ( tempServerList += argConfig.smtp.server.name )
         argConfig.smtp.other.domains.isEmpty() ?: ( tempServerList += argConfig.smtp.other.domains )
-        def returnList = []
+
         tempServerList.collect{ returnList << it.toLowerCase() }
         return returnList
     }
