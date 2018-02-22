@@ -31,15 +31,15 @@ class OutboundSpoolWorkerSpec extends Specification {
     
     def crlf = "\r\n"
     static sqlObject
-    static domainList   = [ 'shelfunit.info', 'groovy-is-groovy.com' ]
+    static domainList   = [] 
     static rString      = getRandomString()
     static gwString     = 'gw' + rString
     static jaString     = 'ja' + rString
     static tjString     = 'tj' + rString
-    static fromString   = gwString + '@' + domainList[ 0 ]
     static gwBase64Hash = getBase64Hash( gwString, 'somePassword' )
     static uuidList     = []
     static params       = []
+    static fromString   
     static config
     static realClamAVClient
     static OutboundSpoolWorker osw  = new OutboundSpoolWorker()
@@ -56,10 +56,12 @@ class OutboundSpoolWorkerSpec extends Specification {
     def setupSpec() {
         MetaProgrammer.runMetaProgramming()
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
-        sqlObject = ConfigHolder.instance.getSqlObject() 
-        config    = ConfigHolder.instance.getConfObject()
-        def host  = config.clamav.hostname
-        def port  = config.clamav.port
+        sqlObject        = ConfigHolder.instance.getSqlObject() 
+        config           = ConfigHolder.instance.getConfObject()
+        domainList       = this.buildServerList( config )
+        fromString       = gwString + '@' + domainList[ 1 ]
+        def host         = config.clamav.hostname
+        def port         = config.clamav.port
         realClamAVClient = this.createClamAVClient()
         this.addUsers()
         // osw = new OutboundSpoolWorker()
@@ -69,11 +71,22 @@ class OutboundSpoolWorkerSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        sqlObject.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
-        sqlObject.execute "DELETE FROM mail_spool_out where from_username like ?", [ '%' + rString ] 
+        // sqlObject.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
+        // sqlObject.execute "DELETE FROM mail_spool_out where from_username like ?", [ '%' + rString ] 
         sqlObject.close()
     }   // run after the last feature method
     
+    def buildServerList( def argConfig ) {
+        def returnList     = []
+        def tempServerList = [ argConfig.smtp.fq.server.name ]
+        argConfig.smtp.server.name.isEmpty() ?: ( tempServerList += argConfig.smtp.server.name )
+        argConfig.smtp.other.domains.isEmpty() ?: ( tempServerList += argConfig.smtp.other.domains )
+
+        tempServerList.collect{ returnList << it.toLowerCase() }
+        println "Here is returnList in buildServerList: ${returnList}"
+        return returnList
+    }
+
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )
         addUser( sqlObject, 'John',   'Adams',      jaString, 'somePassword' )
@@ -87,7 +100,7 @@ class OutboundSpoolWorkerSpec extends Specification {
         return new ClamAVClient( host, port.toInt() )
     }
     
-    def insertIntoMailSpoolOut( status, toAddress, userName = gwString, message = getRandomString( 500 ), uuid = UUID.randomUUID(), userDomain = domainList[ 0 ] ) {
+    def insertIntoMailSpoolOut( status, toAddress, userName = gwString, message = getRandomString( 500 ), uuid = UUID.randomUUID(), userDomain = domainList[ 1 ] ) {
         params.clear() 
         params << uuid // id,
         params << userName + '@' + domainList[ 0 ] // from_address
@@ -104,10 +117,10 @@ class OutboundSpoolWorkerSpec extends Specification {
     }
     
     def enterOutgoingMessages() {
-        insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 0 ] )
+        insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 1 ] )
         insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil' )
         insertIntoMailSpoolOut( 'ENTERED', 'smtp@averagesmtp.com,oneill@stargate.mil' )
-        insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 0 ] + ',jack9@gmail.com,jack@yahoo.com' )
+        insertIntoMailSpoolOut( 'ENTERED', jaString + '@' + domainList[ 1 ] + ',jack9@gmail.com,jack@yahoo.com' )
         insertIntoMailSpoolOut( 'ENTERED', 'oneill@stargate.mil,scarter@stargate.mil,weir@atlantis.mil,mckay@atlantis.mil' )
         insertIntoMailSpoolOut( 'ENTERED', 'weir@atlantis.mil,weir@replicators.org' )
         insertIntoMailSpoolOut( 'ENTERED', 'rush@destiny.ancients.com,young@destiny.ancients.com' )

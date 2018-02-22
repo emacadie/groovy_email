@@ -61,7 +61,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "shelfunit.info"
+	        ssWorker.fqServerName == "shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:
@@ -80,7 +80,7 @@ class ModularSMTPSocketWorkerAuthSpec extends Specification {
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "shelfunit.info"
+	        ssWorker.fqServerName == "shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:

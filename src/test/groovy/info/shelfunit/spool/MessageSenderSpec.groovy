@@ -28,7 +28,7 @@ class MessageSenderSpec extends Specification {
     def crlf = "\r\n"
     static sqlObject
     static config
-    static domainList   = [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    static domainList   = [] // [ 'shelfunit.info', 'groovy-is-groovy.org' ]
     static rString      = getRandomString()
     static gwString     = 'gw' + rString
     static jaString     = 'ja' + rString
@@ -52,7 +52,8 @@ class MessageSenderSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        config = ConfigHolder.instance.getConfObject()
+        config     = ConfigHolder.instance.getConfObject()
+        domainList = this.buildServerList( config  )
 
     }     // run before the first feature method
     
@@ -62,6 +63,16 @@ class MessageSenderSpec extends Specification {
         sqlObject.execute "DELETE FROM mail_spool_out where from_address in (?, ?, ?, ?)", [ fromString, gwString, jaString, tjString ]
         sqlObject.close()
     }   // run after the last feature method
+
+    def buildServerList( def argConfig ) {
+        def returnList     = []
+        def tempServerList = [ argConfig.smtp.fq.server.name ]
+        argConfig.smtp.server.name.isEmpty() ?: ( tempServerList += argConfig.smtp.server.name )
+        argConfig.smtp.other.domains.isEmpty() ?: ( tempServerList += argConfig.smtp.other.domains )
+
+        tempServerList.collect{ returnList << it.toLowerCase() }
+        return returnList
+    }
     
     def addUsers() {
         addUser( sqlObject, 'George', 'Washington', gwString, 'somePassword' )

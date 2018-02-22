@@ -26,7 +26,7 @@ class ModularSMTPSocketWorker {
     @Hidden OutputStream output
     @Hidden String domain
     @Hidden String theResponse
-    @Hidden String serverName
+    @Hidden String fqServerName
     @Hidden prevCommandSet 
     @Hidden rawCommandList
     @Hidden def bufferMap
@@ -53,8 +53,8 @@ class ModularSMTPSocketWorker {
         domainList = []
         argDomainList.collect{ domainList << it.toLowerCase() }
         
-        serverName = domainList[ 0 ]
-        log.info "server name is ${serverName}"
+        fqServerName = domainList[ 0 ]
+        log.info "server name is ${fqServerName}"
         log.info "output is a ${output.getClass().name}"
         statusString     = "ABORTED BY THEM"
         prevCommandSet   = [] as Set
@@ -79,7 +79,7 @@ class ModularSMTPSocketWorker {
         log.info "available: ${input.available()}"
         def reader = input.newReader()
         log.info "reader is a ${reader.class.name}"
-        output.send "220 ${serverName} Simple Mail Transfer Service Ready".checkForCRLF()
+        output.send "220 ${fqServerName} Simple Mail Transfer Service Ready".checkForCRLF()
         
         def responseString
         while ( _not( gotQuitCommand ) ) {

@@ -58,7 +58,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "mail.shelfunit.info"
+	        ssWorker.fqServerName == "mail.shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:
@@ -77,7 +77,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    def ehloCommand = new EHLOCommand()
 	    
 	    expect:
-	        ssWorker.serverName == "mail.shelfunit.info"
+	        ssWorker.fqServerName == "mail.shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when:
@@ -92,7 +92,7 @@ class ModularSMTPSocketWorkerSpec extends Specification {
 	    def ssWorker = new ModularSMTPSocketWorker( Mock( InputStream ), Mock( OutputStream ), domainList, '/10.178.98.210', 'groovy-email-is-awesome.com' ) 
 	    
 	    expect:
-	        ssWorker.serverName == "mail.shelfunit.info"
+	        ssWorker.fqServerName == "mail.shelfunit.info"
 	    
 	    def domain = "hot-groovy.com"
 	    when: "Sending SAML"
