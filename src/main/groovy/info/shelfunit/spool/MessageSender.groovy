@@ -9,7 +9,7 @@ class MessageSender {
         log.info "Starting new MessageSender"
     }
     
-    def doWork( input, output, messageRow, otherDomain, otherUserList, outboundDomain ) {
+    def doWork( input, output, messageRow, otherDomain, otherUserList, outboundDomain, greetingDomain ) {
         log.info "In doWork"
         log.info "output is a ${output.getClass().name}"
         def areWeDone = false
@@ -21,8 +21,8 @@ class MessageSender {
         log.info "Here is newString: ${newString}"
         // log.info "Here is messageRow: it's a ${messageRow.getClass().name}"
         // log.info "here are the keys: ${messageRow.keySet().toArray()}"
-        log.info "About to send: EHLO ${outboundDomain}"
-        output.send "EHLO ${outboundDomain}".checkForCRLF()
+        log.info "About to send: EHLO ${greetingDomain}"
+        output.send "EHLO ${greetingDomain}".checkForCRLF()
         def doneWith250 = false
         def commandList = []
         while ( _not( doneWith250 ) ) {

@@ -33,7 +33,7 @@ class MessageSenderSpec extends Specification {
     static gwString     = 'gw' + rString
     static jaString     = 'ja' + rString
     static tjString     = 'tj' + rString
-    static fromString   = gwString + '@' + domainList[ 0 ]
+    static fromString   = ''
     static gwBase64Hash = getBase64Hash( gwString, 'somePassword' )
     static uuidList     = []
     static params       = []
@@ -54,12 +54,14 @@ class MessageSenderSpec extends Specification {
         this.addUsers()
         config     = ConfigHolder.instance.getConfObject()
         domainList = this.buildServerList( config  )
+        fromString = gwString + '@' + domainList[ 1 ]
 
     }     // run before the first feature method
     
     def cleanupSpec() {
         sqlObject.execute "DELETE FROM email_user where username in ( ?, ?, ? )", [ gwString, jaString, tjString ]
         sqlObject.execute "DELETE FROM mail_spool_in where from_address = ?", [ fromString ]
+        println "about to delete from mail_spool_out where from address in ${fromString}, ${gwString}, ${jaString}, ${tjString} "
         sqlObject.execute "DELETE FROM mail_spool_out where from_address in (?, ?, ?, ?)", [ fromString, gwString, jaString, tjString ]
         sqlObject.close()
     }   // run after the last feature method
@@ -69,8 +71,8 @@ class MessageSenderSpec extends Specification {
         def tempServerList = [ argConfig.smtp.fq.server.name ]
         argConfig.smtp.server.name.isEmpty() ?: ( tempServerList += argConfig.smtp.server.name )
         argConfig.smtp.other.domains.isEmpty() ?: ( tempServerList += argConfig.smtp.other.domains )
-
         tempServerList.collect{ returnList << it.toLowerCase() }
+        println "Here is returnList: ${returnList}"
         return returnList
     }
     
@@ -83,13 +85,14 @@ class MessageSenderSpec extends Specification {
     def insertIntoMailSpoolOut( status, toAddress, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
         params.clear()
         params << uuid // id
-        params << gwString + '@' + domainList[ 0 ] // from_address, 
+        params << gwString + '@' + domainList[ 1 ] // from_address, 
         params << gwString // from_username, 
-        params << domainList[ 0 ] // from_domain,
+        params << domainList[ 1 ] // from_domain,
         params << toAddress    // to_address_list
         params << message      // text_body,
         params << status       // status_string,  
         params << gwBase64Hash // base_64_hash
+        println "entering message from ${gwString} to ${toAddress}" 
         sqlObject.execute "insert into mail_spool_out( " +
             "id, from_address, from_username, from_domain, " +
             "to_address_list, text_body, status_string, " +
@@ -123,11 +126,11 @@ class MessageSenderSpec extends Specification {
             InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 0 ] )
-            
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 1 ], domainList[ 0 ] )
+            println "Here is output.toString(): ${output.toString()}"
         then:
 	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n" +
-                "MAIL FROM:<${gwString}@${domainList[ 0 ]}>\r\n" +
+                "MAIL FROM:<${gwString}@${domainList[ 1 ]}>\r\n" +
                 "RCPT TO:<oneill@stargate.mil>\r\n" +
                 "DATA\r\n" +
                 "${messageString}\r\n" + 
@@ -144,7 +147,7 @@ class MessageSenderSpec extends Specification {
             def row           = this.getMessage( uuid )
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
-            "250-Hello ${domainList[ 0 ]}\r\n" +
+            "250-Hello ${domainList[ 1 ]}\r\n" +
             "250-DSN\r\n" +
             "250-8BITMIME\r\n"   +
             "250-AUTH PLAIN\r\n" + 
@@ -159,11 +162,11 @@ class MessageSenderSpec extends Specification {
             InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 0 ] )
-            
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 1 ], domainList[ 0 ] )
+            println "Here is output.toString(): ${output.toString()}"
         then:
 	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n"   + 
-                "MAIL FROM:<${gwString}@${domainList[ 0 ]}>\r\n" +
+                "MAIL FROM:<${gwString}@${domainList[ 1 ]}>\r\n" +
                 "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
                 "DATA\r\n" +
                 "${messageString}\r\n" + 
@@ -179,7 +182,7 @@ class MessageSenderSpec extends Specification {
             def row           = this.getMessage( uuid )
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
-            "250-Hello ${domainList[ 0 ]}\r\n" +
+            "250-Hello ${domainList[ 1 ]}\r\n" +
             // "250-DSN\r\n" +
             "250-8BITMIME\r\n"   +
             "250-AUTH PLAIN\r\n" + 
@@ -194,11 +197,12 @@ class MessageSenderSpec extends Specification {
             InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            mSender.doWork( input, output, row, 'stargate.mil', [ 'ONeill' ], domainList[ 0 ] )
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'ONeill' ], domainList[ 1 ], domainList[ 0 ] )
+            println "Here is output.toString(): ${output.toString()}"
             
         then:
 	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n"   +
-                "MAIL FROM:<${gwString}@${domainList[ 0 ]}>\r\n" +
+                "MAIL FROM:<${gwString}@${domainList[ 1 ]}>\r\n" +
                 // "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
                 "RCPT TO:<oneill@stargate.mil>\r\n" +
                 "DATA\r\n" +

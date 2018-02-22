@@ -73,6 +73,7 @@ task hello  {
 
 test {
     maxParallelForks = 5
+    // maxParallelForks = 1
     forkEvery = 50
     // this will make it run the test every time you run 'gradle test'
     outputs.upToDateWhen { false }

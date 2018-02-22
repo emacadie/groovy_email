@@ -71,8 +71,8 @@ class OutboundSpoolWorkerSpec extends Specification {
     }     // run before the first feature method
     
     def cleanupSpec() {
-        // sqlObject.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
-        // sqlObject.execute "DELETE FROM mail_spool_out where from_username like ?", [ '%' + rString ] 
+        sqlObject.execute "DELETE FROM email_user where username like ?", [ '%' + rString ]
+        sqlObject.execute "DELETE FROM mail_spool_out where from_username like ?", [ '%' + rString ] 
         sqlObject.close()
     }   // run after the last feature method
     
@@ -103,13 +103,14 @@ class OutboundSpoolWorkerSpec extends Specification {
     def insertIntoMailSpoolOut( status, toAddress, userName = gwString, message = getRandomString( 500 ), uuid = UUID.randomUUID(), userDomain = domainList[ 1 ] ) {
         params.clear() 
         params << uuid // id,
-        params << userName + '@' + domainList[ 0 ] // from_address
+        params << userName + '@' + domainList[ 1 ] // from_address
         params << userName // from_username, 
         params << userDomain // from_domain
         params << toAddress  // to_address_list
         params << message    // text_body
         params << status     // status_string
         params << gwBase64Hash // base_64_hash
+        println "entering message from ${userName} to ${toAddress}" 
         sqlObject.execute "insert into mail_spool_out( id, from_address, from_username, " +
             "from_domain, to_address_list, text_body, " +
             "status_string, base_64_hash ) values (?, ?, ?, ?, ?, ?, ?, ?)", 
@@ -316,8 +317,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 
     def "test domain of different case"() {
         def cleanCountStart = getTableCount( sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
-        println "domainList[ 0 ]: ${domainList[ 0 ]}"
-        println "domainList[ 0 ].toUpperCase(): ${domainList[ 0 ].toUpperCase()}"
+        println "domainList[ 1 ]: ${domainList[ 1 ]}"
+        println "domainList[ 1 ].toUpperCase(): ${domainList[ 1 ].toUpperCase()}"
         println "cleanCountStart: ${cleanCountStart}"
         sqlObject.eachRow( 'select from_address from mail_spool_out where status_string = ?', [ 'CLEAN' ] ) { row ->
             println "here is user name of clean message: ${row[ 'from_address' ]}"
@@ -334,9 +335,9 @@ class OutboundSpoolWorkerSpec extends Specification {
                 gwString,    // userName = gwString, 
                 getRandomString( 500 ), // message = getRandomString( 500 ), 
                 UUID.randomUUID(), // uuid = UUID.randomUUID(), 
-                domainList[ 0 ].toUpperCase()     // userDomain = domainList[ 0 ] 
+                domainList[ 1 ].toUpperCase()     // userDomain = domainList[ 0 ] 
             )
-            println "Inserted outward spool with domain name ${domainList[ 0 ].toUpperCase()}"
+            println "Inserted outward spool with domain name ${domainList[ 1 ].toUpperCase()}"
         }
         when:
             def newCleanCount = getTableCount( 

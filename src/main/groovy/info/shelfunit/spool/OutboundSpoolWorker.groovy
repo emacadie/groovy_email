@@ -161,7 +161,7 @@ class OutboundSpoolWorker {
                         socket.setSoTimeout( 10.minutes() )
                         socket.withStreams { input, output ->
                             def mSender = new MessageSender()
-                            mSender.doWork( input, output, row, otherDomain, otherUserList, domainList[ 0 ] )
+                            mSender.doWork( input, output, row, otherDomain, otherUserList, domainList[ 1 ], domainList[ 0 ] )
                         }
                     }
                 }
