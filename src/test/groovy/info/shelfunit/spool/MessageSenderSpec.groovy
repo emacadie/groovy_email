@@ -104,7 +104,13 @@ class MessageSenderSpec extends Specification {
         return sqlObject.firstRow( 'select * from mail_spool_out where id = ?', [ uuid ] )
     }
 
-    def "first test"() {
+        def "test domain names are correct"() {
+        expect:
+            domainList[ 0 ] == "mail.neutral.nt"
+            domainList[ 1 ] == "neutral.nt"
+    }
+
+    def "first mail test"() {
         setup:
             def uuid          = UUID.randomUUID()
             def messageString = 'q' * 500

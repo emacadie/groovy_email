@@ -129,6 +129,12 @@ class OutboundSpoolWorkerSpec extends Specification {
     // in the closure for Requires, you can use "properties" instead of "System.properties"
     // -Dclam.live.daemon=true
 
+    def "test domain names are correct"() {
+        expect:
+            domainList[ 0 ] == "mail.neutral.nt"
+            domainList[ 1 ] == "neutral.nt"
+    }
+
     @Requires({ properties[ 'clam.live.daemon' ] == 'true' })
     def "test with actual clam client running - default to ignore"() {
         when:
