@@ -28,7 +28,7 @@ class MessageSenderSpec extends Specification {
     def crlf = "\r\n"
     static sqlObject
     static config
-    static domainList   = [] // [ 'shelfunit.info', 'groovy-is-groovy.org' ]
+    static domainList   = [] 
     static rString      = getRandomString()
     static gwString     = 'gw' + rString
     static jaString     = 'ja' + rString
@@ -38,6 +38,8 @@ class MessageSenderSpec extends Specification {
     static uuidList     = []
     static params       = []
     static mSender      = new MessageSender()
+    static greetingDomain      = ''
+    static mainDomain          = ''
     static sqlCountString      = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
     static sqlCountStoreString = 'select count(*) from mail_store where from_address = ?'
    
@@ -52,9 +54,11 @@ class MessageSenderSpec extends Specification {
         ConfigHolder.instance.setConfObject( "src/test/resources/application.test.conf" )
         sqlObject = ConfigHolder.instance.getSqlObject() 
         this.addUsers()
-        config     = ConfigHolder.instance.getConfObject()
-        domainList = this.buildServerList( config  )
-        fromString = gwString + '@' + domainList[ 1 ]
+        config         = ConfigHolder.instance.getConfObject()
+        domainList     = this.buildServerList( config  )
+        greetingDomain = domainList[ 0 ]
+        mainDomain     = domainList[ 1 ]
+        fromString     = gwString + '@' + mainDomain
 
     }     // run before the first feature method
     
@@ -85,9 +89,9 @@ class MessageSenderSpec extends Specification {
     def insertIntoMailSpoolOut( status, toAddress, message = getRandomString( 500 ), uuid = UUID.randomUUID() ) {
         params.clear()
         params << uuid // id
-        params << gwString + '@' + domainList[ 1 ] // from_address, 
+        params << gwString + '@' + mainDomain // from_address, 
         params << gwString // from_username, 
-        params << domainList[ 1 ] // from_domain,
+        params << mainDomain   // from_domain,
         params << toAddress    // to_address_list
         params << message      // text_body,
         params << status       // status_string,  
@@ -106,8 +110,8 @@ class MessageSenderSpec extends Specification {
 
         def "test domain names are correct"() {
         expect:
-            domainList[ 0 ] == "mail.neutral.nt"
-            domainList[ 1 ] == "neutral.nt"
+            greetingDomain == "mail.neutral.nt"
+            mainDomain     == "neutral.nt"
     }
 
     def "first mail test"() {
@@ -118,7 +122,7 @@ class MessageSenderSpec extends Specification {
             def row           = this.getMessage( uuid )
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
-            "250-Hello ${domainList[ 0 ]}\r\n" +
+            "250-Hello ${greetingDomain}\r\n" +
             "250-8BITMIME\r\n"   +
             "250-AUTH PLAIN\r\n" + 
             "250 HELP\r\n"  +
@@ -132,11 +136,11 @@ class MessageSenderSpec extends Specification {
             InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 1 ], domainList[ 0 ] )
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], mainDomain, greetingDomain )
             println "Here is output.toString(): ${output.toString()}"
         then:
-	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n" +
-                "MAIL FROM:<${gwString}@${domainList[ 1 ]}>\r\n" +
+	        output.toString() == "EHLO ${greetingDomain}\r\n" +
+                "MAIL FROM:<${gwString}@${mainDomain}>\r\n" +
                 "RCPT TO:<oneill@stargate.mil>\r\n" +
                 "DATA\r\n" +
                 "${messageString}\r\n" + 
@@ -153,7 +157,7 @@ class MessageSenderSpec extends Specification {
             def row           = this.getMessage( uuid )
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
-            "250-Hello ${domainList[ 1 ]}\r\n" +
+            "250-Hello ${mainDomain}\r\n" +
             "250-DSN\r\n" +
             "250-8BITMIME\r\n"   +
             "250-AUTH PLAIN\r\n" + 
@@ -168,11 +172,11 @@ class MessageSenderSpec extends Specification {
             InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], domainList[ 1 ], domainList[ 0 ] )
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'oneill' ], mainDomain, greetingDomain )
             println "Here is output.toString(): ${output.toString()}"
         then:
-	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n"   + 
-                "MAIL FROM:<${gwString}@${domainList[ 1 ]}>\r\n" +
+	        output.toString() == "EHLO ${greetingDomain}\r\n"   + 
+                "MAIL FROM:<${gwString}@${mainDomain}>\r\n" +
                 "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
                 "DATA\r\n" +
                 "${messageString}\r\n" + 
@@ -188,7 +192,7 @@ class MessageSenderSpec extends Specification {
             def row           = this.getMessage( uuid )
         when:
             def bString = "220 stargte.mil Simple Mail Transfer Service Ready\r\n" + 
-            "250-Hello ${domainList[ 1 ]}\r\n" +
+            "250-Hello ${mainDomain}\r\n" +
             // "250-DSN\r\n" +
             "250-8BITMIME\r\n"   +
             "250-AUTH PLAIN\r\n" + 
@@ -203,12 +207,12 @@ class MessageSenderSpec extends Specification {
             InputStream input   = new ByteArrayInputStream( data )
             OutputStream output = new ByteArrayOutputStream() 
             
-            mSender.doWork( input, output, row, 'stargate.mil', [ 'ONeill' ], domainList[ 1 ], domainList[ 0 ] )
+            mSender.doWork( input, output, row, 'stargate.mil', [ 'ONeill' ], mainDomain, greetingDomain )
             println "Here is output.toString(): ${output.toString()}"
             
         then:
-	        output.toString() == "EHLO ${domainList[ 0 ]}\r\n"   +
-                "MAIL FROM:<${gwString}@${domainList[ 1 ]}>\r\n" +
+	        output.toString() == "EHLO ${greetingDomain}\r\n"   +
+                "MAIL FROM:<${gwString}@${mainDomain}>\r\n" +
                 // "RCPT TO:<oneill@stargate.mil> NOTIFY=NEVER\r\n" +
                 "RCPT TO:<oneill@stargate.mil>\r\n" +
                 "DATA\r\n" +

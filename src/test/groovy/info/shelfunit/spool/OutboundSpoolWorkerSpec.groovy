@@ -45,7 +45,8 @@ class OutboundSpoolWorkerSpec extends Specification {
     static OutboundSpoolWorker osw  = new OutboundSpoolWorker()
     static sqlCountString           = 'select count(*) from mail_spool_out where status_string = ? and from_address = ?'
     static sqlCountStoreString      = 'select count(*) from mail_store where from_address = ?'
-    
+    static greetingDomain           = ''
+    static mainDomain               = ''
     
     def setup() {
         println "\n--- Starting test ${name.methodName}"
@@ -63,6 +64,8 @@ class OutboundSpoolWorkerSpec extends Specification {
         def host         = config.clamav.hostname
         def port         = config.clamav.port
         realClamAVClient = this.createClamAVClient()
+        greetingDomain   = domainList[ 0 ]
+        mainDomain       = domainList[ 1 ]
         this.addUsers()
         // osw = new OutboundSpoolWorker()
         
@@ -131,15 +134,15 @@ class OutboundSpoolWorkerSpec extends Specification {
 
     def "test domain names are correct"() {
         expect:
-            domainList[ 0 ] == "mail.neutral.nt"
-            domainList[ 1 ] == "neutral.nt"
+            greetingDomain == "mail.neutral.nt"
+            mainDomain     == "neutral.nt"
     }
 
     @Requires({ properties[ 'clam.live.daemon' ] == 'true' })
     def "test with actual clam client running - default to ignore"() {
         when:
             def enteredCount = getTableCount( sqlObject, sqlCountString, [ 'ENTERED', fromString ] )
-            def cleanCount   = getTableCount( sqlObject, sqlCountString, [ 'CLEAN', fromString ] )
+            def cleanCount   = getTableCount( sqlObject, sqlCountString, [ 'CLEAN',   fromString ] )
         then:
             enteredCount == 7
             cleanCount   == 0
@@ -323,8 +326,8 @@ class OutboundSpoolWorkerSpec extends Specification {
 
     def "test domain of different case"() {
         def cleanCountStart = getTableCount( sqlObject, 'select count(*) from mail_spool_out where status_string = ?', [ 'CLEAN' ] )
-        println "domainList[ 1 ]: ${domainList[ 1 ]}"
-        println "domainList[ 1 ].toUpperCase(): ${domainList[ 1 ].toUpperCase()}"
+        println "mainDomain: ${mainDomain}"
+        println "mainDomain.toUpperCase(): ${mainDomain.toUpperCase()}"
         println "cleanCountStart: ${cleanCountStart}"
         sqlObject.eachRow( 'select from_address from mail_spool_out where status_string = ?', [ 'CLEAN' ] ) { row ->
             println "here is user name of clean message: ${row[ 'from_address' ]}"
@@ -338,10 +341,10 @@ class OutboundSpoolWorkerSpec extends Specification {
             insertIntoMailSpoolOut( 
                 'CLEAN',     // status, 
                 'rr@rr.com', // toAddress, 
-                gwString,    // userName = gwString, 
-                getRandomString( 500 ), // message = getRandomString( 500 ), 
-                UUID.randomUUID(), // uuid = UUID.randomUUID(), 
-                domainList[ 1 ].toUpperCase()     // userDomain = domainList[ 0 ] 
+                gwString,    // userName 
+                getRandomString( 500 ),  // message 
+                UUID.randomUUID(),       // uuid 
+                mainDomain.toUpperCase() // userDomain 
             )
             println "Inserted outward spool with domain name ${domainList[ 1 ].toUpperCase()}"
         }
